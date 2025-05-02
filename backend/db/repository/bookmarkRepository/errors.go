@@ -30,7 +30,7 @@ func errFindOne(err error, uid primitive.ObjectID, targetId primitive.ObjectID) 
 		ErrCode:    FindOne,
 		UserMsg:    "ブックマークが見つかりません",
 		Level:      logrus.InfoLevel,
-		Input:      fmt.Printf("{uid:%v,targetId:%v}", uid, targetId),
+		Input:      fmt.Sprintf("{uid:%v,targetId:%v}", uid, targetId),
 	})
 }
 
@@ -80,7 +80,7 @@ func errDuplicated(err error, uid primitive.ObjectID, lId primitive.ObjectID) *c
 		ErrCode:    Duplicated,
 		UserMsg:    "すでにブックマークされています",
 		Level:      logrus.InfoLevel,
-		Input:      fmt.Printf("{uid:%v,targetId:%v}", uid, lId),
+		Input:      fmt.Sprintf("{uid:%v,targetId:%v}", uid, lId),
 	})
 }
 
@@ -90,7 +90,7 @@ func errOnAddFind(err error, uid primitive.ObjectID, lId primitive.ObjectID) *cu
 		ErrCode:    ErrorOnAddFind,
 		UserMsg:    "ブックマーク追加に失敗しました",
 		Level:      logrus.ErrorLevel,
-		Input:      fmt.Printf("{uid:%v,targetId:%v}", uid, lId),
+		Input:      fmt.Sprintf("{uid:%v,targetId:%v}", uid, lId),
 	})
 }
 func errOnAdd(err error, uid primitive.ObjectID, lId primitive.ObjectID) *customError.Error {
@@ -99,7 +99,7 @@ func errOnAdd(err error, uid primitive.ObjectID, lId primitive.ObjectID) *custom
 		ErrCode:    ErrorOnAdd,
 		UserMsg:    "ブックマーク追加に失敗しました",
 		Level:      logrus.ErrorLevel,
-		Input:      fmt.Printf("{uid:%v,targetId:%v}", uid, lId),
+		Input:      fmt.Sprintf("{uid:%v,targetId:%v}", uid, lId),
 	})
 }
 func errDeleteOne(err error, uid primitive.ObjectID, lId primitive.ObjectID) *customError.Error {
@@ -108,7 +108,7 @@ func errDeleteOne(err error, uid primitive.ObjectID, lId primitive.ObjectID) *cu
 		ErrCode:    DeleteOne,
 		UserMsg:    "ブックマーク削除に失敗しました",
 		Level:      logrus.ErrorLevel,
-		Input:      fmt.Printf("{uid:%v,targetId:%v}", uid, lId),
+		Input:      fmt.Sprintf("{uid:%v,targetId:%v}", uid, lId),
 	})
 }
 func errOnDelete(err error, uid primitive.ObjectID, lId primitive.ObjectID) *customError.Error {
@@ -117,7 +117,7 @@ func errOnDelete(err error, uid primitive.ObjectID, lId primitive.ObjectID) *cus
 		ErrCode:    ErrOnDelete,
 		UserMsg:    "ブックマーク削除に失敗しました",
 		Level:      logrus.ErrorLevel,
-		Input:      fmt.Printf("{uid:%v,targetId:%v}", uid, lId),
+		Input:      fmt.Sprintf("{uid:%v,targetId:%v}", uid, lId),
 	})
 }
 func errFindRecommend(err error, uid primitive.ObjectID) *customError.Error {

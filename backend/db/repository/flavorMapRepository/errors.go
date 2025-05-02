@@ -62,7 +62,7 @@ func errGetVotedDataByLiquor(err error, uId primitive.ObjectID, lId primitive.Ob
 		ErrCode:    GetVotedDataByLiquor,
 		UserMsg:    errorMsg.SERVER,
 		Level:      logrus.ErrorLevel,
-		Input:      fmt.Printf("uId: %s, lId: %s, cId: %d", uId.Hex(), lId.Hex(), cId),
+		Input:      fmt.Sprintf("uId: %s, lId: %s, cId: %d", uId.Hex(), lId.Hex(), cId),
 	})
 }
 

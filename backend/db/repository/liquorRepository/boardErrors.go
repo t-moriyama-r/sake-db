@@ -45,7 +45,7 @@ func errBoardListByUser(err error, uId primitive.ObjectID, limit int) *customErr
 		ErrCode:    BoardListByUser,
 		UserMsg:    errorMsg.SERVER,
 		Level:      logrus.ErrorLevel,
-		Input:      fmt.Printf("uId: %v, limit: %d", uId, limit),
+		Input:      fmt.Sprintf("uId: %v, limit: %d", uId, limit),
 	})
 }
 func errBoardListByUserDecode(err error, uId primitive.ObjectID, limit int) *customError.Error {
@@ -54,7 +54,7 @@ func errBoardListByUserDecode(err error, uId primitive.ObjectID, limit int) *cus
 		ErrCode:    BoardListByUserDecode,
 		UserMsg:    errorMsg.SERVER,
 		Level:      logrus.ErrorLevel,
-		Input:      fmt.Printf("uId: %v, limit: %d", uId, limit),
+		Input:      fmt.Sprintf("uId: %v, limit: %d", uId, limit),
 	})
 }
 
@@ -64,7 +64,7 @@ func errBoardGetByUserAndLiquor(err error, liquorId primitive.ObjectID, userId p
 		ErrCode:    BoardGetByUserAndLiquor,
 		UserMsg:    errorMsg.SERVER,
 		Level:      logrus.ErrorLevel,
-		Input:      fmt.Printf("liquorId: %v, userId: %v", liquorId, userId),
+		Input:      fmt.Sprintf("liquorId: %v, userId: %v", liquorId, userId),
 	})
 }
 

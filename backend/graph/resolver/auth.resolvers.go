@@ -6,13 +6,12 @@ package resolver
 
 import (
 	"backend/graph/graphModel"
-	"backend/middlewares/customError"
 	"backend/service/authService"
 	"context"
 )
 
 // RegisterUser is the resolver for the registerUser field.
-func (r *mutationResolver) RegisterUser(ctx context.Context, input graphModel.RegisterInput) (*graphModel.AuthPayload, *customError.Error) {
+func (r *mutationResolver) RegisterUser(ctx context.Context, input graphModel.RegisterInput) (*graphModel.AuthPayload, error) {
 	//登録して、挿入したデータを受け取る
 	newUser, err := authService.RegisterUser(ctx, r.UserRepo, input)
 	if err != nil {
@@ -20,18 +19,18 @@ func (r *mutationResolver) RegisterUser(ctx context.Context, input graphModel.Re
 	}
 
 	//ログイン処理を流用する
-	u, err := r.Login(ctx, graphModel.LoginInput{
+	u, instantErr := r.Login(ctx, graphModel.LoginInput{
 		Email:    *newUser.Email,
 		Password: *input.Password,
 	})
-	if err != nil {
-		return nil, err
+	if instantErr != nil {
+		return nil, instantErr
 	}
 	return u, nil
 }
 
 // Login is the resolver for the login field.
-func (r *mutationResolver) Login(ctx context.Context, input graphModel.LoginInput) (*graphModel.AuthPayload, *customError.Error) {
+func (r *mutationResolver) Login(ctx context.Context, input graphModel.LoginInput) (*graphModel.AuthPayload, error) {
 	user, err := authService.LoginWithInput(ctx, getResponseWriter(ctx), input, &r.UserRepo, r.UserTokenConfig)
 	if err != nil {
 		return nil, err
@@ -41,7 +40,7 @@ func (r *mutationResolver) Login(ctx context.Context, input graphModel.LoginInpu
 }
 
 // RefreshToken 単にリフレッシュトークンの更新をするAPI(Vueストアにユーザーデータが存在しており、アクセストークンが切れた導線)
-func (r *mutationResolver) RefreshToken(ctx context.Context) (string, *customError.Error) {
+func (r *mutationResolver) RefreshToken(ctx context.Context) (string, error) {
 	token, err := authService.RefreshTokens(getHttpRequest(ctx), getResponseWriter(ctx), r.UserTokenConfig)
 	if err != nil {
 		return "", err
@@ -50,7 +49,7 @@ func (r *mutationResolver) RefreshToken(ctx context.Context) (string, *customErr
 }
 
 // LoginWithRefreshToken こちらはリフレッシュトークンを用いてログインするAPI(リロードなどでユーザーデータも同時取得する導線・実質再ログイン)
-func (r *mutationResolver) LoginWithRefreshToken(ctx context.Context) (*graphModel.AuthPayload, *customError.Error) {
+func (r *mutationResolver) LoginWithRefreshToken(ctx context.Context) (*graphModel.AuthPayload, error) {
 	userWithToken, err := authService.LoginWithRefreshToken(ctx, getHttpRequest(ctx), getResponseWriter(ctx), r.UserTokenConfig, &r.UserRepo)
 	if err != nil {
 		return nil, err
@@ -59,28 +58,36 @@ func (r *mutationResolver) LoginWithRefreshToken(ctx context.Context) (*graphMod
 }
 
 // Logout is the resolver for the logout field.
-func (r *mutationResolver) Logout(ctx context.Context) (bool, *customError.Error) {
-	return true, authService.DeleteRefreshToken(getResponseWriter(ctx))
+func (r *mutationResolver) Logout(ctx context.Context) (bool, error) {
+	err := authService.DeleteRefreshToken(getResponseWriter(ctx))
+	if err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
 // ResetEmail is the resolver for the resetEmail field.
-func (r *mutationResolver) ResetEmail(ctx context.Context, email string) (bool, *customError.Error) {
-	return authService.ResetEmail(ctx, r.UserRepo, email)
+func (r *mutationResolver) ResetEmail(ctx context.Context, email string) (bool, error) {
+	_, err := authService.ResetEmail(ctx, r.UserRepo, email)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
 // ResetExe is the resolver for the resetExe field.
-func (r *mutationResolver) ResetExe(ctx context.Context, token string, password string) (*graphModel.AuthPayload, *customError.Error) {
+func (r *mutationResolver) ResetExe(ctx context.Context, token string, password string) (*graphModel.AuthPayload, error) {
 	user, err := authService.PasswordResetExe(ctx, r.UserRepo, token, password)
 	if err != nil {
 		return nil, err
 	}
 	//ログイン処理も同時にする(トークン発行が必要)
-	lUser, err := r.Login(ctx, graphModel.LoginInput{
+	lUser, instantErr := r.Login(ctx, graphModel.LoginInput{
 		Email:    *user.Email,
 		Password: password,
 	})
-	if err != nil {
-		return nil, err
+	if instantErr != nil {
+		return nil, instantErr
 	}
 	return lUser, nil
 }

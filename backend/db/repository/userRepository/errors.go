@@ -77,7 +77,7 @@ func errSetPasswordTokenNotFound(email string, token string) *customError.Error 
 		ErrCode:    SetPasswordTokenNotFound,
 		UserMsg:    errorMsg.DATA,
 		Level:      logrus.InfoLevel,
-		Input:      fmt.Printf("email: %s, token: %s", email, token),
+		Input:      fmt.Sprintf("email: %s, token: %s", email, token),
 	})
 }
 
@@ -87,7 +87,7 @@ func errSetPasswordToken(err error, email string, token string) *customError.Err
 		ErrCode:    SetPasswordToken,
 		UserMsg:    errorMsg.DATA,
 		Level:      logrus.ErrorLevel,
-		Input:      fmt.Printf("email: %s, token: %s", email, token),
+		Input:      fmt.Sprintf("email: %s, token: %s", email, token),
 	})
 }
 

@@ -48,8 +48,8 @@ func getUserByInput(ctx context.Context, input graphModel.LoginInput, r *userRep
 	}
 
 	// パスワード検証
-	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(input.Password))
-	if err != nil {
+	rawErr := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(input.Password))
+	if rawErr != nil {
 		return nil, errLogin()
 	}
 	return user, nil

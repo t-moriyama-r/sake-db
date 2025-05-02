@@ -6,14 +6,13 @@ package resolver
 
 import (
 	"backend/graph/graphModel"
-	"backend/middlewares/customError"
 	"backend/service/userService"
 	"backend/util/helper"
 	"context"
 )
 
 // GetUserByID is the resolver for the getUserById field.
-func (r *queryResolver) GetUserByID(ctx context.Context, id string) (*graphModel.User, *customError.Error) {
+func (r *queryResolver) GetUserByID(ctx context.Context, id string) (*graphModel.User, error) {
 	uObjID, err := helper.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, err
@@ -26,14 +25,14 @@ func (r *queryResolver) GetUserByID(ctx context.Context, id string) (*graphModel
 }
 
 // GetUserByIDDetail is the resolver for the getUserByIdDetail field.
-func (r *queryResolver) GetUserByIDDetail(ctx context.Context, id string) (*graphModel.UserPageData, *customError.Error) {
+func (r *queryResolver) GetUserByIDDetail(ctx context.Context, id string) (*graphModel.UserPageData, error) {
 	uObjID, err := helper.ObjectIDFromHex(id) //BoardListByUserに必要なので･･････
 	if err != nil {
 		return nil, err
 	}
-	user, err := r.GetUserByID(ctx, id) //ユーザーデータ自体は通常のユーザーデータ取得メソッドを流用
-	if err != nil {
-		return nil, err
+	user, instantErr := r.GetUserByID(ctx, id) //ユーザーデータ自体は通常のユーザーデータ取得メソッドを流用
+	if instantErr != nil {
+		return nil, instantErr
 	}
 
 	//ここからはユーザーページに特異なデータ

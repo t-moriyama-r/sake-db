@@ -40,7 +40,7 @@ func errGetLogsByVersionNo(err error, cId int, versionNo int) *customError.Error
 		ErrCode:    GetLogsByVersionNo,
 		UserMsg:    errorMsg.DATA,
 		Level:      logrus.InfoLevel,
-		Input:      fmt.Printf("categoryId:%v,versionNo:%v", cId, versionNo),
+		Input:      fmt.Sprintf("categoryId:%v,versionNo:%v", cId, versionNo),
 	})
 }
 

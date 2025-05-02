@@ -4,7 +4,6 @@ import (
 	"backend/db/repository/userRepository"
 	"backend/middlewares/customError"
 	"context"
-	"errors"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -19,11 +18,11 @@ func setId(ctx context.Context, id primitive.ObjectID) context.Context {
 func GetId(ctx context.Context) (primitive.ObjectID, *customError.Error) {
 	rawId := ctx.Value(userContextKey)
 	if rawId == nil {
-		return primitive.NilObjectID, errId()
+		return primitive.NilObjectID, errNotFoundUser()
 	}
 	id := rawId.(primitive.ObjectID)
 	if id == primitive.NilObjectID {
-		return primitive.NilObjectID, errors.New("unauthorized")
+		return primitive.NilObjectID, errUnAuthorized(id)
 	}
 	return id, nil
 }
@@ -31,8 +30,8 @@ func GetId(ctx context.Context) (primitive.ObjectID, *customError.Error) {
 // GetIdNullable nil許容の場合
 func GetIdNullable(ctx context.Context) (*primitive.ObjectID, *customError.Error) {
 	id, err := GetId(ctx)
-	if err != nil {
-		return nil, errId()
+	if err != nil && err.ErrorCode != NotFoundUser { //なんか循環参照が起きるっぽいのでヘルパを使わない
+		return nil, err
 	}
 	if id == primitive.NilObjectID {
 		return nil, nil

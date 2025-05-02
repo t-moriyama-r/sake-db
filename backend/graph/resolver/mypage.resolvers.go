@@ -7,18 +7,21 @@ package resolver
 import (
 	"backend/graph/graphModel"
 	"backend/middlewares/auth"
-	"backend/middlewares/customError"
 	"backend/service/myPageService"
 	"context"
 )
 
 // UpdateUser is the resolver for the updateUser field.
-func (r *mutationResolver) UpdateUser(ctx context.Context, input graphModel.RegisterInput) (bool, *customError.Error) {
-	return myPageService.UpdateUser(ctx, r.UserRepo, input)
+func (r *mutationResolver) UpdateUser(ctx context.Context, input graphModel.RegisterInput) (bool, error) {
+	err := myPageService.UpdateUser(ctx, r.UserRepo, input)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
 // GetMyData is the resolver for the getMyData field.
-func (r *queryResolver) GetMyData(ctx context.Context) (*graphModel.User, *customError.Error) {
+func (r *queryResolver) GetMyData(ctx context.Context) (*graphModel.User, error) {
 	uId, err := auth.GetId(ctx)
 	if err != nil {
 		return nil, err

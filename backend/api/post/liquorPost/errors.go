@@ -48,12 +48,13 @@ func errParseTempID(err error) *customError.Error {
 		Level:      logrus.InfoLevel,
 	})
 }
-func errParseID(err error) *customError.Error {
+func errParseID(err error, id string) *customError.Error {
 	return customError.NewError(err, customError.Params{
 		StatusCode: http.StatusBadRequest,
 		ErrCode:    ParseID,
 		UserMsg:    "IDが不正です",
 		Level:      logrus.InfoLevel,
+		Input:      id,
 	})
 }
 

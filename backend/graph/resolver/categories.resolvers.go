@@ -6,13 +6,12 @@ package resolver
 
 import (
 	"backend/graph/graphModel"
-	"backend/middlewares/customError"
 	"backend/service/categoryService"
 	"context"
 )
 
 // Category is the resolver for the category field.
-func (r *queryResolver) Category(ctx context.Context, id int) (*graphModel.Category, *customError.Error) {
+func (r *queryResolver) Category(ctx context.Context, id int) (*graphModel.Category, error) {
 	//DB上に存在しないキーであり、gqlgenでしか書かない値なので一旦ハードコーディング。childrenを要求していた場合、子カテゴリを取得する。
 	if !r.Resolver.isFieldRequested(ctx, "children") {
 		category, err := r.CategoryRepo.GetCategoryByID(ctx, id)
@@ -30,7 +29,7 @@ func (r *queryResolver) Category(ctx context.Context, id int) (*graphModel.Categ
 }
 
 // Categories is the resolver for the categories field.
-func (r *queryResolver) Categories(ctx context.Context) ([]*graphModel.Category, *customError.Error) {
+func (r *queryResolver) Categories(ctx context.Context) ([]*graphModel.Category, error) {
 	// 構造化されたカテゴリ一覧を返す
 	categories, err := categoryService.LeveledCategoriesGet(ctx, &r.CategoryRepo)
 	if err != nil {
@@ -40,7 +39,7 @@ func (r *queryResolver) Categories(ctx context.Context) ([]*graphModel.Category,
 }
 
 // Histories is the resolver for the histories field.
-func (r *queryResolver) Histories(ctx context.Context, id int) (*graphModel.CategoryHistory, *customError.Error) {
+func (r *queryResolver) Histories(ctx context.Context, id int) (*graphModel.CategoryHistory, error) {
 	//まず対象のカテゴリ情報を取得
 	category, err := r.CategoryRepo.GetCategoryByID(ctx, id)
 	if err != nil {

@@ -8,7 +8,6 @@ import (
 	"backend/db/repository/bookmarkRepository"
 	"backend/graph/graphModel"
 	"backend/middlewares/auth"
-	"backend/middlewares/customError"
 	"backend/service/bookmarkService"
 	"context"
 	"errors"
@@ -17,7 +16,7 @@ import (
 )
 
 // AddBookMark is the resolver for the addBookMark field.
-func (r *mutationResolver) AddBookMark(ctx context.Context, id string) (bool, *customError.Error) {
+func (r *mutationResolver) AddBookMark(ctx context.Context, id string) (bool, error) {
 	uId, targetId, err := bookmarkService.GetPrimitiveIds(ctx, id)
 	if err != nil {
 		return false, err
@@ -26,11 +25,11 @@ func (r *mutationResolver) AddBookMark(ctx context.Context, id string) (bool, *c
 	if err != nil {
 		return false, err
 	}
-	return true, err
+	return true, nil
 }
 
 // RemoveBookMark is the resolver for the removeBookMark field.
-func (r *mutationResolver) RemoveBookMark(ctx context.Context, id string) (bool, *customError.Error) {
+func (r *mutationResolver) RemoveBookMark(ctx context.Context, id string) (bool, error) {
 	uId, targetId, err := bookmarkService.GetPrimitiveIds(ctx, id)
 	if err != nil {
 		return false, err
@@ -39,11 +38,11 @@ func (r *mutationResolver) RemoveBookMark(ctx context.Context, id string) (bool,
 	if err != nil {
 		return false, err
 	}
-	return true, err
+	return true, nil
 }
 
 // GetIsBookMarked is the resolver for the getIsBookMarked field.
-func (r *queryResolver) GetIsBookMarked(ctx context.Context, id string) (bool, *customError.Error) {
+func (r *queryResolver) GetIsBookMarked(ctx context.Context, id string) (bool, error) {
 	uId, targetId, err := bookmarkService.GetPrimitiveIds(ctx, id)
 	if err != nil {
 		return false, err
@@ -61,7 +60,7 @@ func (r *queryResolver) GetIsBookMarked(ctx context.Context, id string) (bool, *
 }
 
 // GetRecommendLiquorList is the resolver for the getRecommendLiquorList field.
-func (r *queryResolver) GetRecommendLiquorList(ctx context.Context) ([]*graphModel.Recommend, *customError.Error) {
+func (r *queryResolver) GetRecommendLiquorList(ctx context.Context) ([]*graphModel.Recommend, error) {
 	uId, err := auth.GetId(ctx)
 	if err != nil {
 		return nil, err
@@ -75,7 +74,7 @@ func (r *queryResolver) GetRecommendLiquorList(ctx context.Context) ([]*graphMod
 }
 
 // GetBookMarkList is the resolver for the getBookMarkList field.
-func (r *queryResolver) GetBookMarkList(ctx context.Context) ([]*graphModel.BookMarkListUser, *customError.Error) {
+func (r *queryResolver) GetBookMarkList(ctx context.Context) ([]*graphModel.BookMarkListUser, error) {
 	uId, err := auth.GetId(ctx)
 	if err != nil {
 		return nil, err
@@ -88,7 +87,7 @@ func (r *queryResolver) GetBookMarkList(ctx context.Context) ([]*graphModel.Book
 }
 
 // GetBookMarkedList is the resolver for the getBookMarkedList field.
-func (r *queryResolver) GetBookMarkedList(ctx context.Context, id string) ([]*graphModel.BookMarkListUser, *customError.Error) {
+func (r *queryResolver) GetBookMarkedList(ctx context.Context, id string) ([]*graphModel.BookMarkListUser, error) {
 	bList, err := bookmarkService.GetBookMarkedList(ctx, r.BookmarkRepo, id)
 	if err != nil {
 		return nil, err

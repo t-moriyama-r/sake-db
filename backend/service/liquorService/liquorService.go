@@ -6,6 +6,7 @@ import (
 	"backend/db/repository/liquorRepository"
 	"backend/db/repository/userRepository"
 	"backend/graph/graphModel"
+	"backend/middlewares/auth"
 	"backend/middlewares/customError"
 	"backend/service/categoryService"
 	"backend/service/userService"
@@ -21,9 +22,9 @@ func GetLiquor(ctx context.Context, lr liquorRepository.LiquorsRepository, cr ca
 	if err != nil {
 		return nil, errGetLiquorIdHex(err, id)
 	}
-	liquor, err := lr.GetLiquorById(ctx, lid)
-	if err != nil {
-		return nil, errGetLiquorId(err, lid)
+	liquor, cErr := lr.GetLiquorById(ctx, lid)
+	if cErr != nil {
+		return nil, cErr
 	}
 	//所属するカテゴリのリストを取得する
 	trails, cErr := categoryService.GetCategoryTrail(ctx, liquor.CategoryID, &cr)
@@ -46,20 +47,20 @@ func GetLiquor(ctx context.Context, lr liquorRepository.LiquorsRepository, cr ca
 	return result, nil
 }
 
-func PostBoard(ctx context.Context, lr liquorRepository.LiquorsRepository, ur userRepository.UsersRepository, input graphModel.BoardInput) (bool, *customError.Error) {
+func PostBoard(ctx context.Context, lr liquorRepository.LiquorsRepository, ur userRepository.UsersRepository, input graphModel.BoardInput) *customError.Error {
 	//バリデーション処理
 	if len(input.Text) > 500 {
-		return false, nil
+		return nil
 	}
 	if input.Rate != nil && (*input.Rate < 1 || *input.Rate > 5) {
-		return false, nil
+		return nil
 	}
 
 	var userID *primitive.ObjectID                //名無しの可能性がある
 	user, err := userService.GetUserData(ctx, ur) //未ログイン状態ならuserIDはnilになる
 
-	if err != nil {
-		return false, err
+	if auth.IsErrWithoutAuth(err) {
+		return err
 	}
 
 	if user != nil {
@@ -68,7 +69,7 @@ func PostBoard(ctx context.Context, lr liquorRepository.LiquorsRepository, ur us
 
 	lId, e := primitive.ObjectIDFromHex(input.LiquorID)
 	if e != nil {
-		return false, errPostBoardObjectIDFromHex(e, input.LiquorID)
+		return errPostBoardObjectIDFromHex(e, input.LiquorID)
 	}
 
 	//挿入するデータを準備
@@ -96,9 +97,9 @@ func PostBoard(ctx context.Context, lr liquorRepository.LiquorsRepository, ur us
 		return true, nil
 	})
 	if e != nil {
-		return false, errPostBoard(e, model)
+		return errPostBoard(e, model)
 	}
-	return true, nil
+	return nil
 }
 
 func GetLiquorHistories(ctx context.Context, r liquorRepository.LiquorsRepository, id string) (*graphModel.LiquorHistory, *customError.Error) {

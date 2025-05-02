@@ -1,11 +1,13 @@
 package authService
 
 import (
+	"backend/db/repository/userRepository"
 	"backend/middlewares/customError"
 	"backend/middlewares/customError/errorMsg"
 	"errors"
 	"fmt"
 	"github.com/sirupsen/logrus"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"net/http"
 )
 
@@ -78,6 +80,8 @@ func errLogin() *customError.Error {
 const (
 	GenerateFromPassword = "AUTH-PASSWORD-RESET-001-GenerateFromPassword"
 	SendPasswordReset    = "AUTH-PASSWORD-RESET-002-SendPasswordReset"
+	GenerateAccessToken  = "AUTH-PASSWORD-RESET-003-GenerateAccessToken"
+	GenerateRefreshToken = "AUTH-PASSWORD-RESET-004-GenerateRefreshToken"
 )
 
 func errGenerateFromPassword(err error) *customError.Error {
@@ -95,6 +99,70 @@ func errSendPasswordReset(err error, email string, token string) *customError.Er
 		ErrCode:    SendPasswordReset,
 		UserMsg:    errorMsg.SERVER,
 		Level:      logrus.ErrorLevel,
-		Input:      fmt.Printf("email: %s, token: %s", email, token),
+		Input:      fmt.Sprintf("email: %s, token: %s", email, token),
+	})
+}
+
+func errGenerateAccessToken(err error, id primitive.ObjectID) *customError.Error {
+	return customError.NewError(err, customError.Params{
+		StatusCode: http.StatusInternalServerError,
+		ErrCode:    GenerateAccessToken,
+		UserMsg:    errorMsg.SERVER,
+		Level:      logrus.ErrorLevel,
+		Input:      id,
+	})
+}
+
+func errGenerateRefreshToken(err error, id primitive.ObjectID) *customError.Error {
+	return customError.NewError(err, customError.Params{
+		StatusCode: http.StatusInternalServerError,
+		ErrCode:    GenerateRefreshToken,
+		UserMsg:    errorMsg.SERVER,
+		Level:      logrus.ErrorLevel,
+		Input:      id,
+	})
+}
+
+const (
+	NeedPassword  = "AUTH-Register-001-NeedPassword"
+	FailHash      = "AUTH-Register-002-FailHash"
+	DuplicateMail = "AUTH-Register-003-DuplicateMail"
+	FailRegister  = "AUTH-Register-004-FailRegister"
+)
+
+func errNeedPassword() *customError.Error {
+	return customError.NewError(errors.New("パスワードは必須です"), customError.Params{
+		StatusCode: http.StatusBadRequest,
+		ErrCode:    NeedPassword,
+		UserMsg:    "パスワードは必須です",
+		Level:      logrus.InfoLevel,
+	})
+}
+func errFailHash(err error) *customError.Error {
+	return customError.NewError(err, customError.Params{
+		StatusCode: http.StatusInternalServerError,
+		ErrCode:    FailHash,
+		UserMsg:    errorMsg.SERVER,
+		Level:      logrus.FatalLevel,
+	})
+}
+
+func errDuplicateMail(u userRepository.Model) *customError.Error {
+	return customError.NewError(errors.New("このメールアドレスは既に登録されています。"), customError.Params{
+		StatusCode: http.StatusInternalServerError,
+		ErrCode:    DuplicateMail,
+		UserMsg:    "このメールアドレスは既に登録されています。",
+		Level:      logrus.InfoLevel,
+		Input:      u,
+	})
+}
+
+func errFailRegister(cErr *customError.Error, u userRepository.Model) *customError.Error {
+	return customError.NewError(cErr, customError.Params{
+		StatusCode: http.StatusInternalServerError,
+		ErrCode:    FailRegister,
+		UserMsg:    "ユーザー登録に失敗しました。",
+		Level:      logrus.ErrorLevel,
+		Input:      u,
 	})
 }

@@ -7,7 +7,6 @@ package resolver
 import (
 	"backend/graph/graphModel"
 	"backend/middlewares/auth"
-	"backend/middlewares/customError"
 	"backend/service/flavorMapService"
 	"backend/util/helper"
 	"backend/util/utilType"
@@ -15,17 +14,20 @@ import (
 )
 
 // PostFlavor is the resolver for the postFlavor field.
-func (r *mutationResolver) PostFlavor(ctx context.Context, input graphModel.PostFlavorMap) (bool, *customError.Error) {
+func (r *mutationResolver) PostFlavor(ctx context.Context, input graphModel.PostFlavorMap) (bool, error) {
 	//マスタが存在するのを確認したので、フレーバーマップを更新する
 	err := flavorMapService.PostFlavorMap(ctx, &r.FlavorMapMstRepo, &r.FlavorLiqRepo, &r.FlavorMapRepo, &r.CategoryRepo, &r.LiquorRepo, input, utilType.Coordinates{
 		X: input.X,
 		Y: input.Y,
 	})
-	return err == nil, err
+	if err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
 // GetFlavorMap is the resolver for the getFlavorMap field.
-func (r *queryResolver) GetFlavorMap(ctx context.Context, liquorID string) (*graphModel.FlavorMapData, *customError.Error) {
+func (r *queryResolver) GetFlavorMap(ctx context.Context, liquorID string) (*graphModel.FlavorMapData, error) {
 	lId, err := helper.ObjectIDFromHex(liquorID)
 	if err != nil {
 		return nil, err
@@ -43,7 +45,7 @@ func (r *queryResolver) GetFlavorMap(ctx context.Context, liquorID string) (*gra
 }
 
 // GetVoted is the resolver for the getVoted field.
-func (r *queryResolver) GetVoted(ctx context.Context, liquorID string) (*graphModel.VotedData, *customError.Error) {
+func (r *queryResolver) GetVoted(ctx context.Context, liquorID string) (*graphModel.VotedData, error) {
 	uId, err := auth.GetId(ctx)
 	if err != nil {
 		return nil, err

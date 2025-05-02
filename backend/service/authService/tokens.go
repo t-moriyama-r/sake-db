@@ -20,7 +20,7 @@ func parseRefreshToken(req *http.Request, tokenConfig tokenConfig.TokenConfig) (
 	}
 
 	// リフレッシュトークンの検証
-	token, err := jwt.ParseWithClaims(cookie.Value, &auth.Claims{}, func(t *jwt.Token) (interface{}, *customError.Error) {
+	token, err := jwt.ParseWithClaims(cookie.Value, &auth.Claims{}, func(t *jwt.Token) (interface{}, error) {
 		return tokenConfig.RefreshSecretKey, nil
 	})
 	if err != nil {

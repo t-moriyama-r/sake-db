@@ -2,6 +2,7 @@ package userRepository
 
 import (
 	"backend/graph/graphModel"
+	"backend/util/helper"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"time"
 )
@@ -35,7 +36,7 @@ func (m *Model) ToGraphQL() *graphModel.User {
 	return &graphModel.User{
 		ID:          m.ID.Hex(),
 		Name:        m.Name,
-		Email:       *m.Email,
+		Email:       helper.NilToZero(m.Email),
 		ImageBase64: m.ImageBase64,
 		Profile:     m.Profile,
 		Roles:       m.Roles,

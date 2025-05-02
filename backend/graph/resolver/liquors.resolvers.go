@@ -7,7 +7,6 @@ package resolver
 import (
 	"backend/graph/graphModel"
 	"backend/middlewares/auth"
-	"backend/middlewares/customError"
 	"backend/service/categoryService"
 	"backend/service/liquorService"
 	"backend/service/userService"
@@ -15,17 +14,25 @@ import (
 )
 
 // PostBoard is the resolver for the postBoard field.
-func (r *mutationResolver) PostBoard(ctx context.Context, input graphModel.BoardInput) (bool, *customError.Error) {
-	return liquorService.PostBoard(ctx, r.LiquorRepo, r.UserRepo, input)
+func (r *mutationResolver) PostBoard(ctx context.Context, input graphModel.BoardInput) (bool, error) {
+	err := liquorService.PostBoard(ctx, r.LiquorRepo, r.UserRepo, input)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
 // Liquor is the resolver for the liquor field.
-func (r *queryResolver) Liquor(ctx context.Context, id string) (*graphModel.Liquor, *customError.Error) {
-	return liquorService.GetLiquor(ctx, r.LiquorRepo, r.CategoryRepo, id)
+func (r *queryResolver) Liquor(ctx context.Context, id string) (*graphModel.Liquor, error) {
+	result, err := liquorService.GetLiquor(ctx, r.LiquorRepo, r.CategoryRepo, id)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }
 
 // RandomRecommendList is the resolver for the randomRecommendList field.
-func (r *queryResolver) RandomRecommendList(ctx context.Context, limit int) ([]*graphModel.Liquor, *customError.Error) {
+func (r *queryResolver) RandomRecommendList(ctx context.Context, limit int) ([]*graphModel.Liquor, error) {
 	collection, err := r.LiquorRepo.GetRandomLiquors(ctx, limit)
 	if err != nil {
 		return nil, err
@@ -41,7 +48,7 @@ func (r *queryResolver) RandomRecommendList(ctx context.Context, limit int) ([]*
 }
 
 // ListFromCategory is the resolver for the listFromCategory field.
-func (r *queryResolver) ListFromCategory(ctx context.Context, categoryID int) (*graphModel.ListFromCategory, *customError.Error) {
+func (r *queryResolver) ListFromCategory(ctx context.Context, categoryID int) (*graphModel.ListFromCategory, error) {
 	ids, err := categoryService.GetBelongCategoryIdList(ctx, categoryID, &r.CategoryRepo)
 	if err != nil {
 		return nil, err
@@ -68,21 +75,29 @@ func (r *queryResolver) ListFromCategory(ctx context.Context, categoryID int) (*
 		Liquors:             liquors,
 	}
 
-	return result, err
+	return result, nil
 }
 
 // LiquorHistories is the resolver for the liquorHistories field.
-func (r *queryResolver) LiquorHistories(ctx context.Context, id string) (*graphModel.LiquorHistory, *customError.Error) {
-	return liquorService.GetLiquorHistories(ctx, r.LiquorRepo, id)
+func (r *queryResolver) LiquorHistories(ctx context.Context, id string) (*graphModel.LiquorHistory, error) {
+	result, err := liquorService.GetLiquorHistories(ctx, r.LiquorRepo, id)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }
 
 // Board TODO:ページネーション
-func (r *queryResolver) Board(ctx context.Context, liquorID string, page *int) ([]*graphModel.BoardPost, *customError.Error) {
-	return liquorService.GetBoard(ctx, r.LiquorRepo, liquorID, page)
+func (r *queryResolver) Board(ctx context.Context, liquorID string, page *int) ([]*graphModel.BoardPost, error) {
+	result, err := liquorService.GetBoard(ctx, r.LiquorRepo, liquorID, page)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }
 
 // GetMyBoard 自身の投稿を取得する(初期値設定用)
-func (r *queryResolver) GetMyBoard(ctx context.Context, liquorID string) (*graphModel.BoardPost, *customError.Error) {
+func (r *queryResolver) GetMyBoard(ctx context.Context, liquorID string) (*graphModel.BoardPost, error) {
 	//未ログイン時にも呼ばれる関数であり、未ログインはエラーなしで空値を返すという処理をする必要がある
 	isLogin := userService.IsLogin(ctx)
 	if isLogin == false {

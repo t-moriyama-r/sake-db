@@ -44,7 +44,7 @@ func errGetLogsByVer(err error, id string, versionNo int) *customError.Error {
 		ErrCode:    GetLogsByVer,
 		UserMsg:    "バージョン取得に失敗しました",
 		Level:      logrus.ErrorLevel,
-		Input:      fmt.Printf("id:%v,version:%v", id, versionNo),
+		Input:      fmt.Sprintf("id:%v,version:%v", id, versionNo),
 	})
 }
 func errToBsonForInsert(err error) *customError.Error {

@@ -57,8 +57,8 @@ func (h *Handler) Post(c *gin.Context, ur *userRepository.UsersRepository) (*str
 	if request.Id != nil {
 		//更新時のみ行う処理
 		lId, HexErr := primitive.ObjectIDFromHex(*request.Id)
-		if err != nil {
-			return nil, errParseID(HexErr)
+		if HexErr != nil {
+			return nil, errParseID(HexErr, *request.Id)
 		}
 		//logsに代入する現在のドキュメントを取得する
 		old, err = h.LiquorsRepo.GetLiquorById(ctx, lId)

@@ -34,7 +34,7 @@ func errNotFound(err error, lId primitive.ObjectID, cId int) *customError.Error 
 		ErrCode:    NotFound,
 		UserMsg:    errorMsg.DATA,
 		Level:      logrus.InfoLevel,
-		Input:      fmt.Printf("lId: %s, cId: %d", lId.Hex(), cId),
+		Input:      fmt.Sprintf("lId: %s, cId: %d", lId.Hex(), cId),
 	})
 }
 func errCursor(err error) *customError.Error {

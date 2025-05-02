@@ -9,15 +9,15 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func UpdateUser(ctx context.Context, r userRepository.UsersRepository, input graphModel.RegisterInput) (bool, *customError.Error) {
+func UpdateUser(ctx context.Context, r userRepository.UsersRepository, input graphModel.RegisterInput) *customError.Error {
 	loginUser, err := userService.GetUserData(ctx, r) //未ログイン状態ならuserIDはnilになる
 	if err != nil {
-		return false, err
+		return err
 	}
 	id := loginUser.ID
 	oldUser, err := r.GetById(ctx, id)
 	if err != nil {
-		return false, err
+		return err
 	}
 
 	//新しいパスワードを生成する(入力が空であれば前の値を代入する)
@@ -25,13 +25,13 @@ func UpdateUser(ctx context.Context, r userRepository.UsersRepository, input gra
 
 	if input.Password != nil && len(*input.Password) != 0 { //空文字もnilと同等に扱う
 		if len(*input.Password) < 8 {
-			return false, errTooShortPassword()
+			return errTooShortPassword()
 		}
 		//パスワードをハッシュする
 		p, rawErr := bcrypt.GenerateFromPassword([]byte(*input.Password), bcrypt.DefaultCost)
 		newPassword = p //直接代入しようとしてもうまくいかないっぽい
 		if rawErr != nil {
-			return false, errGenerateFromPassword(rawErr)
+			return errGenerateFromPassword(rawErr)
 		}
 	} else {
 		newPassword = oldUser.Password
@@ -48,8 +48,8 @@ func UpdateUser(ctx context.Context, r userRepository.UsersRepository, input gra
 
 	err = r.Update(ctx, user)
 	if err != nil {
-		return false, nil
+		return err
 	}
 
-	return true, nil
+	return nil
 }

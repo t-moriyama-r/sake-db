@@ -61,7 +61,7 @@ func ResetEmail(ctx context.Context, r userRepository.UsersRepository, email str
 	//生成したトークンからメールを作り送信する
 	err := ses.SendPasswordReset(ctx, email, token)
 	if err != nil {
-		return false, errSendPasswordReset(err)
+		return false, errSendPasswordReset(err, email, token)
 	}
 	return true, nil
 }

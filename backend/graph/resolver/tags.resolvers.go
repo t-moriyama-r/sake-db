@@ -8,13 +8,12 @@ import (
 	"backend/db/repository/liquorRepository"
 	"backend/graph/graphModel"
 	"backend/middlewares/auth"
-	"backend/middlewares/customError"
 	"backend/util/helper"
 	"context"
 )
 
 // PostTag is the resolver for the postTag field.
-func (r *mutationResolver) PostTag(ctx context.Context, input graphModel.TagInput) (*graphModel.Tag, *customError.Error) {
+func (r *mutationResolver) PostTag(ctx context.Context, input graphModel.TagInput) (*graphModel.Tag, error) {
 	uId, err := auth.GetId(ctx)
 	if err != nil {
 		return nil, err
@@ -31,7 +30,7 @@ func (r *mutationResolver) PostTag(ctx context.Context, input graphModel.TagInpu
 }
 
 // DeleteTag is the resolver for the deleteTag field.
-func (r *mutationResolver) DeleteTag(ctx context.Context, id string) (bool, *customError.Error) {
+func (r *mutationResolver) DeleteTag(ctx context.Context, id string) (bool, error) {
 	tId, err := helper.ObjectIDFromHex(id)
 	if err != nil {
 		return false, err
@@ -44,7 +43,7 @@ func (r *mutationResolver) DeleteTag(ctx context.Context, id string) (bool, *cus
 }
 
 // GetTags is the resolver for the getTags field.
-func (r *queryResolver) GetTags(ctx context.Context, liquorID string) ([]*graphModel.Tag, *customError.Error) {
+func (r *queryResolver) GetTags(ctx context.Context, liquorID string) ([]*graphModel.Tag, error) {
 	tId, err := helper.ObjectIDFromHex(liquorID)
 	if err != nil {
 		return nil, err

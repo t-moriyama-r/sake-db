@@ -44,13 +44,13 @@ func GenerateTokens(writer http.ResponseWriter, id primitive.ObjectID, tokenConf
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, accessClaims)
 	accessString, err := accessToken.SignedString(tokenConfig.AccessSecretKey)
 	if err != nil {
-		return nil, err
+		return nil, errGenerateAccessToken(err, id)
 	}
 
 	// リフレッシュトークン
-	err = resetRefreshToken(writer, id, tokenConfig)
-	if err != nil {
-		return nil, err
+	cErr := resetRefreshToken(writer, id, tokenConfig)
+	if cErr != nil {
+		return nil, cErr
 	}
 
 	return &accessString, nil
@@ -71,16 +71,14 @@ func DeleteRefreshToken(writer http.ResponseWriter) *customError.Error {
 	return nil
 }
 
-// RegisterUser is the resolver for the registerUser field.
 func RegisterUser(ctx context.Context, r userRepository.UsersRepository, input graphModel.RegisterInput) (*userRepository.Model, *customError.Error) {
-	//TODO: なんかロジックが大きいのでサービス層に分離すべきな気がする
 	if input.Password == nil {
-		return nil, errors.New("パスワードは必須です")
+		return nil, errNeedPassword()
 	}
 	//パスワードをハッシュする
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(*input.Password), bcrypt.DefaultCost)
 	if err != nil {
-		return nil, err
+		return nil, errFailHash(err)
 	}
 
 	//ユーザー構造体の定義
@@ -94,16 +92,16 @@ func RegisterUser(ctx context.Context, r userRepository.UsersRepository, input g
 	}
 
 	//登録して、挿入したデータを受け取る
-	newUser, err := r.Register(ctx, &user)
-	if err != nil {
+	newUser, cErr := r.Register(ctx, &user)
+	if cErr != nil {
 		// MongoDBエラーかつ重複エラーかを判定
 		var mongoErr mongo.WriteException
-		if errors.As(err, &mongoErr) {
+		if errors.As(cErr.RawErr, &mongoErr) {
 			if len(mongoErr.WriteErrors) > 0 && mongoErr.WriteErrors[0].Code == 11000 {
-				return nil, errors.New("このメールアドレスは既に登録されています。")
+				return nil, errDuplicateMail(user)
 			}
 		}
-		return nil, errors.New("ユーザー登録に失敗しました。")
+		return nil, errFailRegister(cErr, user)
 	}
 	return newUser, nil
 }

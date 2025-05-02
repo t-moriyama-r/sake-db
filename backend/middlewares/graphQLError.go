@@ -20,7 +20,7 @@ func GraphQLErrorPresenter(ctx context.Context, err error) *gqlerror.Error {
 
 	// customError を作成
 	var customErr *customError.Error
-	if !errors.As(err, &customErr) {
+	if err != nil && !errors.As(err, &customErr) {
 		// 未定義のエラーが存在するので、エラーコードを設定
 		customErr = &customError.Error{
 			ID:          fmt.Sprintf("error-%d", time.Now().Unix()),
