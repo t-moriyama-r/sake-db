@@ -10,6 +10,7 @@
 | backend/tmp               | なんかで自動生成されたやつ。デバッガとか？|
 | const            | グローバルな定数。共通エラーメッセージとか。    |
 | db            | DB関連。リポジトリ層もここで定義。   |
+| **db/repository**            | リポジトリ層のロジックはここ。   |
 | di            | DI関連。最初よく分からず作ってたので正直中身は要リファクタだと思う。   |
 | graph            | GraphQL関連。メインで触るディレクトリの1つ。   |
 | graph/generated            |自動生成されたファイルが出力される。触らない。   |
@@ -32,3 +33,79 @@
 |validator| Ginのデフォルト(binding)で対応できないものに対応するために導入されている。基本は使用を避ける。|
 |logrus|ログに使用|
 |mongo-driver|ORM|
+
+## 基本思想
+### リゾルバ(コントローラー)
+主にコントローラーとして使い、サービス層を組み合わせて呼び出す。<br>
+非常に軽微な処理であれば処理を直書きしても可だが、基本的にはNG。<br>
+また、エラーは`*customError.Error`型を返すこと。
+
+### モデル
+`repository`配下それぞれの`model.go`に基本的に記載されている。<br>
+ドメインとしては同じだが明らかにモデルとして異なる(例えばliquor内の一言掲示板とかはliquorに属するがテーブルとしては別)場合は別のモデルを定義していたりする。(中でディレクトリ切った方がいい説ある...)<br>
+
+### リポジトリ層
+モデルと並列に定義されている。DB操作はすべてここに集約する。
+
+### サービス層
+`service`配下にわかりやすくまとめる。基本ロジックがここに書かれる。
+
+## 開発手順
+### 新規リゾルバ定義時(新しいエンドポイントが欲しい時)
+1. `schema/*.graphqls`を編集する。取得系は`Query`、更新系は`Mutation`を`extend`して定義すればOK。<br>
+返却型はtypeを使って定義する。<br>
+<br>
+```graphqls
+# typeの例
+type ListFromCategory{
+  categoryName:String!
+  categoryDescription:String
+  liquors:[Liquor]!
+}
+
+# こんな風に列挙する
+extend type Query {
+  liquor(id: String!): Liquor!
+  randomRecommendList(limit: Int!): [Liquor!]! #ランダムなリスト
+  listFromCategory(categoryId: Int!): ListFromCategory! #カテゴリで絞り込んだリスト
+  liquorHistories(id: String!):LiquorHistory #編集時に実行する、バージョン履歴つきのデータ
+  board(liquorId: String!,page:Int):[BoardPost!]
+  getMyBoard(liquorId: String!):BoardPost @optionalAuth #未ログイン時にも呼ばれるのでoptionalに
+}
+
+# 更新も同様
+extend type Mutation{
+  postBoard(input: BoardInput!):Boolean! @optionalAuth
+}
+```
+<br>
+2. コードを生成する<br>
+`gqlgen generate`で`graph/resolver`配下にリゾルバが自動生成されるので処理を書けばOK。**ルーティングとか意識しなくてOK。**<br>
+<br>
+3. エラーハンドリング<br>
+とりあえず`*customError.Error`型を返せばエラーハンドリングはよしなにやってくれる想定でOK。<br>
+基本的には各ロジックファイルに並列で定義されている`errors.go`で管理する。
+
+```go
+// こんな風に一意になるエラーコードを定義する
+const (
+	NotFoundMstData        = "FLAVOR-SERVICE-001-GetFlavorMasterData"
+	NotFound               = "FLAVOR-SERVICE-002-NotFound"
+	Cursor                 = "FLAVOR-SERVICE-003-Cursor"
+	InsertOne              = "FLAVOR-SERVICE-004-InsertOne"
+	PostFlavorMapIdFromHex = "FLAVOR-SERVICE-005-PostFlavorMapIdFromHex"
+)
+
+func errNotFound(err error, lId primitive.ObjectID, cId int) *customError.Error {
+  // 第一引数に生のエラーを渡す。特にエラーオブジェクトがないパターン(論理的エラー)の場合はテキトーに新しく定義してOK。
+	return customError.NewError(err, customError.Params{
+		StatusCode: http.StatusBadRequest, // GraphQLは仕様上全て200で返るため、自分で定義する
+		ErrCode:    NotFound, // エラーコードを渡す 
+		UserMsg:    errorMsg.DATA, // フロントに表示させたいメッセージを定義。errorMsgは汎用エラーメッセージ。
+		Level:      logrus.InfoLevel, // ロガーに対してレベルを定義。InfoLevelならDBに残さない軽微なエラー。ありえない動線のエラーはError以上にしてDBに登録する。
+		Input:      fmt.Sprintf("lId: %s, cId: %d", lId.Hex(), cId), // ログに残す目的で入力値を保存しておく。
+	})
+}
+```
+
+基本的にエラーごとに関数を1つ作る構成にしてる。相当ダルいが仕方ない......
