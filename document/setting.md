@@ -21,11 +21,10 @@
 | .husky          | lefthookに移行したはずなので使ってないはず。そのうち消します。       |
 
 ## 環境構築
-### コンテナ
 (正直あんま構造覚えてないので、誰かが環境構築する際に一緒にやりたい...)<br>
-<br>
+### コンテナ
+`docker compose up -d`を実行する
 
-`docker compose up -d`
 ![image](https://github.com/user-attachments/assets/8b2ad7ce-5e21-4871-bd1e-fc0544b85d60)
 
 この4つのイメージが作成されるはず。
