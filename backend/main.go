@@ -4,6 +4,7 @@ import (
 	"backend/db/indexes"
 	"backend/di"
 	"backend/util/helper"
+	"backend/util/validator"
 	"log"
 )
 
@@ -19,6 +20,8 @@ func main() {
 	if err != nil {
 		log.Fatal("Failed to initialize indexes:", err)
 	}
+
+	validator.Init()
 
 	log.Println("connect to http://localhost:8080/query for GraphQL playground")
 	log.Println(server.Run(":8080"))

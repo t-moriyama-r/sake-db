@@ -8,7 +8,7 @@ import (
 var youtubeURLRegex = regexp.MustCompile(`^(https?://)?(www\.)?(youtube\.com|youtu\.be)/(watch\?v=|embed/|v/|.+\?v=)?([^&=%\?]{11})$`)
 
 // YoutubeURL バリデーション
-func YoutubeURL(fl validator.FieldLevel) bool {
+func youtubeURL(fl validator.FieldLevel) bool {
 	url := fl.Field().String()
 	return youtubeURLRegex.MatchString(url)
 }
