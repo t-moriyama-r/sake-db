@@ -67,7 +67,7 @@ func errNotFoundUser() *customError.Error {
 	return customError.NewError(errors.New("ユーザーIDがが見つかりません"), customError.Params{
 		StatusCode: http.StatusUnauthorized,
 		ErrCode:    NotFoundUser,
-		UserMsg:    "ユーザーIDがが見つかりません",
+		UserMsg:    "ユーザーIDが見つかりません",
 		Level:      logrus.InfoLevel,
 	})
 }
@@ -75,7 +75,7 @@ func errUnAuthorized(id primitive.ObjectID) *customError.Error {
 	return customError.NewError(errors.New("ユーザーIDがが見つかりません"), customError.Params{
 		StatusCode: http.StatusUnauthorized,
 		ErrCode:    UnAuthorized,
-		UserMsg:    "ユーザーIDがが見つかりません",
+		UserMsg:    "ユーザーIDが見つかりません",
 		Level:      logrus.InfoLevel,
 		Input:      id,
 	})
