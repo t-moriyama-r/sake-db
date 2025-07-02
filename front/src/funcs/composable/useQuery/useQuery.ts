@@ -83,7 +83,7 @@ export function useMutation<Response = unknown, V = unknown>(
   option?: QueryOption,
 ) {
   const router = useRouter();
-  const { operationName, loading, data, handleError } = getCommon<Response>(
+  const { operationName, loading, data } = getCommon<Response>(
     mutation,
     option,
   );
@@ -112,18 +112,13 @@ export function useMutation<Response = unknown, V = unknown>(
     request: V,
     options?: Omit<MutationOptions<Response>, 'mutation'>,
   ): Promise<Response> {
-    try {
-      return challenge<Response>({
-        run: () => run(request, options),
-        operationName: operationName,
-        data,
-        loading,
-        router,
-      });
-    } catch (e) {
-      handleError(e as Error);
-      throw e;
-    }
+    return challenge<Response>({
+      run: () => run(request, options),
+      operationName: operationName,
+      data,
+      loading,
+      router,
+    });
   }
 
   return { execute, loading, data };

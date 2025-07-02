@@ -9,6 +9,7 @@ import (
 	"backend/service/userService"
 	"context"
 	"errors"
+	"fmt"
 	"github.com/99designs/gqlgen/graphql"
 	"net/http"
 )
@@ -43,7 +44,11 @@ func optionalAuthDirective(ctx context.Context, _ interface{}, next graphql.Reso
 	}
 
 	// トークンを検証し、認証が成功すればユーザーIDをcontextに保存
-	h := ctx.Value("handlers").(handlers.Handlers) //ハンドラをコンテキストに入れたので取得
+	val := ctx.Value("handlers")
+	if val == nil {
+		return nil, fmt.Errorf("internal server error")
+	}
+	h := ctx.Value("handlers").(*handlers.Handlers) //ハンドラをコンテキストに入れたので取得
 	tc := h.TokenConfig
 	ctx, err = auth.AuthenticateToken(ctx, tokenString, *tc)
 	if err != nil {
