@@ -164,6 +164,8 @@ func (h *Handler) Post(c *gin.Context, ur *userRepository.UsersRepository) (*str
 		}
 	}
 
+	rate1Users, rate2Users, rate3Users, rate4Users, rate5Users := getRateUsers(old)
+
 	//挿入するドキュメントを作成
 	record := &liquorRepository.Model{
 		ID:           *id,
@@ -179,6 +181,11 @@ func (h *Handler) Post(c *gin.Context, ur *userRepository.UsersRepository) (*str
 		VersionNo:    &newVersionNo,
 		UserId:       uId,
 		UserName:     uName,
+		Rate1Users:   rate1Users,
+		Rate2Users:   rate2Users,
+		Rate3Users:   rate3Users,
+		Rate4Users:   rate4Users,
+		Rate5Users:   rate5Users,
 	}
 
 	//トランザクション
@@ -217,4 +224,36 @@ func (h *Handler) Post(c *gin.Context, ur *userRepository.UsersRepository) (*str
 		return nil, err
 	}
 	return newId, nil
+}
+
+func getRateUsers(old *liquorRepository.Model) ([]string, []string, []string, []string, []string) {
+	if old == nil {
+		return []string{}, []string{}, []string{}, []string{}, []string{}
+	}
+
+	var (
+		rate1Users []string
+		rate2Users []string
+		rate3Users []string
+		rate4Users []string
+		rate5Users []string
+	)
+
+	if old.Rate1Users != nil {
+		rate1Users = old.Rate1Users
+	}
+	if old.Rate2Users != nil {
+		rate2Users = old.Rate2Users
+	}
+	if old.Rate3Users != nil {
+		rate3Users = old.Rate3Users
+	}
+	if old.Rate4Users != nil {
+		rate4Users = old.Rate4Users
+	}
+	if old.Rate5Users != nil {
+		rate5Users = old.Rate5Users
+	}
+
+	return rate1Users, rate2Users, rate3Users, rate4Users, rate5Users
 }

@@ -114,7 +114,8 @@ export async function challenge<T = unknown>({
     return response;
   } catch (err: unknown) {
     errorDebug('エラー返却：', err);
-    if ((err as Error).message == 'token expired') {
+    //TODO: envに定数化してもいいかも
+    if ((err as Error).message == 'トークンが期限切れです。') {
       await refreshToken(); //アクセストークン期限切れの場合、リフレッシュトークンを再取得
 
       //再度リクエスト

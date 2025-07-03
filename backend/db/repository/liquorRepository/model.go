@@ -29,24 +29,25 @@ const (
 )
 
 type Model struct {
-	ID           primitive.ObjectID  `bson:"_id"`
-	CategoryID   int                 `bson:"category_id"` //カテゴリIDだけは、番号順にソートしたいのでObjectIDではない実装にしている
-	CategoryName string              `bson:"category_name"`
-	Name         string              `bson:"name"`
-	Description  *string             `bson:"description"`
-	Youtube      *string             `bson:"youtube"`
-	ImageURL     *string             `bson:"image_url"`
-	ImageBase64  *string             `bson:"image_base64"`
-	Rate5Users   []string            `bson:"rate5_users"`
-	Rate4Users   []string            `bson:"rate4_users"`
-	Rate3Users   []string            `bson:"rate3_users"`
-	Rate2Users   []string            `bson:"rate2_users"`
-	Rate1Users   []string            `bson:"rate1_users"`
-	UpdatedAt    time.Time           `bson:"updated_at"`
-	RandomKey    float64             `bson:"random_key"`
-	UserId       *primitive.ObjectID `bson:"user_id"`
-	UserName     *string             `bson:"user_name"`
-	VersionNo    *int                `bson:"version_no"`
+	ID           primitive.ObjectID `bson:"_id"`
+	CategoryID   int                `bson:"category_id"` //カテゴリIDだけは、番号順にソートしたいのでObjectIDではない実装にしている
+	CategoryName string             `bson:"category_name"`
+	Name         string             `bson:"name"`
+	Description  *string            `bson:"description"`
+	Youtube      *string            `bson:"youtube"`
+	ImageURL     *string            `bson:"image_url"`
+	ImageBase64  *string            `bson:"image_base64"`
+	// MEMO: toGraphQLでいちいちstringに変換するのがダルいので、[]ObjectIdではなく[]stringにすることにした
+	Rate5Users []string            `bson:"rate5_users"`
+	Rate4Users []string            `bson:"rate4_users"`
+	Rate3Users []string            `bson:"rate3_users"`
+	Rate2Users []string            `bson:"rate2_users"`
+	Rate1Users []string            `bson:"rate1_users"`
+	UpdatedAt  time.Time           `bson:"updated_at"`
+	RandomKey  float64             `bson:"random_key"`
+	UserId     *primitive.ObjectID `bson:"user_id"`
+	UserName   *string             `bson:"user_name"`
+	VersionNo  *int                `bson:"version_no"`
 }
 
 func (m *Model) ToGraphQL() *graphModel.Liquor {

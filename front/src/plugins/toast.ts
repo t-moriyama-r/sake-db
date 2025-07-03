@@ -3,9 +3,13 @@
  */
 /* eslint-disable no-unused-vars */
 import { type App, createApp, h, ref } from 'vue';
+
 import CommonToast from '@/components/parts/common/CommonToast.vue';
 
 export const TOAST_INJECT_KEY = Symbol('toast');
+// グローバル変数を用意
+let globalToastCommand: ToastCommand | null = null; //main.tsで使うためのグローバル参照用 installでセットする
+export const getGlobalToast = () => globalToastCommand;
 
 export enum ToastType {
   Success = 'success',
@@ -61,6 +65,7 @@ export const errorToast = (errorMsg: string) => {
 export default {
   install(app: App) {
     const toast = createToast();
+    globalToastCommand = toast; // ここでグローバル変数に代入
     app.provide<ToastCommand>(TOAST_INJECT_KEY, toast);
     app.config.globalProperties.$toast = toast;
   },
