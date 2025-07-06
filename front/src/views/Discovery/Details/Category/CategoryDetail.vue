@@ -5,7 +5,9 @@
   </div>
   <img v-if="category.imageUrl" :src="category.imageUrl" alt="画像" />
   <div>
-    <p>{{ category.description }}</p>
+    <span v-for="(line, index) in descriptionLines" :key="index">
+      {{ line }}<br v-if="index !== descriptionLines.length - 1" />
+    </span>
   </div>
   <CategoryChildren
     v-if="category.children"
@@ -17,6 +19,8 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
+
 import CommonButton from '@/components/parts/common/CommonButton/CommonButton.vue';
 import type { Category } from '@/graphQL/Category/categories';
 import CategoryChildren from '@/views/Discovery/Details/Category/CategoryChildren.vue';
@@ -25,6 +29,10 @@ interface Props {
   category: Category;
 }
 const { category } = defineProps<Props>();
+
+const descriptionLines = computed<string[]>(() => {
+  return category.description.split('\n');
+});
 </script>
 
 <style scoped></style>

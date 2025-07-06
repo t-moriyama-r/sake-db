@@ -10,7 +10,9 @@
       alt="画像"
     />
     <div>
-      {{ liquor.description }}
+      <span v-for="(line, index) in descriptionLines" :key="index">
+        {{ line }}<br v-if="index !== descriptionLines.length - 1" />
+      </span>
     </div>
     <div>
       <iframe
@@ -49,6 +51,10 @@ interface Props {
 }
 
 const { liquor } = defineProps<Props>();
+
+const descriptionLines = computed<string[]>(() => {
+  return liquor.description.split('\n');
+});
 
 // YouTubeのURLをembed形式に変換するcomputedプロパティ
 const embedUrl = computed<string | null>(() => {
