@@ -52,18 +52,20 @@ type BookMarkListUser struct {
 }
 
 type Category struct {
-	ID          int         `json:"id"`
-	Name        string      `json:"name"`
-	Parent      *int        `json:"parent,omitempty"`
-	Description *string     `json:"description,omitempty"`
-	ImageURL    *string     `json:"imageUrl,omitempty"`
-	ImageBase64 *string     `json:"imageBase64,omitempty"`
-	VersionNo   *int        `json:"versionNo,omitempty"`
-	Readonly    bool        `json:"readonly"`
-	UserID      *string     `json:"userId,omitempty"`
-	UserName    *string     `json:"userName,omitempty"`
-	UpdatedAt   *time.Time  `json:"updatedAt,omitempty"`
-	Children    []*Category `json:"children,omitempty"`
+	ID             int         `json:"id"`
+	Name           string      `json:"name"`
+	Parent         *int        `json:"parent,omitempty"`
+	Description    *string     `json:"description,omitempty"`
+	ImageURL       *string     `json:"imageUrl,omitempty"`
+	ImageBase64    *string     `json:"imageBase64,omitempty"`
+	VersionNo      *int        `json:"versionNo,omitempty"`
+	Readonly       bool        `json:"readonly"`
+	CreateUserID   *string     `json:"createUserId,omitempty"`
+	CreateUserName *string     `json:"createUserName,omitempty"`
+	UpdateUserID   *string     `json:"updateUserId,omitempty"`
+	UpdateUserName *string     `json:"updateUserName,omitempty"`
+	UpdatedAt      *time.Time  `json:"updatedAt,omitempty"`
+	Children       []*Category `json:"children,omitempty"`
 }
 
 type CategoryHistory struct {
@@ -94,24 +96,26 @@ type FlavorMapData struct {
 }
 
 type Liquor struct {
-	ID            string           `json:"id"`
-	CategoryID    int              `json:"categoryId"`
-	CategoryName  string           `json:"categoryName"`
-	CategoryTrail []*CategoryTrail `json:"categoryTrail,omitempty"`
-	Name          string           `json:"name"`
-	Description   *string          `json:"description,omitempty"`
-	ImageURL      *string          `json:"imageUrl,omitempty"`
-	ImageBase64   *string          `json:"imageBase64,omitempty"`
-	Youtube       *string          `json:"youtube,omitempty"`
-	UpdatedAt     time.Time        `json:"updatedAt"`
-	Rate5Users    []string         `json:"rate5Users"`
-	Rate4Users    []string         `json:"rate4Users"`
-	Rate3Users    []string         `json:"rate3Users"`
-	Rate2Users    []string         `json:"rate2Users"`
-	Rate1Users    []string         `json:"rate1Users"`
-	UserID        *string          `json:"userId,omitempty"`
-	UserName      *string          `json:"userName,omitempty"`
-	VersionNo     int              `json:"versionNo"`
+	ID             string           `json:"id"`
+	CategoryID     int              `json:"categoryId"`
+	CategoryName   string           `json:"categoryName"`
+	CategoryTrail  []*CategoryTrail `json:"categoryTrail,omitempty"`
+	Name           string           `json:"name"`
+	Description    *string          `json:"description,omitempty"`
+	ImageURL       *string          `json:"imageUrl,omitempty"`
+	ImageBase64    *string          `json:"imageBase64,omitempty"`
+	Youtube        *string          `json:"youtube,omitempty"`
+	UpdatedAt      time.Time        `json:"updatedAt"`
+	Rate5Users     []string         `json:"rate5Users"`
+	Rate4Users     []string         `json:"rate4Users"`
+	Rate3Users     []string         `json:"rate3Users"`
+	Rate2Users     []string         `json:"rate2Users"`
+	Rate1Users     []string         `json:"rate1Users"`
+	CreateUserID   *string          `json:"createUserId,omitempty"`
+	CreateUserName *string          `json:"createUserName,omitempty"`
+	UpdateUserID   *string          `json:"updateUserId,omitempty"`
+	UpdateUserName *string          `json:"updateUserName,omitempty"`
+	VersionNo      int              `json:"versionNo"`
 }
 
 type LiquorHistory struct {

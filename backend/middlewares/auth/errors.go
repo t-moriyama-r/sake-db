@@ -64,7 +64,7 @@ func errMissBearer() *customError.Error {
 }
 
 func errNotFoundUser() *customError.Error {
-	return customError.NewError(errors.New("ユーザーIDがが見つかりません"), customError.Params{
+	return customError.NewError(errors.New("ユーザーIDが見つかりません"), customError.Params{
 		StatusCode: http.StatusUnauthorized,
 		ErrCode:    NotFoundUser,
 		UserMsg:    "ユーザーIDが見つかりません",
@@ -72,7 +72,7 @@ func errNotFoundUser() *customError.Error {
 	})
 }
 func errUnAuthorized(id primitive.ObjectID) *customError.Error {
-	return customError.NewError(errors.New("ユーザーIDがが見つかりません"), customError.Params{
+	return customError.NewError(errors.New("ユーザーIDが見つかりません"), customError.Params{
 		StatusCode: http.StatusUnauthorized,
 		ErrCode:    UnAuthorized,
 		UserMsg:    "ユーザーIDが見つかりません",

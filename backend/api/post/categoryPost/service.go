@@ -11,6 +11,7 @@ import (
 	"backend/util/helper"
 	"errors"
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"net/http"
 	"time"
@@ -24,7 +25,7 @@ func (h *Handler) Post(c *gin.Context, ur *userRepository.UsersRepository) (*int
 	var imageUrl *string
 	var old *categoriesRepository.Model
 
-	uId, uName, err := auth.GetIdAndNameNullable(c, ur)
+	uId, uName, err := auth.GetIdAndNameNullable(ctx, ur)
 	if err != nil {
 		return nil, err
 	}
@@ -149,18 +150,30 @@ func (h *Handler) Post(c *gin.Context, ur *userRepository.UsersRepository) (*int
 		}
 	}
 
+	var cId *primitive.ObjectID
+	var cName *string
+	if old != nil {
+		cId = old.CreateUserId
+		cName = old.CreateUserName
+	} else {
+		cId = uId
+		cName = uName
+	}
+
 	//挿入するドキュメントを作成
 	record := &categoriesRepository.Model{
-		ID:          id,
-		Parent:      &request.Parent,
-		Name:        request.Name,
-		Description: request.Description,
-		ImageURL:    newImageURL,
-		ImageBase64: newBase64,
-		UserId:      uId,
-		UserName:    uName,
-		UpdatedAt:   time.Now(),
-		VersionNo:   &newVersionNo,
+		ID:             id,
+		Parent:         &request.Parent,
+		Name:           request.Name,
+		Description:    request.Description,
+		ImageURL:       newImageURL,
+		ImageBase64:    newBase64,
+		CreateUserId:   cId,
+		CreateUserName: cName,
+		UpdateUserId:   uId,
+		UpdateUserName: uName,
+		UpdatedAt:      time.Now(),
+		VersionNo:      &newVersionNo,
 	}
 
 	//トランザクション

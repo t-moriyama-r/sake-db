@@ -21,8 +21,10 @@ type Liquor {
   rate3Users: [ID!]!
   rate2Users: [ID!]!
   rate1Users: [ID!]!
-  userId: ID
-  userName: String
+  createUserId: ID
+  createUserName: String
+  updateUserId: ID
+  updateUserName: String
   versionNo: Int!
 }
 

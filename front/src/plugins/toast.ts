@@ -33,6 +33,7 @@ const DEFAULT_TOAST_STATUS = {
   type: ToastType.Success,
   duration: 2000,
 };
+const ERROR_DURATION = 5000; // エラー時のトースト表示時間を延ばすことにした
 
 export const toastState = ref<ToastOptions | null>(null);
 
@@ -59,7 +60,11 @@ const createToast = (): ToastCommand => {
 };
 
 export const errorToast = (errorMsg: string) => {
-  showToast({ message: errorMsg, type: ToastType.Error });
+  showToast({
+    message: errorMsg,
+    type: ToastType.Error,
+    duration: ERROR_DURATION,
+  });
 };
 
 export default {
