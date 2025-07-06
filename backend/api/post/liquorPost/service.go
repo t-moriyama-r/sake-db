@@ -25,7 +25,7 @@ func (h *Handler) Post(c *gin.Context, ur *userRepository.UsersRepository) (*str
 	var imageUrl *string
 	var old *liquorRepository.Model
 
-	uId, uName, err := auth.GetIdAndNameNullable(c, ur)
+	uId, uName, err := auth.GetIdAndNameNullable(ctx, ur)
 	if err != nil {
 		return nil, err
 	}
@@ -166,26 +166,38 @@ func (h *Handler) Post(c *gin.Context, ur *userRepository.UsersRepository) (*str
 
 	rate1Users, rate2Users, rate3Users, rate4Users, rate5Users := getRateUsers(old)
 
+	var cId *primitive.ObjectID
+	var cName *string
+	if old != nil {
+		cId = old.CreateUserId
+		cName = old.CreateUserName
+	} else {
+		cId = uId
+		cName = uName
+	}
+
 	//挿入するドキュメントを作成
 	record := &liquorRepository.Model{
-		ID:           *id,
-		CategoryID:   request.CategoryID,
-		CategoryName: category.Name,
-		Name:         request.Name,
-		Description:  &request.Description,
-		Youtube:      &request.Youtube,
-		ImageURL:     newImageURL,
-		ImageBase64:  newBase64,
-		UpdatedAt:    time.Now(),
-		RandomKey:    rand.New(rand.NewSource(time.Now().UnixNano())).Float64(), //毎回更新する
-		VersionNo:    &newVersionNo,
-		UserId:       uId,
-		UserName:     uName,
-		Rate1Users:   rate1Users,
-		Rate2Users:   rate2Users,
-		Rate3Users:   rate3Users,
-		Rate4Users:   rate4Users,
-		Rate5Users:   rate5Users,
+		ID:             *id,
+		CategoryID:     request.CategoryID,
+		CategoryName:   category.Name,
+		Name:           request.Name,
+		Description:    &request.Description,
+		Youtube:        &request.Youtube,
+		ImageURL:       newImageURL,
+		ImageBase64:    newBase64,
+		UpdatedAt:      time.Now(),
+		RandomKey:      rand.New(rand.NewSource(time.Now().UnixNano())).Float64(), //毎回更新する
+		VersionNo:      &newVersionNo,
+		CreateUserId:   cId,
+		CreateUserName: cName,
+		UpdateUserId:   uId,
+		UpdateUserName: uName,
+		Rate1Users:     rate1Users,
+		Rate2Users:     rate2Users,
+		Rate3Users:     rate3Users,
+		Rate4Users:     rate4Users,
+		Rate5Users:     rate5Users,
 	}
 
 	//トランザクション

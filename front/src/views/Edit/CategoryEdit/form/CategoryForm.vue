@@ -63,6 +63,7 @@ const props = defineProps<{
 //必要な関数をインポート
 const { mutateAsync } = useApiMutation<CategoryRequest, CategoryResponse>(
   CategoryPostAPIType,
+  { isAuth: true },
 );
 const router = useRouter();
 const toast: ToastCommand = useToast();

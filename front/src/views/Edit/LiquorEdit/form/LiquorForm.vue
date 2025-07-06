@@ -64,7 +64,9 @@ const props = defineProps<{
 
 //必要な関数をインポート
 
-const { mutateAsync } = useApiMutation<PostRequest, PostResponse>(PostAPIType);
+const { mutateAsync } = useApiMutation<PostRequest, PostResponse>(PostAPIType, {
+  isAuth: true,
+});
 const router = useRouter();
 const toast: ToastCommand = useToast();
 const loading = useLoading();

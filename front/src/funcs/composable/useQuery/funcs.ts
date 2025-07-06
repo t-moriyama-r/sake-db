@@ -9,6 +9,7 @@ import {
 } from 'vue-loading-overlay';
 import { type Router } from 'vue-router';
 
+import { TOKEN_EXPIRE_MSG } from '@/funcs/composable/const';
 import type { QueryOption } from '@/funcs/composable/useQuery/useQuery';
 import { useToast } from '@/funcs/composable/useToast';
 import { errorDebug } from '@/funcs/util/core/console';
@@ -115,7 +116,7 @@ export async function challenge<T = unknown>({
   } catch (err: unknown) {
     errorDebug('エラー返却：', err);
     //TODO: envに定数化してもいいかも
-    if ((err as Error).message == 'トークンが期限切れです。') {
+    if ((err as Error).message == TOKEN_EXPIRE_MSG) {
       await refreshToken(); //アクセストークン期限切れの場合、リフレッシュトークンを再取得
 
       //再度リクエスト

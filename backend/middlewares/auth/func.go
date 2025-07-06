@@ -39,6 +39,7 @@ func GetIdNullable(ctx context.Context) (*primitive.ObjectID, *customError.Error
 	return &id, nil
 }
 
+// GetIdAndNameNullable note:リゾルバがcontext.Contextなのでそっちに型を合わせている。gin.contextを渡さないよう注意。
 func GetIdAndNameNullable(ctx context.Context, ur *userRepository.UsersRepository) (*primitive.ObjectID, *string, *customError.Error) {
 	uid, err := GetIdNullable(ctx)
 	if err != nil {

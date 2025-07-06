@@ -44,12 +44,13 @@ func RESTOptionalAuthenticate(tokenConfig *tokenConfig.TokenConfig) gin.HandlerF
 			c.Next()
 			return
 		}
-		_, err = AuthenticateToken(c, tokenString, *tokenConfig)
+		newCtx, err := AuthenticateToken(c, tokenString, *tokenConfig)
 		if err != nil {
 			_ = c.Error(err)
 			c.Abort()
 			return
 		}
+		c.Request = c.Request.WithContext(newCtx)
 		c.Next()
 	}
 }
