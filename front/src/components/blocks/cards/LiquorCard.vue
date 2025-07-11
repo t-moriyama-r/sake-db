@@ -2,12 +2,13 @@
 <template>
   <div v-if="liquor" class="liquor-container">
     <router-link :to="{ name: 'LiquorDetail', params: { id: liquor.id } }">
-      <div class="top-content">
+      <div class="top-img-area">
         <img
           v-if="liquor.imageBase64"
           :src="`data:image/jpg;base64,${liquor.imageBase64}`"
           :alt="liquor.name"
         />
+        <img v-else class="no-image" src="/no_image.svg" alt="no image" />
       </div>
     </router-link>
     <div class="bottom-content">
@@ -41,9 +42,20 @@ div.liquor-container {
 
   border: 1px solid #777;
 
-  div.top-content {
+  div.top-img-area {
+    display: flex;
+    align-items: center; /* ← 縦方向の中央揃え */
+    justify-content: center; /* ← 横方向も中央にしたい場合（任意） */
+    height: 100%; /* ← 必要に応じて高さを明示 */
     img {
       width: 100%;
+      object-fit: contain; /* 縦横比を維持して収める */
+      max-height: 100%; /* 親要素からはみ出さないように */
+    }
+    img.no-image {
+      width: 80%;
+      height: auto;
+      object-fit: contain;
     }
   }
   div.bottom-content {

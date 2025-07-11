@@ -58,6 +58,10 @@ func (r *queryResolver) GetVoted(ctx context.Context, liquorID string) (*graphMo
 	if err != nil {
 		return nil, err
 	}
+	// マスターデータが存在しない場合：そのお酒はフレーバーマップを持たない
+	if mst == nil {
+		return nil, nil
+	}
 	result, err := r.FlavorMapRepo.GetVotedDataByLiquor(ctx, uId, lId, mst.CategoryID)
 	if err != nil {
 		return nil, err

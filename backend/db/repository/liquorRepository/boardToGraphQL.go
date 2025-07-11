@@ -88,6 +88,9 @@ func (m *Post) ToGraphQL() *graphModel.UserLiquor {
 func (m *BoardModel) ToGraphQL() *graphModel.BoardPost {
 	//userはnilの可能性があり、そのままObjectIDを変換して*stringに代入できないので変換
 	var userId *string
+	if m == nil {
+		return nil
+	}
 	if m.UserId != nil {
 		id := m.UserId.Hex()
 		userId = &id
