@@ -21,7 +21,7 @@ const { fetch } = useQuery<CategoryResponse<Category>>(GET_DETAIL);
 
 const category = ref<Category | null>(null);
 
-const isNoCache: boolean = window.history.state?.noCache ?? false; //TODO:何故か常にtrueになってる...？
+const isNoCache = window.history.state?.noCache ?? false; //TODO:何故か常にtrueになってる...？
 
 // データフェッチ
 const fetchData = async (id: number): Promise<void> => {

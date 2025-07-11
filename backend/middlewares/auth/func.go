@@ -8,7 +8,9 @@ import (
 )
 
 // ContextKey ユーザーIDを保存するためのコンテキストキー
-const userContextKey = "user"
+type contextKey string
+
+const userContextKey contextKey = "userID"
 
 func setId(ctx context.Context, id primitive.ObjectID) context.Context {
 	return context.WithValue(ctx, userContextKey, id)
