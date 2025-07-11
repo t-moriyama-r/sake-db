@@ -83,8 +83,8 @@ func AuthenticateToken(ctx context.Context, tokenString string, tokenConfig toke
 			return ctx, errTokenInvalid(err)
 		}
 		// 認証に成功した場合、ユーザーIDをcontextに保存
-		ctx = setId(ctx, claims.Id)
-		return ctx, nil
+		newCtx := setId(ctx, claims.Id)
+		return newCtx, nil
 	}
 
 	// 認証に失敗
