@@ -6,8 +6,13 @@
       :aria-hidden="!isOpen"
     >
       <div
-        class="dialog-container bg-white p-4 text-center rounded-2xl transform -translate-y-52"
-        :class="props.class"
+        class="dialog-container bg-white p-4 text-center rounded-2xl transform"
+        :class="[
+          props.class,
+          props.isCentered
+            ? 'translate-y-0 top-1/2 -translate-y-1/2'
+            : 'transform -translate-y-52',
+        ]"
       >
         <DialogPanel>
           <DialogTitle

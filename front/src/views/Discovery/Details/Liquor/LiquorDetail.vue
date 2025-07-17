@@ -1,6 +1,7 @@
 <!--酒詳細ページ-->
 <template>
   <div v-if="liquor">
+    <FlavorMap :liquor="liquor" />
     <p class="title">{{ liquor.name }}</p>
     <CategoryTrail :category-trails="liquor.categoryTrail" />
     <img
@@ -28,7 +29,6 @@
     <router-link :to="{ name: 'LiquorEdit', params: { id: liquor.id } }">
       <CommonButton>編集する</CommonButton></router-link
     >
-    <FlavorMap :liquor="liquor" />
     <LiquorTags :liquor-id="liquor.id" />
     <AffiliateContainer :name="liquor.name" />
     <LiquorBoard :liquorId="liquor.id" />
@@ -39,11 +39,11 @@
 import { computed } from 'vue';
 
 import AffiliateContainer from '@/components/blocks/common/amazon/AffiliateContainer.vue';
-import FlavorMap from '@/components/blocks/FlavorMap/FlavorMap.vue';
 import CommonButton from '@/components/parts/common/CommonButton/CommonButton.vue';
 import type { Liquor } from '@/graphQL/Liquor/liquor';
 import LiquorBoard from '@/views/Discovery/Details/Liquor/board/LiquorBoard.vue';
 import CategoryTrail from '@/views/Discovery/Details/Liquor/CategoryTrail.vue';
+import FlavorMap from '@/views/Discovery/Details/Liquor/flavorMap/FlavorMap.vue';
 import LiquorTags from '@/views/Discovery/Details/Liquor/tag/LiquorTagArea.vue';
 
 interface Props {
