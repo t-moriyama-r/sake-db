@@ -75,7 +75,7 @@ async function onFetch() {
   const response: FlavorMapResponse = await fetch(
     { liquorId: liquor.id },
     {
-      fetchPolicy: 'no-cache',
+      fetchPolicy: 'network-only',
     },
   );
   flavorMap.value = response.getFlavorMap;
@@ -86,7 +86,7 @@ async function setVoted(): Promise<void> {
     const response: VotedResponse = await votedFetch(
       { liquorId: liquor.id },
       {
-        fetchPolicy: 'no-cache',
+        fetchPolicy: 'network-only',
       },
     );
     votedCoordinates.value = response.getVoted;

@@ -33,7 +33,7 @@ onMounted(async () => {
       id: Number(id),
     },
     {
-      fetchPolicy: 'no-cache',
+      fetchPolicy: 'network-only',
     },
   )
     .then((response) => {

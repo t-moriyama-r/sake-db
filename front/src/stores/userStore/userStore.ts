@@ -59,7 +59,7 @@ export const useUserStore = defineStore(USER_STORE, () => {
         undefined,
         option?.isReFetch === true
           ? {
-              fetchPolicy: 'no-cache',
+              fetchPolicy: 'network-only',
             }
           : {},
       );

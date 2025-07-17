@@ -32,7 +32,7 @@ const fetchData = async (id: string): Promise<void> => {
       id,
     },
     {
-      fetchPolicy: isNoCache ? 'no-cache' : undefined, //更新直後だとキャッシュが残っているため、キャッシュを無効化
+      fetchPolicy: isNoCache ? 'network-only' : undefined, //更新直後だとキャッシュが残っているため、キャッシュを無効化
     },
   );
   liquor.value = response;

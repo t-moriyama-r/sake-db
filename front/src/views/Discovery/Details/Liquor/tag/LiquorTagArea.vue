@@ -32,19 +32,30 @@ const props = defineProps<{
 
 const tags = ref<Tag[]>([]);
 
-onMounted(async () => {
-  const response: GetTagsResponse = await fetch({ liquorId: props.liquorId });
+const fetchTags = async ({ isReload = false }: { isReload?: boolean } = {}) => {
+  const response: GetTagsResponse = await fetch(
+    { liquorId: props.liquorId },
+    {
+      fetchPolicy: isReload ? 'network-only' : undefined, //更新直後だとキャッシュが残っているため、キャッシュを無効化
+    },
+  );
   tags.value = response.getTags;
+};
+
+onMounted(async () => {
+  void fetchTags();
 });
 
 //新しいタグが投稿されたら、画面上に反映する
-function submitted(newTag: Tag) {
+async function submitted(newTag: Tag) {
   tags.value = [...tags.value, newTag];
+  void fetchTags({ isReload: true });
 }
 
 //削除処理が成功したら、画面上から削除する
-function deleted(deleteId: string) {
+async function deleted(deleteId: string) {
   tags.value = tags.value.filter((tag) => tag.id !== deleteId);
+  void fetchTags({ isReload: true });
 }
 </script>
 
