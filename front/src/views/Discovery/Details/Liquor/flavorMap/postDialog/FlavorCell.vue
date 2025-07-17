@@ -3,6 +3,7 @@
     class="grid-cell"
     :class="isSelectable ? 'selectable' : ''"
     :style="{ backgroundColor: getBackgroundColor(props.cellData.rate) }"
+    @click="isSelectable ? emit('click') : null"
   ></div>
 </template>
 
@@ -14,6 +15,7 @@ const props = defineProps<{
   isSelectable: boolean;
   cellData: FlavorCell;
 }>();
+const emit = defineEmits(['click']); // 親に送るイベントを定義
 
 // rate に基づいて背景色を決定する関数
 function getBackgroundColor(rate: number): string {
