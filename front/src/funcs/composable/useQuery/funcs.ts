@@ -12,7 +12,7 @@ import { type Router } from 'vue-router';
 import { TOKEN_EXPIRE_MSG } from '@/funcs/composable/const';
 import type { QueryOption } from '@/funcs/composable/useQuery/useQuery';
 import { useToast } from '@/funcs/composable/useToast';
-import { errorDebug } from '@/funcs/util/core/console';
+import { debug, errorDebug } from '@/funcs/util/core/console';
 import { refreshToken, useUserStore } from '@/stores/userStore/userStore';
 
 const spinner: PluginApi = useLoading();
@@ -78,6 +78,7 @@ export function generate<V = unknown>(
     // ストアにアクセスしてアクセストークンを取得
     const { accessToken } = useUserStore();
     const token = accessToken.get();
+    debug('取得アクセストークン：', token);
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
     }
@@ -118,7 +119,6 @@ export async function challenge<T = unknown>({
     //TODO: envに定数化してもいいかも
     if ((err as Error).message == TOKEN_EXPIRE_MSG) {
       await refreshToken(); //アクセストークン期限切れの場合、リフレッシュトークンを再取得
-
       //再度リクエスト
       const response = await run();
       data.value = response;

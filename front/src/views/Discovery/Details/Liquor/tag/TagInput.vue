@@ -1,5 +1,10 @@
 <template>
-  <CommonButton @click="showModal">タグ入力</CommonButton>
+  <CommonTag
+    text="+追加"
+    isHiddenHash
+    @click="showModal"
+    :classes="['addTag']"
+  />
   <CommonDialog
     title="タグ入力"
     v-model="isDialogOpen"
@@ -33,6 +38,7 @@ import { ref } from 'vue';
 
 import CommonButton from '@/components/parts/common/CommonButton/CommonButton.vue';
 import CommonDialog from '@/components/parts/common/CommonDialog/CommonDialog.vue';
+import CommonTag from '@/components/parts/common/CommonTag/CommonTag.vue';
 import FormField from '@/components/parts/forms/core/FormField.vue';
 import SubmitButton from '@/components/parts/forms/core/SubmitButton.vue';
 import { useMutation } from '@/funcs/composable/useQuery/useQuery';
@@ -71,4 +77,14 @@ function showModal() {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.addTag {
+  color: #333;
+  border: 1px solid #ccc;
+
+  &:hover {
+    background-color: #f8d7da;
+    color: #721c24;
+  }
+}
+</style>

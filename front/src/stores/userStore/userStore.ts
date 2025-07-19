@@ -3,7 +3,7 @@ import { nextTick, ref } from 'vue';
 
 import client from '@/apolloClient';
 import { useMutation } from '@/funcs/composable/useQuery/useQuery';
-import { errorDebug } from '@/funcs/util/core/console';
+import { debug, errorDebug } from '@/funcs/util/core/console';
 import {
   LOGIN_WITH_REFRESH_TOKEN,
   LOGOUT,
@@ -36,6 +36,7 @@ export const useUserStore = defineStore(USER_STORE, () => {
 
   //ログイン情報をストアにセットする
   function setUserData(data: AuthPayloadForUI) {
+    debug('setUserData:', data);
     accessToken.reset(data.accessToken);
     isLogin.value = true; //ログイン状態をtrueにする
     user.value = data.user; //ユーザー情報をセット
@@ -46,6 +47,7 @@ export const useUserStore = defineStore(USER_STORE, () => {
       return accessTokenRef.value;
     },
     reset: (newToken: string) => {
+      debug('アクセストークンを更新:', newToken);
       accessTokenRef.value = newToken;
     },
   } as const;
@@ -106,5 +108,5 @@ export async function refreshToken() {
     },
   });
   // リフレッシュトークンから取得したアクセストークンをセット
-  reset(result.data.refreshToken.accessToken);
+  reset(result.data.refreshToken);
 }

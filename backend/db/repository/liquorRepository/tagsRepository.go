@@ -6,6 +6,7 @@ import (
 	"context"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"time"
 )
 
@@ -51,6 +52,30 @@ func (r *LiquorsRepository) GetTags(ctx context.Context, liquorId primitive.Obje
 	}
 
 	return tags, nil
+}
+func (r *LiquorsRepository) GetTagNames(ctx context.Context, liquorId primitive.ObjectID) ([]string, *customError.Error) {
+	// textフィールドだけをプロジェクション
+	projection := bson.M{"text": 1, "_id": 0}
+	cursor, err := r.tagCollection.Find(ctx, bson.M{LiquorID: liquorId}, options.Find().SetProjection(projection))
+	if err != nil {
+		return nil, errGetTags(err, liquorId)
+	}
+	defer cursor.Close(ctx)
+
+	var tagDocs []struct {
+		Text string `bson:"text"`
+	}
+	if err = cursor.All(ctx, &tagDocs); err != nil {
+		return nil, errGetTagsDecode(err, liquorId)
+	}
+
+	// string配列に変換
+	tagNames := make([]string, 0, len(tagDocs))
+	for _, doc := range tagDocs {
+		tagNames = append(tagNames, doc.Text)
+	}
+
+	return tagNames, nil
 }
 
 func (r *LiquorsRepository) PostTag(ctx context.Context, liquorId primitive.ObjectID, userId primitive.ObjectID, tag string) (*TagModel, *customError.Error) {

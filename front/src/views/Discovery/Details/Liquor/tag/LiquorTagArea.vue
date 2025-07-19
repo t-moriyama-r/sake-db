@@ -7,10 +7,13 @@
         :tag="tag"
         :key="tag.id"
         @delete="deleted"
+      /><TagInput
+        v-if="user"
+        :liquor-id="props.liquorId"
+        @submitted="submitted"
       />
     </div>
     <div v-else>登録されたタグはありません</div>
-    <TagInput v-if="user" :liquor-id="props.liquorId" @submitted="submitted" />
   </div>
 </template>
 <script setup lang="ts">

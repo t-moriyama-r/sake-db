@@ -8,8 +8,13 @@ import (
 	"backend/db/repository/liquorRepository"
 	"backend/graph/graphModel"
 	"backend/middlewares/auth"
+	"backend/middlewares/customError"
 	"backend/util/helper"
 	"context"
+	"errors"
+	"fmt"
+	"github.com/sirupsen/logrus"
+	"net/http"
 )
 
 // PostTag is the resolver for the postTag field.
@@ -21,6 +26,23 @@ func (r *mutationResolver) PostTag(ctx context.Context, input graphModel.TagInpu
 	lId, err := helper.ObjectIDFromHex(input.LiquorID)
 	if err != nil {
 		return nil, err
+	}
+	tags, err := r.LiquorRepo.GetTagNames(ctx, lId)
+	if err != nil {
+		return nil, err
+	}
+	// すでに同じタグが存在するか確認（大文字小文字を区別しない場合は strings.EqualFold を使ってもOK）
+	for _, existing := range tags {
+		if existing == input.Text {
+			// 重複が見つかったのでエラーを返す
+			return nil, customError.NewError(errors.New("タグが重複しています"), customError.Params{
+				StatusCode: http.StatusBadRequest,
+				ErrCode:    "TAG_POST_DUPLICATE",
+				UserMsg:    "タグが重複しています。",
+				Level:      logrus.InfoLevel,
+				Input:      fmt.Sprintf("liquorID: %s, input.text: %s", input.LiquorID, input.Text),
+			})
+		}
 	}
 	tag, err := r.LiquorRepo.PostTag(ctx, lId, uId, input.Text)
 	if err != nil {
@@ -44,11 +66,11 @@ func (r *mutationResolver) DeleteTag(ctx context.Context, id string) (bool, erro
 
 // GetTags is the resolver for the getTags field.
 func (r *queryResolver) GetTags(ctx context.Context, liquorID string) ([]*graphModel.Tag, error) {
-	tId, err := helper.ObjectIDFromHex(liquorID)
+	lId, err := helper.ObjectIDFromHex(liquorID)
 	if err != nil {
 		return nil, err
 	}
-	tags, err := r.LiquorRepo.GetTags(ctx, tId)
+	tags, err := r.LiquorRepo.GetTags(ctx, lId)
 	if err != nil {
 		return nil, err
 	}
