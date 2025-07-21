@@ -39,7 +39,7 @@ const categoryList = ref<Category[] | null>();
 
 async function fetchData() {
   const { categories: response } = await fetch(null, {
-    fetchPolicy: 'no-cache',
+    fetchPolicy: 'network-only',
   });
   categoryList.value = [...response];
   sidebarStore.setReloadFlgFalse();

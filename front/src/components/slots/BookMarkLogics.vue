@@ -47,7 +47,7 @@ onMounted(async (): Promise<void> => {
       id: props.targetId,
     },
     {
-      fetchPolicy: 'no-cache',
+      fetchPolicy: 'network-only',
     },
   );
   isBookmarked.value = response.getIsBookMarked;

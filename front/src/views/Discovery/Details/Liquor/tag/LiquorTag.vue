@@ -5,7 +5,7 @@
     @close="isShowDeleteDialog = true"
   />
   <YesNoDialog v-model="isShowDeleteDialog" :on-yes="deleteTag">
-    削除します。宜しいですか？
+    タグ「{{ tag.text }}」を削除します。宜しいですか？
   </YesNoDialog>
 </template>
 <script setup lang="ts">

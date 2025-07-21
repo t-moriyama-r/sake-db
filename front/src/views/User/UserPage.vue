@@ -27,7 +27,7 @@ const fetchData = async (id: string): Promise<void> => {
       id: id,
     },
     {
-      fetchPolicy: 'no-cache', // なぜかこれを付けないとrateがnullになる(キャッシュが原因なのか...？)
+      fetchPolicy: 'network-only', // なぜかこれを付けないとrateがnullになる(キャッシュが原因なのか...？)
     },
   );
   userDetail.value = response;

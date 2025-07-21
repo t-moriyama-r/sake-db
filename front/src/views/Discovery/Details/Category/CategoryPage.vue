@@ -30,7 +30,7 @@ const fetchData = async (id: number): Promise<void> => {
       id,
     },
     {
-      fetchPolicy: isNoCache ? 'no-cache' : undefined, //更新直後だとキャッシュが残っているため、キャッシュを無効化
+      fetchPolicy: isNoCache ? 'network-only' : undefined, //更新直後だとキャッシュが残っているため、キャッシュを無効化
     },
   );
   category.value = response;

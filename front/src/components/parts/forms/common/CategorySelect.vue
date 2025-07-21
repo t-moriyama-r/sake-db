@@ -67,7 +67,7 @@ watch(
   () => props.initialId,
   async (newVal: number | null | undefined) => {
     const { categories: response } = await fetch({
-      fetchPolicy: 'no-cache', //カテゴリが途中で変更されると、意図しない変更になるリスクがあるので再取得
+      fetchPolicy: 'network-only', //カテゴリが途中で変更されると、意図しない変更になるリスクがあるので再取得
     });
     levels.value = [response]; // 最初の階層を設定
     initializeSelections(newVal, response); // 初期値で選択肢を初期化

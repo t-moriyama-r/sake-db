@@ -1,19 +1,41 @@
 <template>
-  <span class="tag"
+  <span
+    class="tag transition-colors duration-300 ease-in-out"
+    :class="[
+      baseColorClass,
+      hoverColorClass,
+      { showHash: !props.isHiddenHash },
+      ...(props.classes ?? []),
+    ]"
+    @click="emit('click')"
     >{{ props.text }}
-    <div v-if="props.isClose" class="close inline-block" @click="emit('close')">
+    <span
+      v-if="props.isClose"
+      class="close inline-block"
+      @click.stop="emit('close')"
+    >
       <span
         class="text-gray-500 transition-colors duration-300 ease-in-out"
-      ></span></div
+      ></span></span
   ></span>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
+
+import { colorClassMap } from '@/components/parts/common/CommonTag/colors';
 import type { TagProps } from '@/components/parts/common/CommonTag/type';
 
 const props = defineProps<TagProps>();
 
-const emit = defineEmits(['close']);
+const emit = defineEmits(['click', 'close']);
+
+const baseColorClass = computed(
+  () => colorClassMap[props.color ?? 'default'].base,
+);
+const hoverColorClass = computed(
+  () => colorClassMap[props.color ?? 'default'].hover,
+);
 </script>
 
 <style scoped>
@@ -23,18 +45,18 @@ span.tag {
   padding: 0.6em;
   line-height: 1;
   text-decoration: none;
-  color: #0000ee;
   background-color: #fff;
-  border: 1px solid #0000ee;
+  border-width: 1px;
+  border-style: solid;
   border-radius: 2em;
   cursor: pointer;
 
-  &:before {
+  &.showHash:before {
     content: '#';
   }
 }
 
-div.close {
+span.close {
   span {
     display: inline-block;
     vertical-align: middle;

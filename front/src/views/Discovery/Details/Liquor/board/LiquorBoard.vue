@@ -31,7 +31,7 @@ async function fetchData(isForceReload: boolean) {
       liquorId: props.liquorId,
     },
     {
-      fetchPolicy: isForceReload ? 'no-cache' : undefined,
+      fetchPolicy: isForceReload ? 'network-only' : undefined,
     },
   );
   posts.value = response.board;

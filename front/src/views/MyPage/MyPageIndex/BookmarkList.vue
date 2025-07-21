@@ -47,7 +47,7 @@ const reFetch = async ({
   isUseCache: boolean;
 }): Promise<void> => {
   const response = await fetch(undefined, {
-    fetchPolicy: isUseCache ? 'cache-first' : 'no-cache',
+    fetchPolicy: isUseCache ? 'cache-first' : 'network-only',
   });
   bookmarks.value = response.getBookMarkList ?? [];
 };
