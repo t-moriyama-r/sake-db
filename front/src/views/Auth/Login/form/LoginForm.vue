@@ -7,8 +7,8 @@
     <FormField :name="FormKeys.MAIL" label="メールアドレス" type="email" />
     <FormField :name="FormKeys.PASSWORD" label="パスワード" type="password" />
     <SubmitButton>ログイン</SubmitButton>
-    <XLogin />
   </Form>
+  <XLogin />
   <router-link :to="{ name: 'PasswordReset' }">パスワードリセット</router-link>
 </template>
 
