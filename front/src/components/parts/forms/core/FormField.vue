@@ -24,7 +24,10 @@
       <!--セレクトボックス用(inputはslotがあると正常に描画されない)-->
       <Field v-if="$slots.default" v-bind="props"> <slot></slot> </Field>
     </div>
-    <div class="error">
+    <div
+      class="error"
+      v-if="!props.isShowErrorsOnlySubmitted || submitCount > 0"
+    >
       <ErrorMessage :name="props.name" />
     </div>
   </div>
@@ -56,6 +59,7 @@ export interface FormFieldProps {
     | 'search'
     | 'file'
     | 'color'; //inputのtype属性
+  isShowErrorsOnlySubmitted?: boolean; //エラーメッセージを表示するかどうか
 }
 
 const props = defineProps<FormFieldProps>();
