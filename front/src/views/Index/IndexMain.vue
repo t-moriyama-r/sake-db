@@ -1,7 +1,6 @@
 <!--メイン画面レイアウト-->
 <template>
   <RecommendList v-if="userStore.user" />
-  ランダムリスト
   <RandomSelect />
 </template>
 

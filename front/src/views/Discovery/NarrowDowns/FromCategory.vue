@@ -1,6 +1,10 @@
 <template>
   <div id="random-pickup-area">
-    <CardContainer>
+    <CardContainer
+      columns="repeat(auto-fill, minmax(100px, 1fr)"
+      gap="0.5em"
+      min="100px"
+    >
       <LiquorCard v-for="liquor in liquors" :liquor="liquor" :key="liquor.id" />
     </CardContainer>
   </div>
