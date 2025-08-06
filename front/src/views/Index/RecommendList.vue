@@ -3,7 +3,11 @@
   <div v-if="dataList.length > 0">
     リコメンドリスト
     <div id="random-pickup-area">
-      <CardContainer>
+      <CardContainer
+        columns="repeat(auto-fill, minmax(100px, 1fr)"
+        gap="0.5em"
+        min="100px"
+      >
         <RecommendCard
           v-for="data in dataList"
           :data="data"

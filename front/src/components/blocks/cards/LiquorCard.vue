@@ -19,6 +19,9 @@
       <router-link :to="{ name: 'LiquorDetail', params: { id: liquor.id } }"
         ><p class="title">{{ liquor.name }}</p></router-link
       >
+      <p class="description">
+        {{ liquor.description }}
+      </p>
     </div>
   </div>
 </template>
@@ -59,11 +62,18 @@ div.liquor-container {
     }
   }
   div.bottom-content {
+    display: flex;
+    flex-direction: column;
     p.category-name {
-      font-size: 75%;
+      font-size: 60%;
     }
     p.title {
+      font-size: 75%;
       font-weight: bold;
+    }
+    p.description {
+      overflow: hidden;
+      font-size: 60%;
     }
   }
 }

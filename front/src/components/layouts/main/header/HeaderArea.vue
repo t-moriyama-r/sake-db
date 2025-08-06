@@ -2,9 +2,7 @@
   <header class="sticky">
     <main class="flex">
       <section class="flex flex-1">
-        <router-link to="/"
-          ><p class="block">酒データベース(仮称)</p></router-link
-        >
+        <router-link to="/"><p class="block">酒データベース(α)</p></router-link>
         <router-link :to="{ name: 'LiquorEdit' }">投稿する</router-link>
       </section>
       <section v-if="getRoles().includes(Roles.Admin)">
@@ -32,7 +30,6 @@ const { getRoles } = useUserStore();
 <style scoped>
 header {
   width: 100%;
-  height: 100px;
   background-color: black;
   color: white;
 }

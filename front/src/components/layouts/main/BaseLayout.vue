@@ -18,16 +18,15 @@ import HeaderArea from '@/components/layouts/main/header/HeaderArea.vue';
 import SideBar from '@/components/layouts/main/sideBar/SideBar.vue';
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+$header-height: 50px;
+
 div {
-  height: calc(100vh - 150px);
-  width: 100%;
+  height: calc(100vh - #{$header-height});
 
   main {
     section {
-      height: calc(
-        100vh - 150px
-      ); /* ヘッダーとフッターの高さを差し引いた高さ */
+      height: calc(100vh - #{$header-height});
       &.main-container {
         margin-left: 180px;
         width: calc(100% - 180px);
