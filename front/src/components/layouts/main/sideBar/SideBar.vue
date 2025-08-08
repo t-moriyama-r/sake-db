@@ -2,7 +2,10 @@
 <template>
   <div class="container flex flex-col">
     <aside class="flex-1">
-      カテゴリから検索
+      <div class="flex">
+        <div class="flex-1">カテゴリから検索</div>
+        <div class="block sm:hidden" @click="emitCloseSidebar">X</div>
+      </div>
       <CategoryParent
         v-for="category in categoryList"
         :key="category.id"
@@ -11,7 +14,7 @@
       />
     </aside>
     <aside class="new-post">
-      <router-link :to="{ name: 'CategoryEdit' }"
+      <router-link :to="{ name: 'CategoryEdit' }" @click="emitCloseSidebar"
         >+新規カテゴリ追加</router-link
       >
     </aside>
@@ -36,6 +39,13 @@ const sidebarStore = useSelectedCategoryStore();
 const { fetch } = useQuery<Categories>(GET_QUERY);
 
 const categoryList = ref<Category[] | null>();
+
+const emit = defineEmits<{
+  (_: 'closeSideBar'): void;
+}>();
+const emitCloseSidebar = () => {
+  emit('closeSideBar');
+};
 
 async function fetchData() {
   const { categories: response } = await fetch(null, {
@@ -70,6 +80,7 @@ const filteredCategoryIdList: ComputedRef<number[]> = computed(() => {
 <style scoped>
 div.container {
   width: 180px;
+  height: 100%;
   background-color: aquamarine;
 }
 </style>
