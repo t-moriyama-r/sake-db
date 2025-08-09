@@ -2,21 +2,21 @@
   <div class="flex pr-2">
     <div>
       <router-link :to="{ name: 'LiquorEdit' }"
-        ><CommonButton :size="'small'"
+        ><CommonButton :size="'small'" class="px-2"
           ><FontAwesomeIcon icon="fa-solid fa-plus" />投稿する</CommonButton
         ></router-link
       >
     </div>
     <div v-if="!userStore.isLogin">
       <router-link :to="{ name: 'Login' }"
-        ><CommonButton :size="'small'" :color="ColorType.None">
+        ><CommonButton :size="'small'" :color="ColorType.None" class="px-2">
           <FontAwesomeIcon
             icon="fa-solid fa-arrow-right-to-bracket"
           />ログイン</CommonButton
         ></router-link
       >
       <router-link :to="{ name: 'Register' }"
-        ><CommonButton :size="'small'"
+        ><CommonButton :size="'small'" class="px-2"
           ><FontAwesomeIcon
             icon="fa-solid fa-person-circle-plus"
           />新規登録</CommonButton

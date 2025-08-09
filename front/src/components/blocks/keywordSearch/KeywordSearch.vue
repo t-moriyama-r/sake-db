@@ -5,7 +5,9 @@
     :validation-schema="validationSchema"
     ><div class="flex">
       <FormField name="keyword" :showErrors="'hidden'" />
-      <SubmitButton :size="'small'">検索</SubmitButton>
+      <SubmitButton :size="'small'" class="ml-1 px-2"
+        ><FontAwesomeIcon icon="fa-solid fa-magnifying-glass"
+      /></SubmitButton>
     </div>
   </Form>
 </template>
@@ -15,6 +17,7 @@
  * TODO: ロジックは後で実装
  */
 
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { Form } from 'vee-validate';
 import { string } from 'yup';
 

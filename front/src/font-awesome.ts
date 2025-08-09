@@ -1,6 +1,7 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
   faArrowRightToBracket,
+  faMagnifyingGlass,
   faPersonCirclePlus,
   faPlus,
   faWineBottle,
@@ -8,7 +9,13 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 // アイコン登録
-library.add(faArrowRightToBracket, faPersonCirclePlus, faPlus, faWineBottle);
+library.add(
+  faArrowRightToBracket,
+  faPersonCirclePlus,
+  faPlus,
+  faWineBottle,
+  faMagnifyingGlass,
+);
 
 export function registerFontAwesome(
   app: ReturnType<typeof import('vue').createApp>,

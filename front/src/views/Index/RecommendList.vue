@@ -4,9 +4,9 @@
     リコメンドリスト
     <div id="random-pickup-area">
       <CardContainer
-        columns="repeat(auto-fill, minmax(100px, 1fr)"
+        columns="repeat(auto-fill, minmax(200px, 1fr)"
         gap="0.5em"
-        min="100px"
+        min="200px"
       >
         <RecommendCard
           v-for="data in dataList"

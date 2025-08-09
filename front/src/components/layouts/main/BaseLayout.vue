@@ -29,7 +29,9 @@
       id="main-container"
       class="verflow-y-scroll ml-0 md:ml-[180px] w-full md:w-[calc(100%-180px)]"
     >
-      <header class="sticky bg-white/30 backdrop-blur-sm">
+      <header
+        class="fixed bg-white/30 backdrop-blur-sm w-full md:w-[calc(100%-180px)]"
+      >
         <HeaderArea @openSideBar="openSideBar" />
       </header>
       <div id="page-area">
@@ -66,14 +68,15 @@ $main-height: calc(100vh - #{$header-height} - #{$footer-height});
 
 main {
   #main-container {
-    height: 100vh;
+    min-height: 100vh;
 
     header {
       height: $header-height;
     }
 
     #page-area {
-      height: $main-height;
+      padding-top: $header-height;
+      min-height: calc(100vh - #{$footer-height});
     }
   }
 }
