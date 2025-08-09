@@ -19,38 +19,53 @@ import { ColorType } from '@/type/common/ColorType';
 
 const props = defineProps<ButtonProps>();
 
-const BaseButtonClass: string =
+const BASE_BUTTON_CLASS =
   'group relative inline-flex items-center justify-center overflow-hidden rounded-md px-6 font-medium';
-const EnabledClass: string = `${BaseButtonClass} transition hover:scale-110 text-white`;
-const DisabledClass: string = `${BaseButtonClass} text-neutral-400 cursor-not-allowed`;
 
 // ボタンのクラスを動的に決定するコンピューテッドプロパティ
 const buttonClass = computed(() => {
-  const baseClass = `${props.isDisabled ? DisabledClass : EnabledClass} ${props.class} ${buttonSize.value}`;
+  const baseClass = `${BASE_BUTTON_CLASS} ${buttonSize.value} ${props.class}`;
+  const hoverClass = props.isDisabled ? '' : 'transition hover:scale-110';
+  const textColorClass = (() => {
+    if (props.color === ColorType.None) {
+      return 'text-inherit';
+    }
+    return props.isDisabled
+      ? 'text-neutral-400 cursor-not-allowed'
+      : 'text-white';
+  })();
 
-  if (props.isDisabled) {
-    switch (props.color) {
-      case ColorType.Primary:
-        return `${baseClass} bg-blue-300`;
-      case ColorType.Secondary:
-        return `${baseClass} bg-green-300`;
-      case ColorType.Danger:
-        return `${baseClass} bg-red-300`;
-      default:
-        return `${baseClass} bg-neutral-300`;
+  const bgClass = (() => {
+    if (props.isDisabled) {
+      switch (props.color) {
+        case ColorType.Primary:
+          return 'bg-blue-300';
+        case ColorType.Secondary:
+          return 'bg-green-300';
+        case ColorType.Danger:
+          return 'bg-red-300';
+        case ColorType.None:
+          return 'bg-transparent';
+        default:
+          return 'bg-neutral-300';
+      }
+    } else {
+      switch (props.color) {
+        case ColorType.Primary:
+          return 'bg-blue-500 hover:bg-blue-600';
+        case ColorType.Secondary:
+          return 'bg-green-500 hover:bg-green-600';
+        case ColorType.Danger:
+          return 'bg-red-500 hover:bg-red-600';
+        case ColorType.None:
+          return 'bg-transparent';
+        default:
+          return 'bg-neutral-950 hover:bg-neutral-800';
+      }
     }
-  } else {
-    switch (props.color) {
-      case ColorType.Primary:
-        return `${baseClass} bg-blue-500 hover:bg-blue-600`;
-      case ColorType.Secondary:
-        return `${baseClass} bg-green-500 hover:bg-green-600`;
-      case ColorType.Danger:
-        return `${baseClass} bg-red-500 hover:bg-red-600`;
-      default:
-        return `${baseClass} bg-neutral-950 hover:bg-neutral-800`;
-    }
-  }
+  })();
+
+  return `${baseClass} ${textColorClass} ${bgClass} ${hoverClass}`;
 });
 
 const buttonSize = computed(() => {

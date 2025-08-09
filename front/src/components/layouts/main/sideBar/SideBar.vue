@@ -1,10 +1,25 @@
 <!--サイドバー-->
 <template>
-  <div class="container flex flex-col">
+  <div class="container flex flex-col bg-gray-100">
     <aside class="flex-1">
       <div class="flex">
-        <div class="flex-1">カテゴリから検索</div>
-        <div class="block sm:hidden" @click="emitCloseSidebar">X</div>
+        <div class="flex-1">
+          <router-link
+            class="inline-block"
+            :to="{ name: 'Index' }"
+            @click="emitCloseSidebar"
+            ><FontAwesomeIcon
+              icon="fa-solid fa-wine-bottle"
+            />酒データベース(α)</router-link
+          >
+        </div>
+        <div class="block md:hidden" @click="emitCloseSidebar">X</div>
+      </div>
+      <div>カテゴリ</div>
+      <div>
+        <router-link class="inline-block" :to="{ name: 'Index' }"
+          >すべて</router-link
+        >
       </div>
       <CategoryParent
         v-for="category in categoryList"
@@ -22,6 +37,7 @@
 </template>
 
 <script setup lang="ts">
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { computed, type ComputedRef, onMounted, ref, watch } from 'vue';
 
 import CategoryParent from '@/components/layouts/main/sideBar/CategoryParent.vue';
@@ -81,6 +97,6 @@ const filteredCategoryIdList: ComputedRef<number[]> = computed(() => {
 div.container {
   width: 180px;
   height: 100%;
-  background-color: aquamarine;
+  border: 1px solid #ccc;
 }
 </style>

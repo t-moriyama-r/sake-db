@@ -1,5 +1,5 @@
 <template>
-  <footer class="fixed">
+  <footer>
     作者:
     <a href="https://x.com/virtualDollym" target="_blank">@virtualDollym</a>
   </footer>
@@ -9,11 +9,12 @@
 
 <style scoped>
 footer {
-  width: 100%;
-  height: 50px;
-  text-align: right;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding-right: 1em;
   background-color: black;
-
+  height: 100%;
   color: white;
 }
 </style>

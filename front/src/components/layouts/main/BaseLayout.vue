@@ -1,40 +1,46 @@
 <template>
-  <div>
-    <HeaderArea @openSideBar="openSideBar" />
-    <main class="flex">
-      <!-- PC・タブレット用 -->
-      <section id="sidebar" class="sidebar fixed hidden sm:block">
-        <SideBar />
-      </section>
+  <main class="flex bg-gray-50">
+    <!-- PC・タブレット用 -->
+    <section id="sidebar" class="sidebar fixed hidden md:block">
+      <SideBar />
+    </section>
 
-      <!-- スマホ用 スライドサイドバー -->
-      <transition name="slide">
-        <div
-          id="mobile-sidebar-wrapper"
-          v-if="isOpenSideBar"
-          class="fixed top-0 left-0 w-[180px] h-full bg-white shadow-lg z-50 sm:hidden"
-        >
-          <SideBar @closeSideBar="closeSideBar" />
-        </div>
-      </transition>
-      <!-- 背景オーバーレイ -->
-      <transition name="fade">
-        <div
-          v-show="isOpenSideBar"
-          id="mobile-sidebar-wrapper-overlay"
-          class="fixed inset-0 bg-black bg-opacity-50 z-40 sm:hidden"
-          @click="closeSideBar"
-        />
-      </transition>
-
-      <section
-        class="main-container overflow-y-scroll ml-0 sm:ml-[180px] w-full sm:w-[calc(100%-180px)]"
+    <!-- スマホ用 スライドサイドバー -->
+    <transition name="slide">
+      <div
+        id="mobile-sidebar-wrapper"
+        v-if="isOpenSideBar"
+        class="fixed top-0 left-0 w-[180px] h-full bg-white shadow-lg z-50 md:hidden"
       >
+        <SideBar @closeSideBar="closeSideBar" />
+      </div>
+    </transition>
+    <!-- 背景オーバーレイ -->
+    <transition name="fade">
+      <div
+        v-show="isOpenSideBar"
+        id="mobile-sidebar-wrapper-overlay"
+        class="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+        @click="closeSideBar"
+      />
+    </transition>
+
+    <section
+      id="main-container"
+      class="verflow-y-scroll ml-0 md:ml-[180px] w-full md:w-[calc(100%-180px)]"
+    >
+      <header class="sticky bg-white/30 backdrop-blur-sm">
+        <HeaderArea @openSideBar="openSideBar" />
+      </header>
+      <div id="page-area">
         <router-view></router-view>
-      </section>
-    </main>
-    <FooterArea />
-  </div>
+      </div>
+
+      <div id="footer" class="w-full">
+        <FooterArea />
+      </div>
+    </section>
+  </main>
 </template>
 <script setup lang="ts">
 import { ref } from 'vue';
@@ -54,23 +60,29 @@ const closeSideBar = () => {
 </script>
 
 <style lang="scss" scoped>
-$header-height: 30px; // TODO:実質的に手打ちなので、なんかもーちょっとうまい書き方にしたい
-$main-height: calc(100vh - #{$header-height} - 30px);
+$header-height: 40px; // TODO:実質的に手打ちなので、なんかもーちょっとうまい書き方にしたい
+$footer-height: 30px; // TODO:実質的に手打ちなので、なんかもーちょっとうまい書き方にしたい
+$main-height: calc(100vh - #{$header-height} - #{$footer-height});
 
 main {
-  section {
-    height: #{$main-height};
+  #main-container {
+    height: 100vh;
+
+    header {
+      height: $header-height;
+    }
+
+    #page-area {
+      height: $main-height;
+    }
   }
 }
 
 #sidebar {
-  height: #{$main-height};
+  height: 100vh;
 }
 
 #mobile-sidebar-wrapper {
-  margin-top: #{$header-height};
-  height: calc(#{$main-height} + 30px); //フッターの高さを足す
-
   &.slide-enter-active,
   &.slide-leave-active {
     transition: transform 0.1s ease;
@@ -103,5 +115,9 @@ main {
 }
 #mobile-sidebar-wrapper-overlay {
   height: 100vh;
+}
+
+#footer {
+  height: #{$footer-height};
 }
 </style>
