@@ -16,8 +16,13 @@
     "fetch-schema": "get-graphql-schema http://localhost:8080/query > schema.graphql"
   },
   "dependencies": {
-    "@auth0/auth0-vue": "^2.3.3",
     "@apollo/client": "^3.12.4",
+    "@auth0/auth0-vue": "^2.3.3",
+    "@fortawesome/fontawesome-svg-core": "^7.0.0",
+    "@fortawesome/free-brands-svg-icons": "^7.0.0",
+    "@fortawesome/free-regular-svg-icons": "^7.0.0",
+    "@fortawesome/free-solid-svg-icons": "^7.0.0",
+    "@fortawesome/vue-fontawesome": "^3.1.1",
     "@headlessui/vue": "^1.7.23",
     "@tanstack/vue-query": "^5.52.2",
     "@vee-validate/rules": "^4.13.2",

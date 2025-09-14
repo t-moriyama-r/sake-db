@@ -20,9 +20,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
-import FormField from '@/components/parts/forms/core/FormField.vue';
 import { useField } from 'vee-validate';
+import { ref, watch } from 'vue';
+
+import FormField from '@/components/parts/forms/core/FormField.vue';
 
 interface Props {
   name: string;

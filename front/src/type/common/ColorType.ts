@@ -4,4 +4,5 @@ export enum ColorType {
   Primary = 'primary',
   Secondary = 'secondary',
   Danger = 'danger',
+  None = 'none',
 }

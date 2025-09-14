@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="w-full">
     <div v-if="label">
       {{ label }}
     </div>
@@ -26,7 +26,10 @@
     </div>
     <div
       class="error"
-      v-if="!props.isShowErrorsOnlySubmitted || submitCount > 0"
+      v-if="
+        showErrors === `show` ||
+        (showErrors === `onlySubmitted` && submitCount > 0) //TODO: このsubmitCountって生きてないよね？
+      "
     >
       <ErrorMessage :name="props.name" />
     </div>
@@ -59,10 +62,12 @@ export interface FormFieldProps {
     | 'search'
     | 'file'
     | 'color'; //inputのtype属性
-  isShowErrorsOnlySubmitted?: boolean; //エラーメッセージを表示するかどうか
+  showErrors?: 'show' | 'onlySubmitted' | 'hidden';
 }
 
 const props = defineProps<FormFieldProps>();
+
+const showErrors = props.showErrors ?? 'show';
 </script>
 
 <style scoped>

@@ -1,43 +1,53 @@
 <template>
-  <Menu>
-    <MenuButton>
-      <svg
-        class="w-6 h-6"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-        xmlns="http://www.w3.org/2000/svg"
+  <div class="flex pr-2 gap-2">
+    <div>
+      <router-link :to="{ name: 'LiquorEdit' }"
+        ><CommonButton :size="'small'" class="px-1 sm:px-6 md:px-3 lg:px-6"
+          ><FontAwesomeIcon icon="fa-solid fa-plus" />投稿</CommonButton
+        ></router-link
       >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M4 6h16M4 12h16M4 18h16"
-        ></path>
-      </svg>
-    </MenuButton>
-    <MenuItems
-      class="absolute right-0 mt-2 py-2 w-48 bg-white rounded-md shadow-xl"
-    >
-      <div v-if="!userStore.isLogin">
-        <MenuItem link-to="Register">新規登録</MenuItem>
-        <MenuItem link-to="Login">ログイン</MenuItem>
-      </div>
-      <div v-else>
-        <MenuItem link-to="MyPageIndex">マイページ</MenuItem>
-        <MenuItem link-to="Index" @click="logout">ログアウト</MenuItem>
-      </div>
-    </MenuItems>
-  </Menu>
+    </div>
+    <div v-if="!userStore.isLogin">
+      <router-link :to="{ name: 'Login' }"
+        ><CommonButton
+          :size="'small'"
+          :color="ColorType.None"
+          class="px-1 sm:px-6 md:px-3 lg:px-6"
+        >
+          <FontAwesomeIcon
+            icon="fa-solid fa-arrow-right-to-bracket"
+          />ログイン</CommonButton
+        ></router-link
+      >
+      <router-link :to="{ name: 'Register' }"
+        ><CommonButton :size="'small'" class="px-1 sm:px-6 md:px-3 lg:px-6"
+          ><FontAwesomeIcon
+            icon="fa-solid fa-person-circle-plus"
+          />新規登録</CommonButton
+        ></router-link
+      >
+    </div>
+    <div v-else>
+      <AccountInfo />
+      <router-link :to="{ name: 'Index' }" @click="logout"
+        ><CommonButton :size="'small'">ログアウト</CommonButton></router-link
+      >
+    </div>
+    <div v-if="userStore.getRoles().includes(Roles.Admin)">
+      <router-link :to="{ name: 'Admin' }">管理者ページ</router-link>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { Menu, MenuButton, MenuItems } from '@headlessui/vue';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
+import AccountInfo from '@/components/layouts/main/header/AccountInfo.vue';
+import CommonButton from '@/components/parts/common/CommonButton/CommonButton.vue';
 import { useToast } from '@/funcs/composable/useToast';
+import { Roles } from '@/graphQL/Auth/types';
 import { useUserStore } from '@/stores/userStore/userStore';
-
-import MenuItem from './MenuItem.vue';
+import { ColorType } from '@/type/common/ColorType';
 
 const userStore = useUserStore();
 const toast = useToast();

@@ -5,6 +5,7 @@ import { DefaultApolloClient } from '@vue/apollo-composable';
 import { createApp, h, provide } from 'vue';
 
 import client from '@/apolloClient';
+import { registerFontAwesome } from '@/font-awesome';
 import { errorDebug } from '@/funcs/util/core/console';
 import { registerPlugins } from '@/plugins';
 import { getGlobalToast } from '@/plugins/toast';
@@ -20,6 +21,7 @@ const app = createApp({
 
 // プラグインの登録
 registerPlugins(app);
+registerFontAwesome(app);
 
 app.mount('#app');
 

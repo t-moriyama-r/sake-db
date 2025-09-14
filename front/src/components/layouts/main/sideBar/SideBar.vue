@@ -1,8 +1,26 @@
 <!--サイドバー-->
 <template>
-  <div class="container flex flex-col">
+  <div class="container flex flex-col bg-gray-100">
     <aside class="flex-1">
-      カテゴリから検索
+      <div class="flex">
+        <div class="flex-1">
+          <router-link
+            class="inline-block"
+            :to="{ name: 'Index' }"
+            @click="emitCloseSidebar"
+            ><FontAwesomeIcon
+              icon="fa-solid fa-wine-bottle"
+            />酒データベース(α)</router-link
+          >
+        </div>
+        <div class="block md:hidden" @click="emitCloseSidebar">X</div>
+      </div>
+      <div>カテゴリ</div>
+      <div>
+        <router-link class="inline-block" :to="{ name: 'Index' }"
+          >すべて</router-link
+        >
+      </div>
       <CategoryParent
         v-for="category in categoryList"
         :key="category.id"
@@ -11,7 +29,7 @@
       />
     </aside>
     <aside class="new-post">
-      <router-link :to="{ name: 'CategoryEdit' }"
+      <router-link :to="{ name: 'CategoryEdit' }" @click="emitCloseSidebar"
         >+新規カテゴリ追加</router-link
       >
     </aside>
@@ -19,6 +37,7 @@
 </template>
 
 <script setup lang="ts">
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { computed, type ComputedRef, onMounted, ref, watch } from 'vue';
 
 import CategoryParent from '@/components/layouts/main/sideBar/CategoryParent.vue';
@@ -36,6 +55,13 @@ const sidebarStore = useSelectedCategoryStore();
 const { fetch } = useQuery<Categories>(GET_QUERY);
 
 const categoryList = ref<Category[] | null>();
+
+const emit = defineEmits<{
+  (_: 'closeSideBar'): void;
+}>();
+const emitCloseSidebar = () => {
+  emit('closeSideBar');
+};
 
 async function fetchData() {
   const { categories: response } = await fetch(null, {
@@ -70,6 +96,7 @@ const filteredCategoryIdList: ComputedRef<number[]> = computed(() => {
 <style scoped>
 div.container {
   width: 180px;
-  background-color: aquamarine;
+  height: 100%;
+  border: 1px solid #ccc;
 }
 </style>

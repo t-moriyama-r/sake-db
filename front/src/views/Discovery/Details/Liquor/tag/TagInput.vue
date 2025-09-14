@@ -23,7 +23,7 @@
       "
     >
       <FormField :name="PostTagKeys.LiquorId" type="hidden" />
-      <FormField :name="PostTagKeys.Tag" isShowErrorsOnlySubmitted />
+      <FormField :name="PostTagKeys.Tag" :showErrors="'onlySubmitted'" />
       <div>
         <SubmitButton size="small">登録</SubmitButton>
         <CommonButton size="small" @click="close">閉じる</CommonButton>

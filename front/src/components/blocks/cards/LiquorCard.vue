@@ -17,7 +17,9 @@
         ><p class="category-name">{{ liquor.categoryName }}</p></router-link
       >
       <router-link :to="{ name: 'LiquorDetail', params: { id: liquor.id } }"
-        ><p class="title">{{ liquor.name }}</p></router-link
+        ><p class="title">
+          {{ truncateString({ str: liquor.name, maxLength: 15 }) }}
+        </p></router-link
       >
       <p class="description">
         {{ liquor.description }}
@@ -28,6 +30,7 @@
 
 <script setup lang="ts">
 //propsのセット
+import truncateString from '@/funcs/util/transform/truncateString';
 import type { Liquor } from '@/graphQL/Index/random';
 
 interface Props {
@@ -68,7 +71,7 @@ div.liquor-container {
       font-size: 60%;
     }
     p.title {
-      font-size: 75%;
+      font-size: 90%;
       font-weight: bold;
     }
     p.description {
