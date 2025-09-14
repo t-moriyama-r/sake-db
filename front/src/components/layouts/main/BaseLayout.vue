@@ -27,10 +27,11 @@
 
     <section
       id="main-container"
-      class="verflow-y-scroll ml-0 md:ml-[180px] w-full md:w-[calc(100%-180px)]"
+      class="ml-0 md:ml-[180px] w-full md:w-[calc(100%-180px)] overflow-y-auto h-screen"
     >
       <header
-        class="fixed bg-white/30 backdrop-blur-sm w-full md:w-[calc(100%-180px)]"
+        ref="headerRef"
+        class="sticky top-0 bg-white/30 backdrop-blur-sm w-full"
       >
         <HeaderArea @openSideBar="openSideBar" />
       </header>

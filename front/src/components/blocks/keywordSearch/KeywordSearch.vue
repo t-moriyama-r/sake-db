@@ -1,15 +1,23 @@
 <template>
-  <Form
-    @submit="onSubmit"
-    :initial-values="{ keyword: '' }"
-    :validation-schema="validationSchema"
-    ><div class="flex">
-      <FormField name="keyword" :showErrors="'hidden'" />
-      <SubmitButton :size="'small'" class="ml-1 px-2"
+  <div class="flex-1 px-6 max-w-[480px]">
+    <Form
+      @submit="onSubmit"
+      :initial-values="{ keyword: '' }"
+      :validation-schema="validationSchema"
+      ><div class="hidden sm:flex">
+        <FormField name="keyword" classes="w-full" :showErrors="'hidden'" />
+        <SubmitButton :size="'small'" class="ml-1 px-2"
+          ><FontAwesomeIcon icon="fa-solid fa-magnifying-glass"
+        /></SubmitButton>
+      </div>
+    </Form>
+    <div class="flex sm:hidden">
+      <CommonButton :size="'small'" class="px-2" @click="onDialogOpen"
         ><FontAwesomeIcon icon="fa-solid fa-magnifying-glass"
-      /></SubmitButton>
+      /></CommonButton>
     </div>
-  </Form>
+    <KeywordSearchDialog v-model="isDialogOpen" :onSubmit="onSubmit" />
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -18,18 +26,33 @@
  */
 
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { Form } from 'vee-validate';
-import { string } from 'yup';
+import { Form, type SubmissionHandler } from 'vee-validate';
+import { ref } from 'vue';
 
+import {
+  type FormValues,
+  validationSchema,
+} from '@/components/blocks/keywordSearch/formSettings';
+import KeywordSearchDialog from '@/components/blocks/keywordSearch/KeywordSearchDialog.vue';
+import CommonButton from '@/components/parts/common/CommonButton/CommonButton.vue';
 import FormField from '@/components/parts/forms/core/FormField.vue';
 import SubmitButton from '@/components/parts/forms/core/SubmitButton.vue';
 
-const validationSchema = {
-  keyword: string().required(),
+const isDialogOpen = ref(false);
+const onDialogOpen = () => {
+  isDialogOpen.value = true;
+};
+const onDialogClose = () => {
+  isDialogOpen.value = false;
 };
 
-const onSubmit = () => {
+// extends GenericObjectは型が広すぎるのでキャストして対応する
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+//@ts-expect-error
+const onSubmit: SubmissionHandler = async (values: FormValues) => {
   //TODO
+  console.log('values:', values);
+  onDialogClose();
 };
 </script>
 

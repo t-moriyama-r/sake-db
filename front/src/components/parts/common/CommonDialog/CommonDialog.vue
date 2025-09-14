@@ -1,6 +1,12 @@
 <!--モーダルコンポーネント。親のrefで開閉状態を管理する。slotで実装するか迷ったが、状態の取り回しがまどろっこしいのでrefは親コンポーネントで定義してもらう。-->
 <template>
-  <Dialog :open="isOpen" @close="handleClose">
+  <Dialog
+    :open="isOpen"
+    @close="handleClose"
+    as="teleport"
+    to="body"
+    :preventScroll="false"
+  >
     <div
       class="fixed flex inset-0 bg-black/30 overflow-y-auto items-center justify-center"
       :aria-hidden="!isOpen"
@@ -22,7 +28,7 @@
             >{{ props.title }}</DialogTitle
           >
           <slot :close="handleClose"></slot>
-          <div v-if="!props.isUnUseDefaultButtons">
+          <div v-if="!props.isUnUseDefaultButtons" class="pt-2">
             <CommonButton @click="handleClose">閉じる</CommonButton>
           </div>
         </DialogPanel>
@@ -33,12 +39,13 @@
 
 <script setup lang="ts">
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/vue';
+import type { ModelRef } from 'vue';
 
 import CommonButton from '@/components/parts/common/CommonButton/CommonButton.vue';
 import type { DialogProps } from '@/components/parts/common/CommonDialog/type';
 
 const props = defineProps<DialogProps>();
-const isOpen = defineModel<boolean>();
+const isOpen = defineModel<boolean>() as ModelRef<boolean>;
 
 function handleClose() {
   isOpen.value = false;

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="w-full">
     <div v-if="label">
       {{ label }}
     </div>
@@ -28,7 +28,7 @@
       class="error"
       v-if="
         showErrors === `show` ||
-        (showErrors === `onlySubmitted` && submitCount > 0) //TODO:このsubmitCountって生きてないよね？
+        (showErrors === `onlySubmitted` && submitCount > 0) //TODO: このsubmitCountって生きてないよね？
       "
     >
       <ErrorMessage :name="props.name" />
