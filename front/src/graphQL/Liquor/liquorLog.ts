@@ -23,6 +23,8 @@ export const GET_LOGS_FOR_ROLLBACK: DocumentNode = gql`
         imageBase64
         versionNo
         updatedAt
+        updateUserId
+        updateUserName
       }
       histories {
         id
@@ -32,6 +34,8 @@ export const GET_LOGS_FOR_ROLLBACK: DocumentNode = gql`
         imageBase64
         versionNo
         updatedAt
+        updateUserId
+        updateUserName
       }
     }
   }

@@ -20,6 +20,8 @@ export interface Liquor extends CardLiquor {
   readonly updatedAt: Date;
   readonly versionNo: number;
   readonly categoryTrail: CategoryTrail;
+  readonly updateUserId?: string | null;
+  readonly updateUserName?: string | null;
 }
 
 export type CategoryTrail = {

@@ -7,7 +7,7 @@
         radius="10px"
       />
       <div>
-        {{ userStore.user.name }}
+        {{ truncateString({ str: userStore.user.name, maxLength: 10 }) }}
       </div>
     </div>
   </router-link>
@@ -15,6 +15,7 @@
 
 <script setup lang="ts">
 import RadiusImage from '@/components/parts/common/RadiusImage.vue';
+import truncateString from '@/funcs/util/transform/truncateString';
 import { useUserStore } from '@/stores/userStore/userStore';
 
 const userStore = useUserStore();

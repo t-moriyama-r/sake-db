@@ -36,7 +36,7 @@
         <HeaderArea @openSideBar="openSideBar" />
       </header>
       <div id="page-area">
-        <router-view></router-view>
+        <router-view />
       </div>
 
       <div id="footer" class="w-full">
@@ -76,8 +76,7 @@ main {
     }
 
     #page-area {
-      padding-top: $header-height;
-      min-height: calc(100vh - #{$footer-height});
+      min-height: #{$main-height};
     }
   }
 }

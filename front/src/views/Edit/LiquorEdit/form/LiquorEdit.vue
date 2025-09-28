@@ -1,6 +1,6 @@
 <template>
   <div id="layout" class="flex">
-    <div id="form-container" class="flex-1">
+    <div id="form-container" class="flex-1 w-full md:min-w-[380px]">
       <h1 v-if="route.params.id">お酒ページ編集</h1>
       <h1 v-else>お酒ページ作成</h1>
       <LiquorForm
@@ -8,7 +8,7 @@
         :version-no="historyData?.now.versionNo ?? null"
       />
     </div>
-    <div id="versions" v-if="historyData?.histories">
+    <div id="versions" v-if="historyData?.histories" class="hidden md:block">
       <LiquorLogs
         :logs="[historyData.now, ...historyData.histories]"
         @selectLog="reflectLog"
@@ -24,12 +24,11 @@ import { useRoute } from 'vue-router';
 import type { Liquor } from '@/graphQL/Liquor/liquor';
 import type { LiquorHistoryData } from '@/graphQL/Liquor/liquorLog';
 import LiquorForm from '@/views/Edit/LiquorEdit/form/LiquorForm.vue';
-import LiquorLogs from '@/views/Edit/LiquorEdit/form/LiquorLogs.vue';
+import LiquorLogs from '@/views/Edit/LiquorEdit/form/LiquorLogs/LiquorLogs.vue';
 
 const props = defineProps<{
   historyData: LiquorHistoryData | null;
 }>();
-console.log('historyData', props.historyData);
 
 const route = useRoute(); // 現在のルートを取得
 

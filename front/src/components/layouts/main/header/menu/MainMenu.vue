@@ -27,10 +27,12 @@
         ></router-link
       >
     </div>
-    <div v-else>
+    <div class="flex" v-else>
       <AccountInfo />
       <router-link :to="{ name: 'Index' }" @click="logout"
-        ><CommonButton :size="'small'">ログアウト</CommonButton></router-link
+        ><CommonButton :size="'small'" class="sm:px-6 md:px-3 lg:px-6"
+          >ログアウト</CommonButton
+        ></router-link
       >
     </div>
     <div v-if="userStore.getRoles().includes(Roles.Admin)">
