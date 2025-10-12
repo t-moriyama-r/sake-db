@@ -17,7 +17,7 @@
       :default="initialData?.imageBase64"
     >
       <!-- trigger を ref に保存 -->
-      <template v-if="setTrigger(setImage)"></template>
+      <template v-if="setTrigger(setImage)" />
     </UploadWithImage>
     <div class="mt-5 flex gap-4">
       <ReturnButton

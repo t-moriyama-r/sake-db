@@ -15,16 +15,15 @@
         {{ line }}<br v-if="index !== descriptionLines.length - 1" />
       </span>
     </div>
-    <div>
+    <div class="max-w-[515px]">
       <iframe
         v-if="liquor.youtube"
-        width="560"
-        height="315"
+        class="w-full aspect-video"
         :src="embedUrl ?? undefined"
         title="YouTube video player"
         allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
         allowfullscreen
-      ></iframe>
+      />
     </div>
     <router-link :to="{ name: 'LiquorEdit', params: { id: liquor.id } }">
       <CommonButton>編集する</CommonButton></router-link

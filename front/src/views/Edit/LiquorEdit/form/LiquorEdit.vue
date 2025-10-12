@@ -1,16 +1,19 @@
 <template>
-  <p v-if="route.params.id">お酒ページ編集</p>
-  <p v-else>お酒ページ作成</p>
-  <div class="flex">
-    <div class="flex-1">
+  <div id="layout" class="flex">
+    <div id="form-container" class="flex-1 w-full md:min-w-[380px]">
+      <h1 v-if="route.params.id">お酒ページ編集</h1>
+      <h1 v-else>お酒ページ作成</h1>
+
+      <div class="md:hidden">
+        <LiquorLogsButton />
+      </div>
       <LiquorForm
         :initial-data="initialValues"
         :version-no="historyData?.now.versionNo ?? null"
       />
     </div>
-    <div>
+    <div id="versions" v-if="historyData?.histories" class="hidden md:block">
       <LiquorLogs
-        v-if="historyData?.histories"
         :logs="[historyData.now, ...historyData.histories]"
         @selectLog="reflectLog"
       />
@@ -25,9 +28,9 @@ import { useRoute } from 'vue-router';
 import type { Liquor } from '@/graphQL/Liquor/liquor';
 import type { LiquorHistoryData } from '@/graphQL/Liquor/liquorLog';
 import LiquorForm from '@/views/Edit/LiquorEdit/form/LiquorForm.vue';
-import LiquorLogs from '@/views/Edit/LiquorEdit/form/LiquorLogs.vue';
+import LiquorLogs from '@/views/Edit/LiquorEdit/form/LiquorLogs/LiquorLogs.vue';
+import LiquorLogsButton from '@/views/Edit/LiquorEdit/form/LiquorLogs/LiquorLogsButton/LiquorLogsButton.vue';
 
-// propsから受け取る初期値
 const props = defineProps<{
   historyData: LiquorHistoryData | null;
 }>();
@@ -50,4 +53,16 @@ watch(
 );
 </script>
 
-<style scoped></style>
+<style scoped>
+div#layout {
+  margin: 0 1rem;
+}
+
+div#form-container {
+  margin: 0 1rem;
+}
+
+div#versions {
+  margin: 0 1rem;
+}
+</style>

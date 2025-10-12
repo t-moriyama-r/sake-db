@@ -3,23 +3,28 @@ directive @adminAuth(role: String) on FIELD_DEFINITION
 directive @auth on FIELD_DEFINITION
 
 """
-The @defer directive may be specified on a fragment spread to imply
-de-prioritization, that causes the fragment to be omitted in the initial
-response, and delivered as a subsequent response afterward. A query with @defer
-directive will cause the request to potentially return multiple responses, where
-non-deferred data is delivered in the initial response and data deferred
-delivered in a subsequent response. @include and @skip take precedence over @defer.
+Directs the executor to defer this fragment when the `if` argument is true or undefined.
 """
-directive @defer(if: Boolean = true, label: String) on FRAGMENT_SPREAD | INLINE_FRAGMENT
+directive @defer(
+  """Deferred when true or undefined."""
+  if: Boolean = true
+
+  """Unique name"""
+  label: String
+) on FRAGMENT_SPREAD | INLINE_FRAGMENT
+
+"""
+Indicates exactly one field must be supplied and this field must not be `null`.
+"""
+directive @oneOf on INPUT_OBJECT
 
 directive @optionalAuth on FIELD_DEFINITION
 
-"""
-The @specifiedBy built-in directive is used within the type system definition
-language to provide a scalar specification URL for specifying the behavior of
-custom scalar types.
-"""
-directive @specifiedBy(url: String!) on SCALAR
+"""Exposes a URL that specifies the behavior of this scalar."""
+directive @specifiedBy(
+  """The URL that specifies the behavior of this scalar."""
+  url: String!
+) on SCALAR
 
 type AffiliateData {
   items: [AffiliateItem!]
@@ -74,6 +79,10 @@ type Category {
   imageBase64: String
   versionNo: Int
   readonly: Boolean!
+  createUserId: ID
+  createUserName: String
+  updateUserId: ID
+  updateUserName: String
   updatedAt: DateTime
   children: [Category!]
 }
@@ -125,6 +134,10 @@ type Liquor {
   rate3Users: [ID!]!
   rate2Users: [ID!]!
   rate1Users: [ID!]!
+  createUserId: ID
+  createUserName: String
+  updateUserId: ID
+  updateUserName: String
   versionNo: Int!
 }
 
