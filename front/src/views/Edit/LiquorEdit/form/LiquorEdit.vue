@@ -3,6 +3,10 @@
     <div id="form-container" class="flex-1 w-full md:min-w-[380px]">
       <h1 v-if="route.params.id">お酒ページ編集</h1>
       <h1 v-else>お酒ページ作成</h1>
+
+      <div class="md:hidden">
+        <LiquorLogsButton />
+      </div>
       <LiquorForm
         :initial-data="initialValues"
         :version-no="historyData?.now.versionNo ?? null"
@@ -25,6 +29,7 @@ import type { Liquor } from '@/graphQL/Liquor/liquor';
 import type { LiquorHistoryData } from '@/graphQL/Liquor/liquorLog';
 import LiquorForm from '@/views/Edit/LiquorEdit/form/LiquorForm.vue';
 import LiquorLogs from '@/views/Edit/LiquorEdit/form/LiquorLogs/LiquorLogs.vue';
+import LiquorLogsButton from '@/views/Edit/LiquorEdit/form/LiquorLogs/LiquorLogsButton/LiquorLogsButton.vue';
 
 const props = defineProps<{
   historyData: LiquorHistoryData | null;
