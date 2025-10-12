@@ -20,7 +20,6 @@
 </template>
 
 <script setup lang="ts">
-// propsから受け取る初期値
 import { format } from 'date-fns';
 
 import type { Liquor } from '@/graphQL/Liquor/liquor';

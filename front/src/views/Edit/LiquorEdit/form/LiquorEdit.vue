@@ -3,7 +3,6 @@
     <div id="form-container" class="flex-1 w-full md:min-w-[380px]">
       <h1 v-if="route.params.id">お酒ページ編集</h1>
       <h1 v-else>お酒ページ作成</h1>
-
       <div class="md:hidden">
         <LiquorLogsButton />
       </div>

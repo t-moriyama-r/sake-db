@@ -1,17 +1,17 @@
 <template>
-  <p v-if="route.params.id">カテゴリー編集</p>
-  <p v-else>カテゴリー作成</p>
-  <div class="flex">
-    <div class="flex-1">
+  <div id="layout" class="flex">
+    <div id="form-container" class="flex-1 w-full md:min-w-[380px]">
+      <h1 v-if="route.params.id">カテゴリー編集</h1>
+      <h1 v-else>カテゴリー作成</h1>
+      <div class="md:hidden">TODO: カテゴリーログボタン</div>
       <CategoryForm
         :initial-data="initialValues"
         :version-no="historyData?.now.versionNo ?? null"
         :readonly="historyData?.now.readonly ?? false"
       />
     </div>
-    <div>
+    <div id="versions" v-if="historyData?.histories" class="hidden md:block">
       <CategoryLogs
-        v-if="historyData?.histories"
         :logs="[historyData.now, ...historyData.histories]"
         @selectLog="reflectLog"
       />
@@ -54,4 +54,16 @@ const reflectLog = (log: Category) => {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+div#layout {
+  margin: 0 1rem;
+}
+
+div#form-container {
+  margin: 0 1rem;
+}
+
+div#versions {
+  margin: 0 1rem;
+}
+</style>
