@@ -1,8 +1,20 @@
 <template>
   <div>
-    <div v-for="log in logs" :key="log.versionNo" @click="handleClick(log)">
-      バージョン：{{ log.versionNo }}
-      {{ log.updatedAt ? format(log.updatedAt, 'yyyy/MM/dd HH:mm:ss') : '' }}
+    <div>過去のバージョン</div>
+    <div
+      v-for="log in logs"
+      class="version-link"
+      :key="log.versionNo"
+      @click="handleClick(log)"
+    >
+      <span class="mr-1">{{ log.versionNo }}:</span>
+      <span>
+        {{
+          log.updatedAt ? format(log.updatedAt, 'yyyy/MM/dd HH:mm:ss') : ''
+        }} </span
+      ><span v-if="log.updateUserId && log.updateUserName"
+        >({{ log.updateUserName }})</span
+      >
     </div>
   </div>
 </template>
@@ -24,4 +36,12 @@ const handleClick = (log: Category) => {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+div.version-link {
+  cursor: pointer;
+
+  &:hover {
+    background-color: #ddd;
+  }
+}
+</style>

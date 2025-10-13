@@ -24,6 +24,7 @@
 import { ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
+import { assertNonNullable } from '@/funcs/util/core/assertNonNullable';
 import type { Liquor } from '@/graphQL/Liquor/liquor';
 import type { LiquorHistoryData } from '@/graphQL/Liquor/liquorLog';
 import LiquorForm from '@/views/Edit/LiquorEdit/form/LiquorForm.vue';
@@ -41,12 +42,13 @@ const initialValues = ref<Liquor | null>(props.historyData?.now ?? null);
 
 //バージョン履歴をコピーする時に呼ばれる関数
 const reflectLog = (log: Liquor) => {
-  initialValues.value = { ...log, id: props.historyData!.now.id }; //過去のデータをそのまま初期値として代入する(IDだけは現在の値で上書き。ここが呼び出された次点で初期値は存在しないとおかしいのでアサーション)
+  assertNonNullable(props.historyData);
+  initialValues.value = { ...log, id: props.historyData.now.id }; //過去のデータをそのまま初期値として代入する(IDだけは現在の値で上書き。ここが呼び出された時点で初期値は存在しないとおかしいのでアサーション)
 };
 
 watch(
   () => props.historyData,
-  (liquor: LiquorHistoryData | null) => {
+  (liquor) => {
     initialValues.value = liquor?.now ?? null;
   },
 );
