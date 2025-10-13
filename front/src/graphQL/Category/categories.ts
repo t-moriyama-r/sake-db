@@ -10,6 +10,8 @@ export interface Category {
   readonly description: string;
   readonly versionNo: number;
   readonly readonly: boolean;
+  readonly updateUserId?: string | null;
+  readonly updateUserName?: string | null;
   readonly createdAt: Date | null;
   readonly updatedAt: Date | null;
   readonly children: Category[] | null;
