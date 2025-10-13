@@ -1,8 +1,12 @@
 <template>
   <div id="layout" class="flex">
     <div id="form-container" class="flex-1 w-full md:min-w-[380px]">
-      <h1 v-if="route.params.id">お酒ページ編集</h1>
-      <h1 v-else>お酒ページ作成</h1>
+      <div class="flex">
+        <BackButton />
+        <h1 v-if="route.params.id">お酒ページ編集</h1>
+        <h1 v-else>お酒ページ作成</h1>
+      </div>
+
       <div class="md:hidden">
         <LiquorLogsButton />
       </div>
@@ -24,6 +28,7 @@
 import { ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
+import BackButton from '@/components/parts/common/BackButton.vue';
 import { assertNonNullable } from '@/funcs/util/core/assertNonNullable';
 import type { Liquor } from '@/graphQL/Liquor/liquor';
 import type { LiquorHistoryData } from '@/graphQL/Liquor/liquorLog';
@@ -57,6 +62,11 @@ watch(
 <style scoped>
 div#layout {
   margin: 0 1rem;
+}
+
+h1 {
+  font-size: 150%;
+  font-weight: bold;
 }
 
 div#form-container {

@@ -1,8 +1,11 @@
 <template>
   <div id="layout" class="flex">
     <div id="form-container" class="flex-1 w-full md:min-w-[380px]">
-      <h1 v-if="route.params.id">カテゴリー編集</h1>
-      <h1 v-else>カテゴリー作成</h1>
+      <div class="flex">
+        <BackButton />
+        <h1 v-if="route.params.id">カテゴリー編集</h1>
+        <h1 v-else>カテゴリー作成</h1>
+      </div>
       <div class="md:hidden">TODO: カテゴリーログボタン</div>
       <CategoryForm
         :initial-data="initialValues"
@@ -23,6 +26,7 @@
 import { ref } from 'vue';
 import { useRoute } from 'vue-router';
 
+import BackButton from '@/components/parts/common/BackButton.vue';
 import type { Category } from '@/graphQL/Category/categories';
 import type { CategoryHistoryData } from '@/graphQL/Category/categoryLog';
 import CategoryForm from '@/views/Edit/CategoryEdit/form/CategoryForm.vue';
@@ -57,6 +61,10 @@ const reflectLog = (log: Category) => {
 <style scoped>
 div#layout {
   margin: 0 1rem;
+}
+h1 {
+  font-size: 150%;
+  font-weight: bold;
 }
 
 div#form-container {

@@ -1,5 +1,6 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
+  faArrowLeft,
   faArrowRightToBracket,
   faMagnifyingGlass,
   faPersonCirclePlus,
@@ -15,6 +16,7 @@ library.add(
   faPlus,
   faWineBottle,
   faMagnifyingGlass,
+  faArrowLeft,
 );
 
 export function registerFontAwesome(
