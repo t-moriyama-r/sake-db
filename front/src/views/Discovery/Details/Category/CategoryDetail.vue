@@ -13,6 +13,7 @@
       {{ line }}<br v-if="index !== descriptionLines.length - 1" />
     </span>
   </div>
+  <AffiliateContainer :name="category.name" />
   <div class="mt-2 mb-2">
     <CategoryChildren
       v-if="category.children"
@@ -29,6 +30,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
+import AffiliateContainer from '@/components/blocks/common/amazon/AffiliateContainer.vue';
 import CommonButton from '@/components/parts/common/CommonButton/CommonButton.vue';
 import type { Category } from '@/graphQL/Category/categories';
 import CategoryChildren from '@/views/Discovery/Details/Category/CategoryChildren.vue';
