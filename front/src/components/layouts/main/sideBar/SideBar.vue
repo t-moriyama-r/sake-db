@@ -15,18 +15,19 @@
         </div>
         <div class="block md:hidden" @click="emitCloseSidebar">X</div>
       </div>
-      <div>カテゴリ</div>
-      <div>
-        <router-link class="inline-block" :to="{ name: 'Index' }"
-          >すべて</router-link
-        >
-      </div>
-      <CategoryParent
-        v-for="category in categoryList"
-        :key="category.id"
-        :category="category"
-        :display-ids="filteredCategoryIdList"
-      />
+      <section class="menu">
+        <div :class="{ 'font-bold': isNonSelectedCategory }">
+          <router-link class="inline-block" :to="{ name: 'Index' }"
+            >すべてのお酒</router-link
+          >
+        </div>
+        <CategoryParent
+          v-for="category in categoryList"
+          :key="category.id"
+          :category="category"
+          :display-ids="filteredCategoryIdList"
+        />
+      </section>
     </aside>
     <aside class="new-post">
       <router-link :to="{ name: 'CategoryEdit' }" @click="emitCloseSidebar"
@@ -85,6 +86,8 @@ watch(
   },
 );
 
+const isNonSelectedCategory = computed(() => sidebarStore.content === null);
+
 // sidebarStore.contentに基づいてカテゴリをフィルタリングする
 const filteredCategoryIdList: ComputedRef<number[]> = computed(() => {
   if (!categoryList.value) return []; //そもそも存在していなければ処理終了
@@ -98,5 +101,9 @@ div.container {
   width: 180px;
   height: 100%;
   border: 1px solid #ccc;
+}
+
+section.menu {
+  padding-left: 5px;
 }
 </style>

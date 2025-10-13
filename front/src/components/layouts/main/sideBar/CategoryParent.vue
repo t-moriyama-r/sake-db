@@ -1,17 +1,22 @@
 <template>
   <div class="ml-2" v-if="props.displayIds.includes(props.category.id)">
-    ┗<span
-      v-if="sidebarStore.content != props.category.id"
-      class="category-name"
-      ><router-link
-        class="inline-block"
-        :to="{ name: 'CategoryNarrowDown', params: { id: props.category.id } }"
-        >{{ props.category.name }}</router-link
-      ></span
-    >
-    <span v-else class="category-name selected font-bold">
-      {{ props.category.name }}
-    </span>
+    <div class="flex" v-if="sidebarStore.content != props.category.id">
+      ┗<span class="category-name"
+        ><router-link
+          class="inline-block"
+          :to="{
+            name: 'CategoryNarrowDown',
+            params: { id: props.category.id },
+          }"
+          >{{ props.category.name }}</router-link
+        ></span
+      >
+    </div>
+    <div v-else class="flex">
+      ┗<span class="category-name font-bold">
+        {{ props.category.name }}
+      </span>
+    </div>
     <CategoryParent
       v-for="child in props.category.children"
       :key="child.id"
