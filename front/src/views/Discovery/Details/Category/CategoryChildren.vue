@@ -1,11 +1,11 @@
 <!--子カテゴリのリスト-->
 <template>
-  子カテゴリ一覧
-  <div v-for="category in categoryList" :key="category.id">
+  <p class="title">子カテゴリ一覧</p>
+  <ul v-for="category in categoryList" :key="category.id">
     <router-link :to="{ name: 'CategoryDetail', params: { id: category.id } }"
-      ><p>{{ category.name }}</p></router-link
+      ><li>{{ category.name }}</li></router-link
     >
-  </div>
+  </ul>
 </template>
 <script setup lang="ts">
 import type { Category } from '@/graphQL/Category/categories';
@@ -17,4 +17,9 @@ interface Props {
 const { categoryList } = defineProps<Props>();
 </script>
 
-<style scoped></style>
+<style scoped>
+p.title {
+  font-size: 125%;
+  font-weight: bold;
+}
+</style>

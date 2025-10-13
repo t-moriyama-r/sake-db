@@ -6,18 +6,14 @@
 import { ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
-import useQuery from '@/funcs/composable/useQuery/useQuery';
-import {
-  type Category,
-  type CategoryResponse,
-  GET_DETAIL,
-} from '@/graphQL/Category/categories';
+import { type Category } from '@/graphQL/Category/categories';
+import { getCategoryDetail } from '@/repository/getCategoryDetail';
 import { useSelectedCategoryStore } from '@/stores/sidebar';
 import CategoryDetail from '@/views/Discovery/Details/Category/CategoryDetail.vue';
 
 const route = useRoute(); // 現在のルートを取得
 const sidebarStore = useSelectedCategoryStore();
-const { fetch } = useQuery<CategoryResponse<Category>>(GET_DETAIL);
+const { fetch } = getCategoryDetail();
 
 const category = ref<Category | null>(null);
 
