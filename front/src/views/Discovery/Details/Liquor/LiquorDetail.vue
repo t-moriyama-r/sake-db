@@ -2,7 +2,10 @@
 <template>
   <div v-if="liquor">
     <FlavorMap :liquor="liquor" />
-    <p class="title">{{ liquor.name }}</p>
+    <div class="flex">
+      <BackButton />
+      <p class="title">{{ liquor.name }}</p>
+    </div>
     <CategoryTrail :category-trails="liquor.categoryTrail" />
     <img
       v-if="liquor.imageUrl"
@@ -38,6 +41,7 @@
 import { computed } from 'vue';
 
 import AffiliateContainer from '@/components/blocks/common/amazon/AffiliateContainer.vue';
+import BackButton from '@/components/parts/common/BackButton.vue';
 import CommonButton from '@/components/parts/common/CommonButton/CommonButton.vue';
 import type { Liquor } from '@/graphQL/Liquor/liquor';
 import LiquorBoard from '@/views/Discovery/Details/Liquor/board/LiquorBoard.vue';

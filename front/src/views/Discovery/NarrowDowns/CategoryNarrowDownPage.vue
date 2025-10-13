@@ -1,9 +1,9 @@
 <template>
   <div>
-    <p>
-      カテゴリで検索:<span v-if="Number(route.params.id) < 10">
-        {{ categoryName }}</span
-      >
+    <p class="flex">
+      <BackButton to="Index" />
+      <span>カテゴリで検索:</span
+      ><span v-if="Number(route.params.id) < 10"> {{ categoryName }}</span>
       <router-link
         v-else
         :to="{ name: 'CategoryDetail', params: { id: route.params.id } }"
@@ -25,6 +25,7 @@
 import { computed, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
+import BackButton from '@/components/parts/common/BackButton.vue';
 import useQuery from '@/funcs/composable/useQuery/useQuery';
 import truncateString from '@/funcs/util/transform/truncateString';
 import type { Liquor } from '@/graphQL/Index/random';

@@ -1,5 +1,9 @@
 <template>
-  <div>
+  <div class="flex">
+    <BackButton
+      to="CategoryNarrowDown"
+      :option="{ params: { id: category.id } }"
+    />
     <p class="title">{{ category.name }}</p>
   </div>
   <img
@@ -31,6 +35,7 @@
 import { computed } from 'vue';
 
 import AffiliateContainer from '@/components/blocks/common/amazon/AffiliateContainer.vue';
+import BackButton from '@/components/parts/common/BackButton.vue';
 import CommonButton from '@/components/parts/common/CommonButton/CommonButton.vue';
 import type { Category } from '@/graphQL/Category/categories';
 import CategoryChildren from '@/views/Discovery/Details/Category/CategoryChildren.vue';
