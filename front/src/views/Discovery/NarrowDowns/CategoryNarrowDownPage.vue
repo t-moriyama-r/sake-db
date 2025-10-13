@@ -1,13 +1,20 @@
 <template>
-  カテゴリで検索：
-  <span v-if="Number(route.params.id) < 10"> {{ categoryName }}</span>
-  <router-link
-    v-else
-    :to="{ name: 'CategoryEdit', params: { id: route.params.id } }"
-  >
-    {{ categoryName }}</router-link
-  >
-  {{ categoryDescription }}
+  <div>
+    <p>
+      カテゴリで検索:<span v-if="Number(route.params.id) < 10">
+        {{ categoryName }}</span
+      >
+      <router-link
+        v-else
+        :to="{ name: 'CategoryDetail', params: { id: route.params.id } }"
+      >
+        {{ categoryName }}</router-link
+      >
+    </p>
+    <div class="max-sm:text-sm">
+      {{ truncatedDescription }}
+    </div>
+  </div>
   <FromCategory
     :key="route.params.id as string"
     v-if="liquors"
@@ -15,10 +22,11 @@
   />
 </template>
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
 import useQuery from '@/funcs/composable/useQuery/useQuery';
+import truncateString from '@/funcs/util/transform/truncateString';
 import type { Liquor } from '@/graphQL/Index/random';
 import {
   LIQUOR_LIST_FROM_CATEGORY,
@@ -34,6 +42,9 @@ const { fetch } = useQuery<ListFromCategoryResponse>(LIQUOR_LIST_FROM_CATEGORY);
 const liquors = ref<Liquor[] | null>(null);
 const categoryName = ref<string>('');
 const categoryDescription = ref<string>('');
+const truncatedDescription = computed(() =>
+  truncateString({ str: categoryDescription.value ?? '', maxLength: 100 }),
+);
 
 // データフェッチ
 const fetchData = async (id: number): Promise<void> => {
