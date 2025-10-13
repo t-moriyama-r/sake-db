@@ -33,7 +33,6 @@ const { historyData } = defineProps<{
   historyData: CategoryHistoryData | null;
 }>();
 
-console.log('historyData:', historyData);
 const route = useRoute(); // 現在のルートを取得
 
 // 初期値を定義

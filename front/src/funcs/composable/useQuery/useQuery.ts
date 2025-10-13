@@ -42,14 +42,6 @@ export function useQuery<T = unknown, V = unknown>(
     const { variables, headers } = generate(request, options, option);
 
     debug(operationName, '送信データ：', variables);
-    console.log('option:', {
-      ...variables,
-      ...options,
-      query,
-      context: {
-        headers, // ヘッダーをセット
-      },
-    });
     //ここで例外が投げられるとfetchでキャッチする
     const result = (await client.query<T>({
       ...variables,
@@ -59,7 +51,6 @@ export function useQuery<T = unknown, V = unknown>(
         headers, // ヘッダーをセット
       },
     })) as ApolloQueryResult<T>; // MaybeMaskedを剥がす
-    console.log('a:', result);
     debug(operationName, 'レスポンス：', result.data);
 
     data.value = result.data;
