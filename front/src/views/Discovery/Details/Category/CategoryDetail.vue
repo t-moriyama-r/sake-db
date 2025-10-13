@@ -1,21 +1,29 @@
 <template>
-  カテゴリー詳細
   <div>
-    <p>{{ category.name }}</p>
+    <p class="title">{{ category.name }}</p>
   </div>
-  <img v-if="category.imageUrl" :src="category.imageUrl" alt="画像" />
+  <img
+    v-if="category.imageUrl"
+    :src="category.imageUrl"
+    class="image"
+    alt="画像"
+  />
   <div>
     <span v-for="(line, index) in descriptionLines" :key="index">
       {{ line }}<br v-if="index !== descriptionLines.length - 1" />
     </span>
   </div>
-  <CategoryChildren
-    v-if="category.children"
-    :category-list="category.children"
-  />
-  <router-link :to="{ name: 'CategoryEdit', params: { id: category.id } }">
-    <CommonButton>編集する</CommonButton></router-link
-  >
+  <div class="mt-2 mb-2">
+    <CategoryChildren
+      v-if="category.children"
+      :category-list="category.children"
+    />
+  </div>
+  <div class="p-2">
+    <router-link :to="{ name: 'CategoryEdit', params: { id: category.id } }">
+      <CommonButton>編集する</CommonButton></router-link
+    >
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -31,8 +39,18 @@ interface Props {
 const { category } = defineProps<Props>();
 
 const descriptionLines = computed<string[]>(() => {
+  if (category.description.length === 0) return ['説明なし'];
   return category.description.split('\n');
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+p.title {
+  font-size: 150%;
+  font-weight: bold;
+}
+img.image {
+  max-height: 300px;
+  max-width: 500px;
+}
+</style>
