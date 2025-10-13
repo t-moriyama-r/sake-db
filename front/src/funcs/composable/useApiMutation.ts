@@ -3,7 +3,6 @@ import axios, { type AxiosError, type AxiosResponse } from 'axios';
 import { unref } from 'vue';
 
 import { TOKEN_EXPIRE_MSG } from '@/funcs/composable/const';
-import { useToast } from '@/funcs/composable/useToast';
 import { debug, errorDebug } from '@/funcs/util/core/console';
 import router from '@/router';
 import { refreshToken, useUserStore } from '@/stores/userStore/userStore';
@@ -16,7 +15,6 @@ export function useApiMutation<
   apiType: APIType<Request, Response>,
   options: { isAuth: boolean } = { isAuth: false },
 ) {
-  const toast = useToast();
   const mutationFn = async (
     data: Request,
   ): Promise<AxiosResponse<Response>> => {
@@ -61,10 +59,8 @@ export function useApiMutation<
       } else if ((err as Error).message == 'unauthorized') {
         //認証エラーの場合はログインページにリダイレクト
         void router.push({ name: 'Login' });
-      } else {
-        toast.errorToast(errResponse?.message || '不明なエラー');
       }
-      throw err; // 親にエラーを投げる
+      throw new Error(errResponse?.message || '不明なエラー'); // 親にエラーを投げる
     }
   };
 
