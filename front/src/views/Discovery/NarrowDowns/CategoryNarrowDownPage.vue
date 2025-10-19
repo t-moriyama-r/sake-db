@@ -17,7 +17,8 @@
   </div>
   <FromCategory
     :key="route.params.id as string"
-    v-if="liquors"
+    v-if="liquors && categoryId"
+    :category-id="categoryId"
     :liquors="liquors"
   />
 </template>
@@ -40,6 +41,7 @@ const route = useRoute(); // 現在のルートを取得
 const sidebarStore = useSelectedCategoryStore();
 const { fetch } = useQuery<ListFromCategoryResponse>(LIQUOR_LIST_FROM_CATEGORY);
 
+const categoryId = ref<string | null>(null);
 const liquors = ref<Liquor[] | null>(null);
 const categoryName = ref<string>('');
 const categoryDescription = ref<string>('');
@@ -60,14 +62,16 @@ const fetchData = async (id: number): Promise<void> => {
 
 // `watch` を使ってルートパラメータの変更を監視
 watch(
-  () => route.params.id, // ルートのパスやクエリ、パラメータなどを監視
+  () => route.params.id,
   (to) => {
     // ルートが変更された際に実行される処理
     const id = to as string; // ルートパラメータからidを取得
     if (!id) {
+      categoryId.value = null;
       return;
     }
-    fetchData(Number(to));
+    categoryId.value = id;
+    fetchData(Number(id));
   },
   { immediate: true }, // 初回レンダリング時に実行される
 );
