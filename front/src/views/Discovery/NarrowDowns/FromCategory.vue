@@ -8,7 +8,7 @@
       <LiquorCard v-for="liquor in liquors" :liquor="liquor" :key="liquor.id" />
     </CardContainer>
   </div>
-  <EmptyCategory v-else />
+  <EmptyCategory v-else :category-id="categoryId" />
 </template>
 
 <script setup lang="ts">
@@ -18,10 +18,11 @@ import type { Liquor } from '@/graphQL/Index/random';
 import EmptyCategory from '@/views/Discovery/NarrowDowns/EmptyCategory.vue';
 
 interface Props {
+  categoryId: string;
   liquors: Liquor[];
 }
 
-const { liquors } = defineProps<Props>();
+defineProps<Props>();
 </script>
 
 <style scoped>

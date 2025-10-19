@@ -59,6 +59,7 @@ import {
 // propsから受け取る初期値
 const props = defineProps<{
   initialData: LiquorForEdit | null;
+  initialCategoryId: number | null;
   versionNo: number | null;
 }>();
 
@@ -111,7 +112,7 @@ onMounted(() => {
 });
 
 const initialParentId: ComputedRef<number | null> = computed(
-  () => props.initialData?.categoryId ?? null,
+  () => props.initialData?.categoryId ?? props.initialCategoryId ?? null,
 );
 
 // extends GenericObjectは型が広すぎるのでキャストして対応する

@@ -12,6 +12,7 @@
       </div>
       <LiquorForm
         :initial-data="initialValues"
+        :initial-category-id="initialCategoryId"
         :version-no="historyData?.now.versionNo ?? null"
       />
     </div>
@@ -25,11 +26,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
 import BackButton from '@/components/parts/common/BackButton.vue';
 import { assertNonNullable } from '@/funcs/util/core/assertNonNullable';
+import { isEmpty } from '@/funcs/util/isEmpty';
 import type { Liquor } from '@/graphQL/Liquor/liquor';
 import type { LiquorHistoryData } from '@/graphQL/Liquor/liquorLog';
 import LiquorForm from '@/views/Edit/LiquorEdit/form/LiquorForm.vue';
@@ -44,6 +46,12 @@ const route = useRoute(); // 現在のルートを取得
 
 // 初期値を定義
 const initialValues = ref<Liquor | null>(props.historyData?.now ?? null);
+const initialCategoryId = ref<number | null>(null); // 初期カテゴリを指定して新規投稿する場合
+
+onMounted(async () => {
+  const categoryId: string = route.params.categoryId as string;
+  initialCategoryId.value = !isEmpty(categoryId) ? Number(categoryId) : null;
+});
 
 //バージョン履歴をコピーする時に呼ばれる関数
 const reflectLog = (log: Liquor) => {

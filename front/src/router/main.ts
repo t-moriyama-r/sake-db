@@ -48,6 +48,11 @@ const MainRouter = {
           name: 'LiquorEdit',
           component: CreatePost,
         },
+        {
+          path: 'create/:categoryId',
+          name: 'LiquorPostByCategory',
+          component: CreatePost,
+        },
       ],
     },
     {
