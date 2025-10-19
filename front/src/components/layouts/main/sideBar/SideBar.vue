@@ -13,7 +13,9 @@
             />酒データベース(α)</router-link
           >
         </div>
-        <div class="block md:hidden" @click="emitCloseSidebar">X</div>
+        <div class="block md:hidden cursor-pointer" @click="emitCloseSidebar">
+          X
+        </div>
       </div>
       <section class="menu">
         <div :class="{ 'font-bold': isNonSelectedCategory }">

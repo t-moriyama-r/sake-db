@@ -3,7 +3,7 @@ import { nextTick, ref } from 'vue';
 
 import client from '@/apolloClient';
 import { useMutation } from '@/funcs/composable/useQuery/useQuery';
-import { debug, errorDebug } from '@/funcs/util/core/console';
+import { debug } from '@/funcs/util/core/console';
 import {
   LOGIN_WITH_REFRESH_TOKEN,
   LOGOUT,
@@ -54,7 +54,7 @@ export const useUserStore = defineStore(USER_STORE, () => {
 
   //画面リロード時・情報アップデート時などにユーザーデータを取得するために使用(情報を変えない限りキャッシュを使った方がいい)
   async function restoreUserData(option?: { isReFetch?: boolean }) {
-    console.log('restore userStore');
+    debug('restore userStore');
     try {
       // APIからユーザー情報を取得(ユーザー情報)
       const { loginWithRefreshToken: payload } = await refreshTokenExecute(
@@ -70,7 +70,7 @@ export const useUserStore = defineStore(USER_STORE, () => {
 
       await nextTick(); // nextTickでUIの更新を保証
     } catch (error) {
-      errorDebug('restoreUserData失敗', error); // トーストは必要ない
+      debug('restoreUserData失敗', error); // トーストは必要ない
     }
   }
 

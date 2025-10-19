@@ -1,46 +1,35 @@
 <template>
   <main class="flex">
     <section class="block md:hidden">
-      <Menu @click="handleOpenSidebarClick">
-        <MenuButton>
-          <svg
-            class="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M4 6h16M4 12h16M4 18h16"
-            />
-          </svg>
-        </MenuButton>
-      </Menu>
+      <CategoriesForSmartMenu />
     </section>
     <section class="flex flex-1">
       <KeywordSearch />
     </section>
-    <section>
+    <section class="flex items-center justify-center">
+      <router-link :to="{ name: 'LiquorEdit' }"
+        ><CommonButton :size="'small'" class="px-6 md:px-3 lg:px-6"
+          ><FontAwesomeIcon icon="fa-solid fa-plus" />投稿</CommonButton
+        ></router-link
+      >
+    </section>
+    <section class="block sm:hidden">
+      <AccountMenuForSmart />
+    </section>
+    <section class="hidden sm:block">
       <MainMenu />
     </section>
   </main>
 </template>
 
 <script setup lang="ts">
-import { Menu, MenuButton } from '@headlessui/vue';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 import KeywordSearch from '@/components/blocks/keywordSearch/KeywordSearch.vue';
-import MainMenu from '@/components/layouts/main/header/menu/MainMenu.vue';
-
-const emit = defineEmits<{
-  (_: 'openSideBar'): void;
-}>();
-const handleOpenSidebarClick = () => {
-  emit('openSideBar');
-};
+import MainMenu from '@/components/layouts/main/header/accountMenu/AccountMenu.vue';
+import AccountMenuForSmart from '@/components/layouts/main/header/accountMenuForSmart/AccountMenuForSmartButton.vue';
+import CategoriesForSmartMenu from '@/components/layouts/main/header/categoriesForSmart/CategoriesForSmartMenuButton.vue';
+import CommonButton from '@/components/parts/common/CommonButton/CommonButton.vue';
 </script>
 
 <style scoped>

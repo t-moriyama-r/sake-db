@@ -1,12 +1,5 @@
 <template>
   <div class="flex pr-2 gap-2">
-    <div>
-      <router-link :to="{ name: 'LiquorEdit' }"
-        ><CommonButton :size="'small'" class="px-1 sm:px-6 md:px-3 lg:px-6"
-          ><FontAwesomeIcon icon="fa-solid fa-plus" />投稿</CommonButton
-        ></router-link
-      >
-    </div>
     <div v-if="!userStore.isLogin">
       <router-link :to="{ name: 'Login' }"
         ><CommonButton
@@ -44,7 +37,7 @@
 <script setup lang="ts">
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
-import AccountInfo from '@/components/layouts/main/header/AccountInfo.vue';
+import AccountInfo from '@/components/layouts/main/header/accountMenu/AccountInfo.vue';
 import CommonButton from '@/components/parts/common/CommonButton/CommonButton.vue';
 import { useToast } from '@/funcs/composable/useToast';
 import { Roles } from '@/graphQL/Auth/types';
