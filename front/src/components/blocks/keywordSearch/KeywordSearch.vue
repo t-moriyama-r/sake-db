@@ -1,5 +1,5 @@
 <template>
-  <div class="flex-1 px-6 max-w-[480px]">
+  <div class="flex-1 px-0 sm:px-6 max-w-[480px]">
     <Form
       @submit="onSubmit"
       :initial-values="{ keyword: '' }"

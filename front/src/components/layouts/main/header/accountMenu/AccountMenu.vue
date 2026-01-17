@@ -1,24 +1,10 @@
 <template>
   <div class="flex pr-2 gap-2">
     <div v-if="!userStore.isLogin">
-      <router-link :to="{ name: 'Login' }"
-        ><CommonButton
-          :size="'small'"
-          :color="ColorType.None"
-          class="px-1 sm:px-6 md:px-3 lg:px-6"
-        >
-          <FontAwesomeIcon
-            icon="fa-solid fa-arrow-right-to-bracket"
-          />ログイン</CommonButton
-        ></router-link
-      >
-      <router-link :to="{ name: 'Register' }"
-        ><CommonButton :size="'small'" class="px-1 sm:px-6 md:px-3 lg:px-6"
-          ><FontAwesomeIcon
-            icon="fa-solid fa-person-circle-plus"
-          />新規登録</CommonButton
-        ></router-link
-      >
+      <LoginAndSignUpButton class="px-1 sm:px-6 md:px-3 lg:px-6">
+        <FontAwesomeIcon icon="fa-solid fa-arrow-right-to-bracket" />ログイン /
+        新規登録
+      </LoginAndSignUpButton>
     </div>
     <div class="flex" v-else>
       <AccountInfo />
@@ -38,11 +24,11 @@
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 import AccountInfo from '@/components/layouts/main/header/accountMenu/AccountInfo.vue';
+import LoginAndSignUpButton from '@/components/layouts/main/header/loginAndSignUp/LoginAndSignUpButton.vue';
 import CommonButton from '@/components/parts/common/CommonButton/CommonButton.vue';
 import { useToast } from '@/funcs/composable/useToast';
 import { Roles } from '@/graphQL/Auth/types';
 import { useUserStore } from '@/stores/userStore/userStore';
-import { ColorType } from '@/type/common/ColorType';
 
 const userStore = useUserStore();
 const toast = useToast();
