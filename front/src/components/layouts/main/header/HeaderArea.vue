@@ -13,10 +13,10 @@
         ></router-link
       >
     </section>
-    <section class="block sm:hidden shrink-0">
+    <section class="block sm:hidden shrink-0 overflow-hidden">
       <LoginAndSignUpButton />
     </section>
-    <section class="hidden sm:block shrink-0">
+    <section class="hidden sm:block shrink-0 overflow-hidden">
       <AccountMenu />
     </section>
   </main>
