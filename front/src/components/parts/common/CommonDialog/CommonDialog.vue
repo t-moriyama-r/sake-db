@@ -54,6 +54,6 @@ function handleClose() {
 
 <style scoped>
 div.dialog-container {
-  min-width: 30em;
+  min-width: min(30em, calc(100vw - 2rem));
 }
 </style>

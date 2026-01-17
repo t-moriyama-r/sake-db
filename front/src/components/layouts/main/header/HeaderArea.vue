@@ -1,46 +1,36 @@
 <template>
-  <main class="flex">
+  <main class="flex items-center gap-1 sm:gap-2">
     <section class="block md:hidden">
-      <Menu @click="handleOpenSidebarClick">
-        <MenuButton>
-          <svg
-            class="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M4 6h16M4 12h16M4 18h16"
-            />
-          </svg>
-        </MenuButton>
-      </Menu>
+      <CategoriesForSmartMenu />
     </section>
-    <section class="flex flex-1">
+    <section class="flex flex-1 min-w-0">
       <KeywordSearch />
     </section>
-    <section>
-      <MainMenu />
+    <section class="flex items-center shrink-0">
+      <router-link :to="{ name: 'LiquorEdit' }"
+        ><CommonButton :size="'small'" class="px-2 sm:px-6 md:px-3 lg:px-6"
+          ><FontAwesomeIcon icon="fa-solid fa-plus" />投稿</CommonButton
+        ></router-link
+      >
+    </section>
+    <section class="shrink-0 overflow-hidden">
+      <LoginAndSignUpButton v-if="!userStore.isLogin" />
+      <AccountMenu v-else />
     </section>
   </main>
 </template>
 
 <script setup lang="ts">
-import { Menu, MenuButton } from '@headlessui/vue';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 import KeywordSearch from '@/components/blocks/keywordSearch/KeywordSearch.vue';
-import MainMenu from '@/components/layouts/main/header/menu/MainMenu.vue';
+import AccountMenu from '@/components/layouts/main/header/accountMenu/AccountMenu.vue';
+import CategoriesForSmartMenu from '@/components/layouts/main/header/categoriesForSmart/CategoriesForSmartMenuButton.vue';
+import LoginAndSignUpButton from '@/components/layouts/main/header/loginAndSignUp/LoginAndSignUpButton.vue';
+import CommonButton from '@/components/parts/common/CommonButton/CommonButton.vue';
+import { useUserStore } from '@/stores/userStore/userStore';
 
-const emit = defineEmits<{
-  (_: 'openSideBar'): void;
-}>();
-const handleOpenSidebarClick = () => {
-  emit('openSideBar');
-};
+const userStore = useUserStore();
 </script>
 
 <style scoped>
