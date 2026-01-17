@@ -45,23 +45,5 @@ const closeSidebar = () => {
   &.slide-leave-from {
     transform: translateX(0);
   }
-
-  &.fade-enter-active,
-  &.fade-leave-active {
-    transition: opacity 0.1s ease;
-  }
-
-  &.fade-enter-from,
-  &.fade-leave-to {
-    opacity: 0;
-  }
-
-  &.fade-enter-to,
-  &.fade-leave-from {
-    opacity: 1;
-  }
-}
-#mobile-sidebar-wrapper-overlay {
-  height: 100vh;
 }
 </style>
