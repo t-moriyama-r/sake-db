@@ -13,11 +13,9 @@
         ></router-link
       >
     </section>
-    <section class="block sm:hidden shrink-0 overflow-hidden">
-      <LoginAndSignUpButton />
-    </section>
-    <section class="hidden sm:block shrink-0 overflow-hidden">
-      <AccountMenu />
+    <section class="shrink-0 overflow-hidden">
+      <LoginAndSignUpButton v-if="!userStore.isLogin" />
+      <AccountMenu v-else />
     </section>
   </main>
 </template>
@@ -30,6 +28,9 @@ import AccountMenu from '@/components/layouts/main/header/accountMenu/AccountMen
 import CategoriesForSmartMenu from '@/components/layouts/main/header/categoriesForSmart/CategoriesForSmartMenuButton.vue';
 import LoginAndSignUpButton from '@/components/layouts/main/header/loginAndSignUp/LoginAndSignUpButton.vue';
 import CommonButton from '@/components/parts/common/CommonButton/CommonButton.vue';
+import { useUserStore } from '@/stores/userStore/userStore';
+
+const userStore = useUserStore();
 </script>
 
 <style scoped>

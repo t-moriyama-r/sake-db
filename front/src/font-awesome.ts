@@ -5,18 +5,20 @@ import {
   faMagnifyingGlass,
   faPersonCirclePlus,
   faPlus,
+  faRightFromBracket,
   faWineBottle,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 // アイコン登録
 library.add(
+  faArrowLeft,
   faArrowRightToBracket,
+  faMagnifyingGlass,
   faPersonCirclePlus,
   faPlus,
+  faRightFromBracket,
   faWineBottle,
-  faMagnifyingGlass,
-  faArrowLeft,
 );
 
 export function registerFontAwesome(

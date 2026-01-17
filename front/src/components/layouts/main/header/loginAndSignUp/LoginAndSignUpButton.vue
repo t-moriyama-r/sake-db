@@ -1,11 +1,12 @@
 <template>
-  <CommonButton :size="'small'" :color="ColorType.None" @click="openDialog">
-    <slot>
-      <FontAwesomeIcon
-        icon="fa-solid fa-arrow-right-to-bracket"
-        class="text-lg"
-      />
-    </slot>
+  <CommonButton
+    :size="'small'"
+    :color="ColorType.None"
+    class="px-1 sm:px-6 md:px-3 lg:px-6"
+    @click="openDialog"
+  >
+    <FontAwesomeIcon icon="fa-solid fa-arrow-right-to-bracket" />
+    <span class="hidden sm:inline">ログイン / 新規登録</span>
   </CommonButton>
   <CommonDialog
     v-model="isDialogOpen"
