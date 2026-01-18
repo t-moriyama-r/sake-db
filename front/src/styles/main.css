@@ -3,7 +3,8 @@ html, body {
 }
 
 /* 全体のカーソルをデフォルトに（テキスト選択は可能） */
-*:not(input):not(textarea):not(select):not([contenteditable="true"]) {
+/* :where()で詳細度を0にし、後のルールが優先されるようにする */
+:where(*) {
   cursor: default;
 }
 
