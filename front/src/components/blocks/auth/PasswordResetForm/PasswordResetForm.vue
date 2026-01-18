@@ -6,8 +6,23 @@
     }"
   >
     <FormField name="email" label="メールアドレス" type="email" />
-    <SubmitButton />
+    <p class="mb-4 text-sm text-gray-500">
+      登録済みのメールアドレスを入力してください。<br />
+      パスワードリセット用のリンクをお送りします。
+    </p>
+    <div class="flex justify-center">
+      <SubmitButton>送信</SubmitButton>
+    </div>
   </Form>
+  <div v-if="showBackToLogin" class="mt-4 text-center">
+    <button
+      type="button"
+      class="text-sm text-gray-500 hover:underline"
+      @click="emit('backToLogin')"
+    >
+      ログインに戻る
+    </button>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -21,7 +36,14 @@ import { useToast } from '@/funcs/composable/useToast';
 import { PASSWORD_RESET } from '@/graphQL/Auth/auth';
 import { ToastType } from '@/plugins/toast';
 
-//メールアドレス以外現状要らないので、定数もここで定義
+defineProps<{
+  showBackToLogin?: boolean;
+}>();
+
+const emit = defineEmits<{
+  backToLogin: [];
+}>();
+
 const EMAIL_NAME = 'email';
 
 const toast = useToast();
@@ -32,7 +54,6 @@ const { execute } = useMutation<{
   isUseSpinner: true,
 });
 
-// extends GenericObjectは型が広すぎるのでキャストして対応する
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 //@ts-expect-error
 const onSubmit: SubmissionHandler = async (values: {

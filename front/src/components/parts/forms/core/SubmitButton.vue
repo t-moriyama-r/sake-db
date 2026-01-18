@@ -1,7 +1,7 @@
 <template>
   <CommonButton
     v-bind="props"
-    :is-disabled="!isReady || !isValid || !isDirty"
+    :is-disabled="props.isDisabled || !isReady || !isValid || !isDirty"
     :class="props.class"
     ><slot>送信</slot></CommonButton
   >

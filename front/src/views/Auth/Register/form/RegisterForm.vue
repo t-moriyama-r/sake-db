@@ -7,9 +7,19 @@
     <FormField :name="FormKeys.NAME" label="名前" />
     <FormField :name="FormKeys.MAIL" label="メールアドレス" type="email" />
     <FormField :name="FormKeys.PASSWORD" label="パスワード" type="password" />
-    <SubmitButton>登録</SubmitButton>
-    <XLogin />
+    <div class="mt-2 flex justify-center">
+      <SubmitButton>登録</SubmitButton>
+    </div>
   </Form>
+  <div class="mt-2 text-center">
+    <router-link
+      :to="{ name: 'Login' }"
+      class="text-sm text-gray-500 hover:underline"
+    >
+      すでにアカウントをお持ちですか？
+    </router-link>
+  </div>
+  <XLogin />
 </template>
 
 <script setup lang="ts">

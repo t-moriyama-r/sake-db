@@ -25,5 +25,5 @@ export const initialValues: FormValues = {
 
 export const validationSchema = {
   [FormKeys.MAIL]: string().email().required(),
-  [FormKeys.PASSWORD]: string(),
+  [FormKeys.PASSWORD]: string().required(),
 };

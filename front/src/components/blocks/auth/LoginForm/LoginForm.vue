@@ -3,15 +3,38 @@
     @submit="onSubmit"
     :initial-values="initialValues"
     :validation-schema="validationSchema"
+    :validate-on-mount="false"
+    v-slot="{ values }"
   >
-    <FormField :name="FormKeys.MAIL" label="メールアドレス" type="email" />
-    <FormField :name="FormKeys.PASSWORD" label="パスワード" type="password" />
+    <FormField
+      :name="FormKeys.MAIL"
+      label="メールアドレス"
+      type="email"
+      :showErrors="shouldValidate(values) ? 'show' : 'hidden'"
+    />
+    <FormField
+      :name="FormKeys.PASSWORD"
+      label="パスワード"
+      type="password"
+      :showErrors="shouldValidate(values) ? 'show' : 'hidden'"
+    />
     <div class="mt-2 flex justify-center">
-      <SubmitButton>ログイン</SubmitButton>
+      <SubmitButton :isDisabled="!shouldValidate(values)"
+        >ログイン</SubmitButton
+      >
     </div>
   </Form>
   <div class="mt-2 text-center">
+    <button
+      v-if="isModal"
+      type="button"
+      class="text-sm text-gray-500 hover:underline"
+      @click="emit('goToPasswordReset')"
+    >
+      パスワードをお忘れですか？
+    </button>
     <router-link
+      v-else
       :to="{ name: 'PasswordReset' }"
       class="text-sm text-gray-500 hover:underline"
     >
@@ -41,6 +64,18 @@ import {
   initialValues,
   validationSchema,
 } from './LoginForm';
+
+const shouldValidate = (values: FormValues) => {
+  return Boolean(values[FormKeys.MAIL] && values[FormKeys.PASSWORD]);
+};
+
+defineProps<{
+  isModal?: boolean;
+}>();
+
+const emit = defineEmits<{
+  goToPasswordReset: [];
+}>();
 
 const router = useRouter();
 const userStore = useUserStore();

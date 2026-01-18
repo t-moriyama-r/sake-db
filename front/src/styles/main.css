@@ -2,6 +2,27 @@ html, body {
   height: 100%;
 }
 
+/* 全体のカーソルをデフォルトに（テキスト選択は可能） */
+*:not(input):not(textarea):not(select):not([contenteditable="true"]) {
+  cursor: default;
+}
+
+/* input系要素はテキストカーソル */
+input,
+textarea,
+select,
+[contenteditable="true"] {
+  cursor: text;
+}
+
+/* ボタン系はポインターカーソル */
+button,
+a,
+[role="button"],
+.cursor-pointer {
+  cursor: pointer;
+}
+
 a {
   text-decoration: underline;
 }
