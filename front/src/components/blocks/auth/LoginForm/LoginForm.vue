@@ -6,10 +6,19 @@
   >
     <FormField :name="FormKeys.MAIL" label="メールアドレス" type="email" />
     <FormField :name="FormKeys.PASSWORD" label="パスワード" type="password" />
-    <SubmitButton>ログイン</SubmitButton>
+    <div class="mt-2 flex justify-center">
+      <SubmitButton>ログイン</SubmitButton>
+    </div>
   </Form>
+  <div class="mt-2 text-center">
+    <router-link
+      :to="{ name: 'PasswordReset' }"
+      class="text-sm text-gray-500 hover:underline"
+    >
+      パスワードをお忘れですか？
+    </router-link>
+  </div>
   <XLogin />
-  <router-link :to="{ name: 'PasswordReset' }">パスワードリセット</router-link>
 </template>
 
 <script setup lang="ts">
