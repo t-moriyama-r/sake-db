@@ -8,7 +8,7 @@
       <SideBar @closeSideBar="closeSidebar" />
     </div>
   </transition>
-  <CommonOverlay :isVisible="isOpen" @click="closeSidebar" />
+  <CommonOverlay :isVisible="isOpen" :zIndex="45" @click="closeSidebar" />
 </template>
 
 <script setup lang="ts">

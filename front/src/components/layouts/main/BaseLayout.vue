@@ -11,7 +11,7 @@
     >
       <header
         ref="headerRef"
-        class="sticky top-0 bg-white/30 backdrop-blur-sm w-full"
+        class="sticky top-0 z-40 bg-white/30 backdrop-blur-sm w-full"
       >
         <HeaderArea />
       </header>
