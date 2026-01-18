@@ -16,6 +16,7 @@
 import { Form, type SubmissionHandler } from 'vee-validate';
 import { useRouter } from 'vue-router';
 
+import XLogin from '@/components/blocks/auth/XLogin.vue';
 import FormField from '@/components/parts/forms/core/FormField.vue';
 import SubmitButton from '@/components/parts/forms/core/SubmitButton.vue';
 import { useMutation } from '@/funcs/composable/useQuery/useQuery';
@@ -24,13 +25,13 @@ import { LOGIN } from '@/graphQL/Auth/auth';
 import type { LoginMutation } from '@/graphQL/auto-generated';
 import { getAuthPayloadForUI } from '@/stores/userStore/type';
 import { useUserStore } from '@/stores/userStore/userStore';
+
 import {
   FormKeys,
   type FormValues,
   initialValues,
   validationSchema,
-} from '@/views/Auth/Login/form/LoginForm';
-import XLogin from '@/views/Auth/Login/XLogin.vue';
+} from './LoginForm';
 
 const router = useRouter();
 const userStore = useUserStore();

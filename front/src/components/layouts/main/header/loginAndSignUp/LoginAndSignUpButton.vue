@@ -28,10 +28,10 @@
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { ref } from 'vue';
 
+import LoginForm from '@/components/blocks/auth/LoginForm/LoginForm.vue';
 import CommonButton from '@/components/parts/common/CommonButton/CommonButton.vue';
 import CommonDialog from '@/components/parts/common/CommonDialog/CommonDialog.vue';
 import { ColorType } from '@/type/common/ColorType';
-import LoginForm from '@/views/Auth/Login/form/LoginForm.vue';
 
 const isDialogOpen = ref<boolean>(false);
 const openDialog = () => {
