@@ -7,15 +7,26 @@
     <FormField :name="FormKeys.NAME" label="名前" />
     <FormField :name="FormKeys.MAIL" label="メールアドレス" type="email" />
     <FormField :name="FormKeys.PASSWORD" label="パスワード" type="password" />
-    <SubmitButton>登録</SubmitButton>
-    <XLogin />
+    <div class="mt-2 flex justify-center">
+      <SubmitButton>登録</SubmitButton>
+    </div>
   </Form>
+  <div class="mt-2 text-center">
+    <router-link
+      :to="{ name: 'Login' }"
+      class="text-sm text-gray-500 hover:underline"
+    >
+      すでにアカウントをお持ちですか？
+    </router-link>
+  </div>
+  <XLogin />
 </template>
 
 <script setup lang="ts">
 import { Form, type SubmissionHandler } from 'vee-validate';
 import { useRouter } from 'vue-router';
 
+import XLogin from '@/components/blocks/auth/XLogin.vue';
 import FormField from '@/components/parts/forms/core/FormField.vue';
 import SubmitButton from '@/components/parts/forms/core/SubmitButton.vue';
 import { useMutation } from '@/funcs/composable/useQuery/useQuery';
@@ -24,7 +35,6 @@ import { Register } from '@/graphQL/Auth/auth';
 import type { RegisterUserMutation } from '@/graphQL/auto-generated';
 import { getAuthPayloadForUI } from '@/stores/userStore/type';
 import { useUserStore } from '@/stores/userStore/userStore';
-import XLogin from '@/views/Auth/Login/XLogin.vue';
 import {
   FormKeys,
   type FormValues,

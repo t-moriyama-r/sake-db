@@ -2,6 +2,28 @@ html, body {
   height: 100%;
 }
 
+/* 全体のカーソルをデフォルトに（テキスト選択は可能） */
+/* :where()で詳細度を0にし、後のルールが優先されるようにする */
+:where(*) {
+  cursor: default;
+}
+
+/* input系要素はテキストカーソル */
+input,
+textarea,
+select,
+[contenteditable="true"] {
+  cursor: text;
+}
+
+/* ボタン系はポインターカーソル */
+button,
+a,
+[role="button"],
+.cursor-pointer {
+  cursor: pointer;
+}
+
 a {
   text-decoration: underline;
 }

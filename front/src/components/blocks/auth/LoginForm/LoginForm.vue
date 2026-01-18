@@ -3,19 +3,52 @@
     @submit="onSubmit"
     :initial-values="initialValues"
     :validation-schema="validationSchema"
+    :validate-on-mount="false"
+    v-slot="{ values }"
   >
-    <FormField :name="FormKeys.MAIL" label="メールアドレス" type="email" />
-    <FormField :name="FormKeys.PASSWORD" label="パスワード" type="password" />
-    <SubmitButton>ログイン</SubmitButton>
+    <FormField
+      :name="FormKeys.MAIL"
+      label="メールアドレス"
+      type="email"
+      :showErrors="shouldValidate(values) ? 'show' : 'hidden'"
+    />
+    <FormField
+      :name="FormKeys.PASSWORD"
+      label="パスワード"
+      type="password"
+      :showErrors="shouldValidate(values) ? 'show' : 'hidden'"
+    />
+    <div class="mt-2 flex justify-center">
+      <SubmitButton :isDisabled="!shouldValidate(values)"
+        >ログイン</SubmitButton
+      >
+    </div>
   </Form>
+  <div class="mt-2 text-center">
+    <button
+      v-if="isModal"
+      type="button"
+      class="text-sm text-gray-500 hover:underline"
+      @click="emit('goToPasswordReset')"
+    >
+      パスワードをお忘れですか？
+    </button>
+    <router-link
+      v-else
+      :to="{ name: 'PasswordReset' }"
+      class="text-sm text-gray-500 hover:underline"
+    >
+      パスワードをお忘れですか？
+    </router-link>
+  </div>
   <XLogin />
-  <router-link :to="{ name: 'PasswordReset' }">パスワードリセット</router-link>
 </template>
 
 <script setup lang="ts">
 import { Form, type SubmissionHandler } from 'vee-validate';
 import { useRouter } from 'vue-router';
 
+import XLogin from '@/components/blocks/auth/XLogin.vue';
 import FormField from '@/components/parts/forms/core/FormField.vue';
 import SubmitButton from '@/components/parts/forms/core/SubmitButton.vue';
 import { useMutation } from '@/funcs/composable/useQuery/useQuery';
@@ -24,13 +57,25 @@ import { LOGIN } from '@/graphQL/Auth/auth';
 import type { LoginMutation } from '@/graphQL/auto-generated';
 import { getAuthPayloadForUI } from '@/stores/userStore/type';
 import { useUserStore } from '@/stores/userStore/userStore';
+
 import {
   FormKeys,
   type FormValues,
   initialValues,
   validationSchema,
-} from '@/views/Auth/Login/form/LoginForm';
-import XLogin from '@/views/Auth/Login/XLogin.vue';
+} from './LoginForm';
+
+const shouldValidate = (values: FormValues) => {
+  return Boolean(values[FormKeys.MAIL] && values[FormKeys.PASSWORD]);
+};
+
+defineProps<{
+  isModal?: boolean;
+}>();
+
+const emit = defineEmits<{
+  goToPasswordReset: [];
+}>();
 
 const router = useRouter();
 const userStore = useUserStore();
