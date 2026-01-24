@@ -34,10 +34,15 @@ const liquors = ref<Liquor[] | null>(null);
 
 // データフェッチ
 const fetchData = async (searchTag: string): Promise<void> => {
-  const { searchLiquorsByTag: response } = await fetch({
-    tag: searchTag,
-  });
-  liquors.value = response;
+  try {
+    const { searchLiquorsByTag: response } = await fetch({
+      tag: searchTag,
+    });
+    liquors.value = response;
+  } catch (error) {
+    console.error('タグ検索中にエラーが発生しました:', error);
+    liquors.value = [];
+  }
 };
 
 // `watch` を使ってルートパラメータの変更を監視
