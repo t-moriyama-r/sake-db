@@ -2,6 +2,7 @@ import './styles/tailwind.css';
 import './styles/main.css';
 
 import { DefaultApolloClient } from '@vue/apollo-composable';
+import { createHead } from '@vueuse/head';
 import { createApp, h, provide } from 'vue';
 
 import client from '@/apolloClient';
@@ -18,6 +19,10 @@ const app = createApp({
   },
   render: () => h(App),
 });
+
+// headプラグインの登録
+const head = createHead();
+app.use(head);
 
 // プラグインの登録
 registerPlugins(app);
