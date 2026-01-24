@@ -126,8 +126,9 @@ const onSubmit: SubmissionHandler = async (
   //Categoryが空はバリデーションで弾かれる想定なのでキャスト
   await mutateAsync(<PostRequest>values, {
     onSuccess(value: AxiosResponse<PostResponse>) {
-      // Clear Apollo Client cache to ensure newly registered liquor appears in search results
-      clearLiquorCache();
+      // 登録したお酒が一覧に表示されるようにキャッシュをクリア
+      const categoryId = values[FormKeys.CATEGORY];
+      clearLiquorCache(categoryId ?? undefined);
 
       toast.showToast({
         message: '登録が成功しました！',
