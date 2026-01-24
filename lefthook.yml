@@ -2,5 +2,5 @@ pre-commit:
   parallel: true
   commands:
     lint-staged:
-      glob: "front/**/*.{js,ts,vue}"
-      run: cd front && npx lint-staged
+      root: "front/"
+      run: npx lint-staged
