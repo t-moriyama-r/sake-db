@@ -38,7 +38,7 @@ const categoryStore = useSelectedCategoryStore();
 // 現在のカテゴリに応じて投稿ボタンのルートを決定
 const postButtonRoute = computed(() => {
   const categoryId = categoryStore.content;
-  if (categoryId) {
+  if (categoryId && typeof categoryId === 'number' && categoryId > 0) {
     return {
       name: 'LiquorPostByCategory',
       params: { categoryId: String(categoryId) },
