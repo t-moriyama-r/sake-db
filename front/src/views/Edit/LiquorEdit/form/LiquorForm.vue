@@ -42,6 +42,7 @@ import UploadWithImage from '@/components/parts/forms/common/UploadWithImage.vue
 import FormField from '@/components/parts/forms/core/FormField.vue';
 import SubmitButton from '@/components/parts/forms/core/SubmitButton.vue';
 import { useApiMutation } from '@/funcs/composable/useApiMutation';
+import { clearLiquorCache } from '@/funcs/composable/useCacheManagement';
 import { useToast } from '@/funcs/composable/useToast';
 import type { LiquorForEdit } from '@/graphQL/Liquor/liquor';
 import type { ToastCommand } from '@/plugins/toast';
@@ -125,6 +126,10 @@ const onSubmit: SubmissionHandler = async (
   //Categoryが空はバリデーションで弾かれる想定なのでキャスト
   await mutateAsync(<PostRequest>values, {
     onSuccess(value: AxiosResponse<PostResponse>) {
+      // 登録したお酒が一覧に表示されるようにキャッシュをクリア
+      const categoryId = values[FormKeys.CATEGORY];
+      clearLiquorCache(categoryId ?? undefined);
+
       toast.showToast({
         message: '登録が成功しました！',
       });
