@@ -10,7 +10,8 @@ This template should help get you started developing with Vue 3 in Vite.
 
 これらのファイルを変更する必要がある場合は：
 
-1. 元のGraphQLスキーマファイル（`../backend/graph/schema/*.graphqls`）またはGraphQLドキュメント（`src/graphQL/**/*.ts`）を修正してください
+1. 元のGraphQLスキーマファイル（`../backend/graph/schema/*.graphqls`）またはGraphQLクエリ/ミューテーションファイル（`src/graphQL/`のサブディレクトリ内の`.ts`ファイル、例：`Auth/`, `User/`, `Liquor/`など）を修正してください
+   - **注意：`auto-generated.ts`自体は修正しないでください**
 2. 以下のコマンドを実行して、自動生成ファイルを再生成してください：
    ```sh
    npm run codegen
