@@ -104,7 +104,7 @@ function updatePosition() {
   }
 }
 
-async function toggleMenu() {
+function toggleMenu() {
   if (!isOpen.value) {
     updatePosition();
   }
