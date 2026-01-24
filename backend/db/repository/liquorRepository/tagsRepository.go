@@ -106,3 +106,26 @@ func (r *LiquorsRepository) DeleteTag(ctx context.Context, id primitive.ObjectID
 
 	return nil
 }
+
+func (r *LiquorsRepository) SearchLiquorsByTag(ctx context.Context, tag string) ([]primitive.ObjectID, *customError.Error) {
+	// タグコレクションから指定されたタグテキストに一致するドキュメントを検索
+	cursor, err := r.tagCollection.Find(ctx, bson.M{"text": tag})
+	if err != nil {
+		return nil, errSearchByTag(err, tag)
+	}
+	defer cursor.Close(ctx)
+
+	// 結果を格納するスライス
+	var tags []*TagModel
+	if err = cursor.All(ctx, &tags); err != nil {
+		return nil, errSearchByTagDecode(err, tag)
+	}
+
+	// liquorIdのリストを抽出
+	liquorIds := make([]primitive.ObjectID, 0, len(tags))
+	for _, tagDoc := range tags {
+		liquorIds = append(liquorIds, tagDoc.LiquorId)
+	}
+
+	return liquorIds, nil
+}

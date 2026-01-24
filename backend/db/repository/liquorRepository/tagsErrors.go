@@ -14,6 +14,8 @@ const (
 	PostTag       = "REPO-LIQUOR-TAG-003-PostTag"
 	DeleteTag     = "REPO-LIQUOR-TAG-004-DeleteTag"
 	ZeroDelete    = "REPO-LIQUOR-TAG-005-ZeroDelete"
+	SearchByTag   = "REPO-LIQUOR-TAG-006-SearchByTag"
+	SearchByTagDecode = "REPO-LIQUOR-TAG-007-SearchByTagDecode"
 )
 
 func errGetTags(err error, liquorId primitive.ObjectID) *customError.Error {
@@ -62,5 +64,25 @@ func errZeroDelete(err error, id primitive.ObjectID) *customError.Error {
 		UserMsg:    errorMsg.SERVER,
 		Level:      logrus.InfoLevel,
 		Input:      id,
+	})
+}
+
+func errSearchByTag(err error, tag string) *customError.Error {
+	return customError.NewError(err, customError.Params{
+		StatusCode: http.StatusInternalServerError,
+		ErrCode:    SearchByTag,
+		UserMsg:    errorMsg.DATA,
+		Level:      logrus.ErrorLevel,
+		Input:      tag,
+	})
+}
+
+func errSearchByTagDecode(err error, tag string) *customError.Error {
+	return customError.NewError(err, customError.Params{
+		StatusCode: http.StatusInternalServerError,
+		ErrCode:    SearchByTagDecode,
+		UserMsg:    errorMsg.SERVER,
+		Level:      logrus.ErrorLevel,
+		Input:      tag,
 	})
 }
