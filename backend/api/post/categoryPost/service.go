@@ -52,7 +52,7 @@ func (h *Handler) Post(c *gin.Context, ur *userRepository.UsersRepository) (*int
 		}
 
 		// 親カテゴリ（Parentがnil）の移動を禁止
-		if old.Parent == nil && request.Parent != *request.Id {
+		if old.Parent == nil {
 			return nil, errParentCategoryMove(request)
 		}
 
