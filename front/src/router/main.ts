@@ -9,6 +9,7 @@ import { UserRouter } from '@/router/user';
 import CategoryPage from '@/views/Discovery/Details/Category/CategoryPage.vue';
 import DetailPage from '@/views/Discovery/Details/Liquor/LiquorPage.vue';
 import CategoryNarrowDownPage from '@/views/Discovery/NarrowDowns/CategoryNarrowDownPage.vue';
+import TagSearchPage from '@/views/Discovery/TagSearch/TagSearchPage.vue';
 import CategoryEditPage from '@/views/Edit/CategoryEdit/CategoryEditPage.vue';
 import CreatePost from '@/views/Edit/LiquorEdit/LiquorEditPage.vue';
 import IndexPage from '@/views/Index/IndexPage.vue';
@@ -36,6 +37,11 @@ const MainRouter = {
           path: 'category/:id?',
           name: 'CategoryNarrowDown',
           component: CategoryNarrowDownPage,
+        },
+        {
+          path: 'tag/:tag',
+          name: 'TagSearch',
+          component: TagSearchPage,
         },
       ],
     },
