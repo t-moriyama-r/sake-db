@@ -37,13 +37,16 @@ const pageDescription = computed(() => {
   return desc.length > 200 ? desc.substring(0, 200) + '...' : desc;
 });
 
-const pageImage = computed(
-  () => liquor.value?.imageUrl || liquor.value?.imageBase64 || '',
-);
+const pageImage = computed(() => {
+  // SNSカードにはimageUrlのみを使用（base64はサポートされない可能性がある）
+  return liquor.value?.imageUrl || '';
+});
 
 const pageUrl = computed(() => {
-  if (typeof window !== 'undefined') {
-    return window.location.href;
+  if (typeof window !== 'undefined' && liquor.value) {
+    // クエリパラメータを除いた正規のURLを使用
+    const origin = window.location.origin;
+    return `${origin}/liquor/${liquor.value.id}`;
   }
   return '';
 });
