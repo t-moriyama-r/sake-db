@@ -13,7 +13,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue';
+import { computed, ref, watch } from 'vue';
+
 import { type ToastOptions, toastState, ToastType } from '@/plugins/toast';
 
 const isVisible = ref<boolean>(false); //DOM要素についてのstate

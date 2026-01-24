@@ -46,6 +46,7 @@ import { computed, type ComputedRef, onMounted, ref, watch } from 'vue';
 import CategoryParent from '@/components/layouts/main/sideBar/CategoryParent.vue';
 import { getDisplayCategoryIds } from '@/components/layouts/main/sideBar/func/sideBarFunc';
 import useQuery from '@/funcs/composable/useQuery/useQuery';
+import { sortCategoriesWithOtherLast } from '@/funcs/util/sortCategories';
 import {
   type Categories,
   type Category,
@@ -70,7 +71,7 @@ async function fetchData() {
   const { categories: response } = await fetch(null, {
     fetchPolicy: 'network-only',
   });
-  categoryList.value = [...response];
+  categoryList.value = sortCategoriesWithOtherLast([...response]);
   sidebarStore.setReloadFlgFalse();
 }
 

@@ -1,4 +1,4 @@
-import { gql, type DocumentNode } from '@apollo/client/core';
+import { type DocumentNode, gql } from '@apollo/client/core';
 
 export interface RecommendLiquorResponse {
   readonly randomRecommendList: Liquor[];
