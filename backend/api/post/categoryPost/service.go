@@ -50,6 +50,17 @@ func (h *Handler) Post(c *gin.Context, ur *userRepository.UsersRepository) (*int
 		if err != nil {
 			return nil, err
 		}
+
+		// 親カテゴリ（Parentがnil）の移動を禁止
+		if old.Parent == nil && request.Parent != *request.Id {
+			return nil, errParentCategoryMove(request)
+		}
+
+		// readonlyフラグが設定されているカテゴリの移動を禁止
+		if old.Readonly && old.Parent != nil && *old.Parent != request.Parent {
+			return nil, errReadonlyCategoryMove(request)
+		}
+
 		//nil参照エラー回避が面倒なので、nilは0扱いとする(versionNoがスキーマ上後付なので、nilの可能性がある)
 		if old.VersionNo == nil {
 			zero := 0
@@ -63,6 +74,15 @@ func (h *Handler) Post(c *gin.Context, ur *userRepository.UsersRepository) (*int
 		if *old.VersionNo != *request.VersionNo {
 			return nil, errInvalidVersion(request)
 		}
+	}
+
+	// 同じ親カテゴリ内での重複チェック
+	duplicate, err := h.CategoryRepo.FindCategoryByParentAndName(ctx, &request.Parent, request.Name, request.Id)
+	if err != nil {
+		return nil, err
+	}
+	if duplicate != nil {
+		return nil, errDuplicateName(request)
 	}
 
 	// フォームからファイルを取得

@@ -8,18 +8,19 @@ import (
 )
 
 const (
-	Find            = "REPO-CATEGORY-001-Find"
-	FindDecode      = "REPO-CATEGORY-002-FindDecode"
-	FindCursor      = "REPO-CATEGORY-003-FindCursor"
-	FindById        = "REPO-CATEGORY-004-FindById"
-	NotFound        = "REPO-CATEGORY-005-NotFound"
-	InsertOne       = "REPO-CATEGORY-006-InsertOne"
-	InsertOneGetId  = "REPO-CATEGORY-007-InsertOneGetId"
-	UpdateBsonMap   = "REPO-CATEGORY-008-UpdateBsonMap"
-	UpdateUnMarshal = "REPO-CATEGORY-009-UpdateUnMarshal"
-	UpdateOne       = "REPO-CATEGORY-010-UpdateOne"
-	UpdateOneGetId  = "REPO-CATEGORY-011-UpdateOneGetId"
-	GetMaxID  = "REPO-CATEGORY-012-GetMaxID"
+	Find                   = "REPO-CATEGORY-001-Find"
+	FindDecode             = "REPO-CATEGORY-002-FindDecode"
+	FindCursor             = "REPO-CATEGORY-003-FindCursor"
+	FindById               = "REPO-CATEGORY-004-FindById"
+	NotFound               = "REPO-CATEGORY-005-NotFound"
+	InsertOne              = "REPO-CATEGORY-006-InsertOne"
+	InsertOneGetId         = "REPO-CATEGORY-007-InsertOneGetId"
+	UpdateBsonMap          = "REPO-CATEGORY-008-UpdateBsonMap"
+	UpdateUnMarshal        = "REPO-CATEGORY-009-UpdateUnMarshal"
+	UpdateOne              = "REPO-CATEGORY-010-UpdateOne"
+	UpdateOneGetId         = "REPO-CATEGORY-011-UpdateOneGetId"
+	GetMaxID               = "REPO-CATEGORY-012-GetMaxID"
+	FindByParentAndName    = "REPO-CATEGORY-013-FindByParentAndName"
 )
 
 func errFind(err error) *customError.Error {
@@ -130,5 +131,18 @@ func errGetMaxID(err error) *customError.Error {
 		ErrCode:    GetMaxID,
 		UserMsg:    errorMsg.SERVER,
 		Level:      logrus.ErrorLevel,
+	})
+}
+
+func errFindByParentAndName(err error, parent *int, name string) *customError.Error {
+	return customError.NewError(err, customError.Params{
+		StatusCode: http.StatusInternalServerError,
+		ErrCode:    FindByParentAndName,
+		UserMsg:    errorMsg.SERVER,
+		Level:      logrus.ErrorLevel,
+		Input: map[string]interface{}{
+			"parent": parent,
+			"name":   name,
+		},
 	})
 }

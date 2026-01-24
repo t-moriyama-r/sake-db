@@ -10,11 +10,14 @@ import (
 )
 
 const (
-	ParseFailInput = "CATEGORY-POST-001-ParseFailInput"
-	InvalidInput   = "CATEGORY-POST-002-InvalidInput"
-	InvalidParent  = "CATEGORY-POST-003-InvalidParent"
-	InvalidVersion = "CATEGORY-POST-004-InvalidVersion"
-	InvalidFile    = "CATEGORY-POST-005-InvalidFile"
+	ParseFailInput       = "CATEGORY-POST-001-ParseFailInput"
+	InvalidInput         = "CATEGORY-POST-002-InvalidInput"
+	InvalidParent        = "CATEGORY-POST-003-InvalidParent"
+	InvalidVersion       = "CATEGORY-POST-004-InvalidVersion"
+	InvalidFile          = "CATEGORY-POST-005-InvalidFile"
+	DuplicateName        = "CATEGORY-POST-006-DuplicateName"
+	ParentCategoryMove   = "CATEGORY-POST-007-ParentCategoryMove"
+	ReadonlyCategoryMove = "CATEGORY-POST-008-ReadonlyCategoryMove"
 )
 
 func errInvalidInput(c *gin.Context, err error) *customError.Error {
@@ -61,6 +64,36 @@ func errInvalidFile(err error, input RequestData) *customError.Error {
 		StatusCode: http.StatusBadRequest,
 		ErrCode:    InvalidFile,
 		UserMsg:    "ファイルが不正です",
+		Level:      logrus.InfoLevel,
+		Input:      input,
+	})
+}
+
+func errDuplicateName(input RequestData) *customError.Error {
+	return customError.NewError(errors.New("同じ親カテゴリ内に同名のカテゴリが既に存在します"), customError.Params{
+		StatusCode: http.StatusBadRequest,
+		ErrCode:    DuplicateName,
+		UserMsg:    "同じ親カテゴリ内に同名のカテゴリが既に存在します",
+		Level:      logrus.InfoLevel,
+		Input:      input,
+	})
+}
+
+func errParentCategoryMove(input RequestData) *customError.Error {
+	return customError.NewError(errors.New("親カテゴリは移動できません"), customError.Params{
+		StatusCode: http.StatusBadRequest,
+		ErrCode:    ParentCategoryMove,
+		UserMsg:    "親カテゴリは移動できません",
+		Level:      logrus.InfoLevel,
+		Input:      input,
+	})
+}
+
+func errReadonlyCategoryMove(input RequestData) *customError.Error {
+	return customError.NewError(errors.New("このカテゴリは移動できません"), customError.Params{
+		StatusCode: http.StatusBadRequest,
+		ErrCode:    ReadonlyCategoryMove,
+		UserMsg:    "このカテゴリは移動できません",
 		Level:      logrus.InfoLevel,
 		Input:      input,
 	})
