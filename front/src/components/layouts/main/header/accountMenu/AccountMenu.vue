@@ -115,13 +115,19 @@ function closeMenu() {
   isOpen.value = false;
 }
 
-function handleLogout() {
+async function handleLogout() {
   closeMenu();
-  userStore.logout();
-  toast.showToast({
-    message: 'ログアウトしました',
-  });
-  router.push({ name: 'Index' });
+  try {
+    await userStore.logout();
+    toast.showToast({
+      message: 'ログアウトしました',
+    });
+    void router.push({ name: 'Index' });
+  } catch (error) {
+    toast.showToast({
+      message: 'ログアウトに失敗しました',
+    });
+  }
 }
 
 // 外側クリックでメニューを閉じる
