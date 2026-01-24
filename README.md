@@ -2,6 +2,14 @@
 
 [環境構築・開発プロセス](./document/README.md)
 
+## GitHub Copilot 自動コードレビュー
+
+このリポジトリでは、プルリクエストを作成すると自動的にGitHub Copilotによるコードレビューが実行されます。
+
+- **トリガー**: PRのオープン時、更新時（synchronize）、再オープン時
+- **ワークフロー**: `.github/workflows/copilot-review.yml`
+- Copilotがコードの品質、潜在的な問題、改善提案などを自動的にレビューします
+
 
 
 ## トップページ(ランダムに取得)
