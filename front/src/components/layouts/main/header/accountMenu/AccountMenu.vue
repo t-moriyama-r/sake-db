@@ -161,7 +161,7 @@ onUnmounted(() => {
 });
 </script>
 
-<style>
+<style scoped>
 .dropdown-enter-active,
 .dropdown-leave-active {
   transition:
