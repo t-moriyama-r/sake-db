@@ -28,7 +28,7 @@ generate:
 	go run github.com/99designs/gqlgen generate --config gqlgen.yml
 
 # すべてのチェックを実行
-check: fmt vet lint
+check: fmt vet lint generate
 	@echo "All checks passed!"
 
 # 依存関係のダウンロード

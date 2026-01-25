@@ -30,7 +30,8 @@ pre-commit:
       root: "backend/"
       run: |
         if command -v golangci-lint &> /dev/null; then
-          golangci-lint run --new-from-rev=HEAD~1 {staged_files}
+          # --new-from-rev を使用して変更されたファイルのみをチェック
+          golangci-lint run --new-from-rev=HEAD~1
         else
           echo "⚠ golangci-lint not installed. Skipping linting."
           echo "  Install with: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest"
