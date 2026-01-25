@@ -18,7 +18,7 @@ install-tools:
 	go install github.com/99designs/gqlgen@latest
 	@echo "Tools installed successfully!"
 
-# コードフォーマット
+# コードフォーマット（ファイルを変更）
 fmt:
 	gofmt -w .
 
@@ -34,9 +34,9 @@ vet:
 generate:
 	go run github.com/99designs/gqlgen generate --config gqlgen.yml
 
-# すべてのチェックを実行
-check: fmt vet lint generate
-	@echo "All checks passed!"
+# すべてのチェックを実行（注意：fmtはファイルを変更します）
+check: vet lint generate
+	@gofmt -l . | grep . && echo "Warning: Some files need formatting. Run 'make fmt' to fix." || echo "All checks passed!"
 
 # 依存関係のダウンロード
 deps:

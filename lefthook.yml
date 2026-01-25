@@ -8,16 +8,23 @@ pre-commit:
     # Go構文チェック  
     go-fmt:
       tags: backend
-      files: git diff --name-only --cached backend/
+      files: git diff --name-only --cached | grep '^backend/'
       glob: "*.go"
       run: |
         cd backend
-        gofmt -l . | grep '.go$' && echo "✗ Go files are not formatted. Run 'cd backend && make fmt'" && exit 1 || echo "✓ Go formatting check passed"
+        if [ -n "$(gofmt -l .)" ]; then
+          echo "✗ Go files are not formatted:"
+          gofmt -l .
+          echo "Run 'cd backend && make fmt' to fix"
+          exit 1
+        else
+          echo "✓ Go formatting check passed"
+        fi
     
     # Go静的解析
     go-lint:
       tags: backend
-      files: git diff --name-only --cached backend/
+      files: git diff --name-only --cached | grep '^backend/'
       glob: "*.go"
       run: |
         cd backend
@@ -32,14 +39,14 @@ pre-commit:
     # Go vet
     go-vet:
       tags: backend
-      files: git diff --name-only --cached backend/
+      files: git diff --name-only --cached | grep '^backend/'
       glob: "*.go"
       run: cd backend && go vet ./...
     
     # GraphQLスキーマ検証
     graphql-validate:
       tags: backend graphql
-      files: git diff --name-only --cached backend/graph/schema/
+      files: git diff --name-only --cached | grep '^backend/graph/schema/'
       glob: "*.graphqls"
       run: |
         cd backend
@@ -58,6 +65,7 @@ pre-commit:
           echo "✗ GraphQL schema validation failed"
           exit 1
         fi
+
 
 
 

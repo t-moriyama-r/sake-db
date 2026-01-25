@@ -33,11 +33,12 @@ if ! command -v lefthook &> /dev/null; then
 fi
 
 # lefthookのインストール
+GOPATH_BIN="$(go env GOPATH)/bin"
 if command -v lefthook &> /dev/null; then
     lefthook install
     echo "✓ Lefthook setup completed!"
-elif [ -f ~/go/bin/lefthook ]; then
-    ~/go/bin/lefthook install
+elif [ -f "$GOPATH_BIN/lefthook" ]; then
+    "$GOPATH_BIN/lefthook" install
     echo "✓ Lefthook setup completed!"
 else
     echo "✗ Failed to install lefthook"
@@ -48,4 +49,5 @@ echo ""
 echo "Lefthook is now configured to check backend files only."
 echo "To install other Go development tools, run:"
 echo "  cd backend && make install-tools"
+
 
