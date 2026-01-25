@@ -60,11 +60,11 @@ npx --prefix front lefthook install
 ```
 
 #### 実行タイミング
-pre-pushフックでは、フロントエンドのコードに対して`npm run lint`および`npm run format`が実行され、プッシュ前にLintとフォーマットが自動で行われます。
+pre-pushフックでは、フロントエンドのコードに対して`npm run lint`および`npm run format`が実行され、プッシュ前にLintとフォーマットが自動で行われます。lintコマンドは自動生成ファイルを除外するよう設定されています。
 
 #### 設定ファイル
 - `front/.lefthook.yml`: フロントエンドのGit hooks設定（実際の設定）
-- `lefthook.yml`（リポジトリルート）: `front/.lefthook.yml`を参照する最小限の設定ファイル
+- `lefthook.yml`（リポジトリルート）: `front/.lefthook.yml`を拡張（extends）する最小限の設定ファイル
 - 将来的に`backend/.lefthook.yml`も追加可能で、それぞれが独立して管理されます
 
 #### 一時的に無効化する方法
