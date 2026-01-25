@@ -16,7 +16,8 @@
 
 ここで表示する画像はBase64エンコードで表示
 
-![image](https://github.com/user-attachments/assets/2f77c46e-9a65-4ca8-a9a9-e9c946c7266b)
+<img width="1003" height="1024" alt="image" src="https://github.com/user-attachments/assets/ec4beacd-f456-44e0-9a8e-9b13a5363998" />
+
 
 ## 詳細ページ・カテゴリ展開・Amazonアフィリエイト部分
 画像データ格納はAmazon S3使用
