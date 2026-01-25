@@ -2,6 +2,7 @@ package ses
 
 import (
 	"os"
+	"strings"
 	"testing"
 )
 
@@ -107,7 +108,7 @@ func TestValidateSESConfig(t *testing.T) {
 					t.Errorf("エラーが期待されましたが、エラーが返されませんでした")
 				} else if tt.expectedInMsg != "" {
 					// エラーメッセージに期待される文字列が含まれているか確認
-					if err.Error() == "" || !containsString(err.Error(), tt.expectedInMsg) {
+					if !strings.Contains(err.Error(), tt.expectedInMsg) {
 						t.Errorf("エラーメッセージに '%s' が含まれていることが期待されましたが、実際のメッセージは: %s", tt.expectedInMsg, err.Error())
 					}
 				}
@@ -161,7 +162,7 @@ func TestGeneratePwRstStr(t *testing.T) {
 				if err == nil {
 					t.Errorf("エラーが期待されましたが、エラーが返されませんでした")
 				} else if tt.expectedInMsg != "" {
-					if !containsString(err.Error(), tt.expectedInMsg) {
+					if !strings.Contains(err.Error(), tt.expectedInMsg) {
 						t.Errorf("エラーメッセージに '%s' が含まれていることが期待されましたが、実際のメッセージは: %s", tt.expectedInMsg, err.Error())
 					}
 				}
@@ -170,24 +171,10 @@ func TestGeneratePwRstStr(t *testing.T) {
 					t.Errorf("エラーが期待されていませんでしたが、エラーが返されました: %v", err)
 				}
 				// 結果が期待通りか確認
-				if !containsString(result, tt.frontURI) {
+				if !strings.Contains(result, tt.frontURI) {
 					t.Errorf("結果に FRONT_URI '%s' が含まれていることが期待されましたが、実際の結果は: %s", tt.frontURI, result)
 				}
 			}
 		})
 	}
-}
-
-// containsString は文字列に部分文字列が含まれているかチェックする
-func containsString(s, substr string) bool {
-	return len(s) >= len(substr) && (s == substr || len(substr) == 0 || s[0:len(substr)] == substr || containsStringHelper(s, substr))
-}
-
-func containsStringHelper(s, substr string) bool {
-	for i := 0; i <= len(s)-len(substr); i++ {
-		if s[i:i+len(substr)] == substr {
-			return true
-		}
-	}
-	return false
 }

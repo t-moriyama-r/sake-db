@@ -2,7 +2,6 @@ package ses
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
@@ -66,23 +65,14 @@ func SendPasswordReset(ctx context.Context, email string, token string) error {
 
 func sendMail(ctx context.Context, content *emailContent) error {
 	// 環境変数の検証
+	if err := ValidateSESConfig(); err != nil {
+		return err
+	}
+
 	region := os.Getenv("AWS_REGION")
 	accessKey := os.Getenv("AWS_SES_ACCESS_KEY")
 	secretKey := os.Getenv("AWS_SES_ACCESS_SECRET")
 	from := os.Getenv("AWS_SES_FROM")
-
-	if region == "" {
-		return errors.New("AWS_REGION環境変数が設定されていません。詳細は document/aws-ses-setup.md を参照してください")
-	}
-	if accessKey == "" {
-		return errors.New("AWS_SES_ACCESS_KEY環境変数が設定されていません。詳細は document/aws-ses-setup.md を参照してください")
-	}
-	if secretKey == "" {
-		return errors.New("AWS_SES_ACCESS_SECRET環境変数が設定されていません。詳細は document/aws-ses-setup.md を参照してください")
-	}
-	if from == "" {
-		return errors.New("AWS_SES_FROM環境変数が設定されていません。詳細は document/aws-ses-setup.md を参照してください")
-	}
 
 	// 1. AWSの設定を読み込む
 	cfg, err := config.LoadDefaultConfig(ctx, config.WithRegion(region), config.WithCredentialsProvider(
