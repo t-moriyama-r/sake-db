@@ -1,15 +1,4 @@
 # lefthook.yml
-pre-push:
-  parallel: true
-  commands:
-    eslint:
-      root: "front/"
-      run: npm run lint
-    prettier:
-      root: "front/"
-      run: npm run format
-
-post-push:
-  commands:
-    message:
-      run: echo "プッシュが完了しました。"
+# This extends the front directory's lefthook configuration
+extends:
+  - front/.lefthook.yml
