@@ -42,10 +42,10 @@ const isShowDeleteDialog = ref<boolean>(false);
 async function deleteTag() {
   // ここに削除処理を書く
   await execute({ id: tag.id });
-  
+
   // タグ検索のキャッシュをクリア
   clearTagSearchCache(tag.text);
-  
+
   toast.showToast({
     message: 'タグの削除に成功しました',
   });

@@ -1,45 +1,78 @@
 <!--酒詳細ページ-->
 <template>
-  <div v-if="liquor">
+  <div v-if="liquor" class="max-w-5xl mx-auto px-4 py-6 space-y-6">
+    <!-- フレーバーマップ -->
     <FlavorMap :liquor="liquor" />
-    <div class="flex">
-      <BackButton />
-      <p class="title">{{ liquor.name }}</p>
+
+    <!-- メインコンテンツカード -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+      <!-- ヘッダー部分 -->
+      <div class="p-6 border-b border-gray-200">
+        <div class="flex items-start gap-4 mb-3">
+          <BackButton />
+          <h1 class="text-3xl font-bold text-gray-900 flex-1">
+            {{ liquor.name }}
+          </h1>
+        </div>
+        <CategoryTrail :category-trails="liquor.categoryTrail" />
+      </div>
+
+      <!-- 画像とYouTube埋め込み -->
+      <div class="p-6 space-y-6">
+        <div
+          v-if="liquor.imageUrl || liquor.youtube"
+          class="flex flex-col md:flex-row gap-6"
+        >
+          <img
+            v-if="liquor.imageUrl"
+            :src="liquor.imageUrl"
+            class="w-full md:w-1/2 h-auto object-contain rounded-lg shadow-sm max-h-96"
+            alt="画像"
+          />
+          <div
+            v-if="liquor.youtube"
+            class="w-full md:w-1/2 aspect-video rounded-lg overflow-hidden shadow-sm"
+          >
+            <iframe
+              class="w-full h-full"
+              :src="embedUrl ?? undefined"
+              title="YouTube video player"
+              allow="
+                accelerometer;
+                clipboard-write;
+                encrypted-media;
+                gyroscope;
+                picture-in-picture;
+                web-share;
+              "
+              allowfullscreen
+            />
+          </div>
+        </div>
+
+        <!-- 説明文 -->
+        <div class="prose max-w-none">
+          <p class="text-gray-700 leading-relaxed whitespace-pre-line">
+            {{ liquor.description }}
+          </p>
+        </div>
+
+        <!-- 編集ボタン -->
+        <div class="flex justify-end pt-4">
+          <router-link :to="{ name: 'LiquorEdit', params: { id: liquor.id } }">
+            <CommonButton>編集する</CommonButton>
+          </router-link>
+        </div>
+      </div>
     </div>
-    <CategoryTrail :category-trails="liquor.categoryTrail" />
-    <img
-      v-if="liquor.imageUrl"
-      :src="liquor.imageUrl"
-      class="image"
-      alt="画像"
-    />
-    <div>
-      <span v-for="(line, index) in descriptionLines" :key="index">
-        {{ line }}<br v-if="index !== descriptionLines.length - 1" />
-      </span>
-    </div>
-    <div class="max-w-[515px]">
-      <iframe
-        v-if="liquor.youtube"
-        class="w-full aspect-video"
-        :src="embedUrl ?? undefined"
-        title="YouTube video player"
-        allow="
-          accelerometer;
-          clipboard-write;
-          encrypted-media;
-          gyroscope;
-          picture-in-picture;
-          web-share;
-        "
-        allowfullscreen
-      />
-    </div>
-    <router-link :to="{ name: 'LiquorEdit', params: { id: liquor.id } }">
-      <CommonButton>編集する</CommonButton></router-link
-    >
+
+    <!-- タグ -->
     <LiquorTags :liquor-id="liquor.id" />
+
+    <!-- アフィリエイト -->
     <AffiliateContainer :name="liquor.name" />
+
+    <!-- 掲示板 -->
     <LiquorBoard :liquorId="liquor.id" />
   </div>
 </template>
@@ -62,10 +95,6 @@ interface Props {
 
 const { liquor } = defineProps<Props>();
 
-const descriptionLines = computed<string[]>(() => {
-  return liquor.description.split('\n');
-});
-
 // YouTubeのURLをembed形式に変換するcomputedプロパティ
 const embedUrl = computed<string | null>(() => {
   if (!liquor.youtube) return null;
@@ -78,14 +107,4 @@ const embedUrl = computed<string | null>(() => {
 });
 </script>
 
-<style scoped>
-p.title {
-  font-size: 150%;
-  font-weight: bold;
-}
-
-img.image {
-  max-height: 300px;
-  max-width: 500px;
-}
-</style>
+<style scoped></style>

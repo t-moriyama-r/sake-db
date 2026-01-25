@@ -5,12 +5,7 @@
       <span>タグで検索: {{ tag }}</span>
     </p>
   </div>
-  <FromTag
-    :key="tag"
-    v-if="liquors"
-    :tag="tag"
-    :liquors="liquors"
-  />
+  <FromTag :key="tag" v-if="liquors" :tag="tag" :liquors="liquors" />
 </template>
 
 <script setup lang="ts">

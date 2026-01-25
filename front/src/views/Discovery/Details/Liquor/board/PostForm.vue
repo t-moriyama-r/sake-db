@@ -1,16 +1,18 @@
 <template>
-  感想を投稿
-  <form @submit="onSubmit">
-    <div class="flex board-container">
-      <div class="flex-1 text-area">
-        <FormField :name="FormKeys.TEXT" label="本文" classes="w-full" />
+  <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+    <h3 class="text-xl font-semibold text-gray-900 mb-4">感想を投稿</h3>
+    <form @submit="onSubmit">
+      <div class="flex flex-col sm:flex-row gap-4 items-end">
+        <div class="flex-1 w-full">
+          <FormField :name="FormKeys.TEXT" label="本文" classes="w-full" />
+        </div>
+        <div class="flex gap-2 items-end w-full sm:w-auto">
+          <RatingButton :name="FormKeys.RATE" label="評価" ref="ratingButton" />
+          <SubmitButton class="h-10 whitespace-nowrap">送信</SubmitButton>
+        </div>
       </div>
-      <RatingButton :name="FormKeys.RATE" label="評価" ref="ratingButton" />
-      <div class="submit flex items-center justify-center ml-1.5">
-        <SubmitButton class="h-10">送信</SubmitButton>
-      </div>
-    </div>
-  </form>
+    </form>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -81,8 +83,4 @@ const onSubmit = handleSubmit(async (values: FormValues) => {
 });
 </script>
 
-<style scoped>
-div.board-container {
-  max-width: 800px;
-}
-</style>
+<style scoped></style>
