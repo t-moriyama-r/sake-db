@@ -81,6 +81,30 @@ export function clearLiquorDetailCache(id: string) {
 }
 
 /**
+ * タグ検索のキャッシュをクリア
+ * タグの登録・削除後に呼び出して、検索結果に最新の情報が反映されるようにする
+ * @param tag - クリアするタグのテキスト（オプション、指定しない場合は全てのタグ検索キャッシュをクリア）
+ */
+export function clearTagSearchCache(tag?: string) {
+  if (tag) {
+    // 特定のタグ検索キャッシュをクリア
+    client.cache.evict({
+      id: 'ROOT_QUERY',
+      fieldName: 'searchLiquorsByTag',
+      args: { tag },
+    });
+  } else {
+    // すべてのタグ検索キャッシュをクリア
+    client.cache.evict({
+      id: 'ROOT_QUERY',
+      fieldName: 'searchLiquorsByTag',
+    });
+  }
+
+  client.cache.gc();
+}
+
+/**
  * 指定されたカテゴリIDから親カテゴリまでのIDパスを取得
  * @param categories - カテゴリツリー
  * @param targetId - 検索対象のカテゴリID

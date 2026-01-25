@@ -22,10 +22,8 @@ export const FormKeys = {
   VERSION_NO: 'version_no',
 } as const;
 
-export interface FormValues extends Omit<
-  CategoryRequest,
-  typeof FormKeys.PARENT
-> {
+export interface FormValues
+  extends Omit<CategoryRequest, typeof FormKeys.PARENT> {
   [FormKeys.PARENT]: number | null;
 }
 
