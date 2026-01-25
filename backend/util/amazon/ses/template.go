@@ -2,7 +2,7 @@ package ses
 
 import (
 	"bytes"
-	"errors"
+	"fmt"
 	"os"
 	"text/template"
 )
@@ -15,7 +15,7 @@ type passwordReset struct {
 func generatePwRstStr() (string, error) {
 	frontURI := os.Getenv("FRONT_URI")
 	if frontURI == "" {
-		return "", errors.New("FRONT_URI環境変数が設定されていません。詳細は document/aws-ses-setup.md を参照してください")
+		return "", fmt.Errorf("FRONT_URI環境変数が設定されていません。詳細は document/aws-ses-setup.md を参照してください")
 	}
 	return "URLは " + frontURI + "/auth/password/reset/{{ .Token }} です", nil
 }

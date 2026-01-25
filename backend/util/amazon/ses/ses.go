@@ -40,7 +40,7 @@ func ValidateSESConfig() error {
 	}
 
 	if len(missingVars) > 0 {
-		return fmt.Errorf("以下のAWS SES環境変数が設定されていません: %v\n設定方法の詳細は document/aws-ses-setup.md を参照してください", missingVars)
+		return fmt.Errorf("以下のAWS SES環境変数が設定されていません: %v (設定方法の詳細は document/aws-ses-setup.md を参照してください)", missingVars)
 	}
 
 	return nil
