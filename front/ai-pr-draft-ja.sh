@@ -15,8 +15,22 @@ RESET_COLOR=$'\033[0m'
 set -euo pipefail
 [[ $DEBUG -eq 1 ]] && set -x
 
+# ---- クリーンアップ関数 -------------------------------------------------------
+# 一時ファイルを追跡
+TEMP_FILES=()
+
+cleanup() {
+  local file
+  for file in "${TEMP_FILES[@]}"; do
+    if [[ -n "$file" && -f "$file" ]]; then
+      rm -f "$file"
+    fi
+  done
+}
+
 # ---- ヘルパー関数 -------------------------------------------------------------
 log() { echo -e "${TRACE_COLOR}[$(date +%H:%M:%S)] $*${RESET_COLOR}"; }
+trap cleanup EXIT
 trap 'log "❌ Error at line ${LINENO}: \"${BASH_COMMAND}\""' ERR
 
 # ---- ツールチェック -----------------------------------------------------------
@@ -258,14 +272,13 @@ elif command -v python3 >/dev/null 2>&1; then
 
   # シェルエスケープ問題を回避するため一時ファイルを作成
   TEMP_JSON=$(mktemp 2>/dev/null) || {
-    log "  ⚠️  一時ファイルを作成できませんでした。"
-    # mktempが使えない場合はスキップ
-    :
+    log "  ⚠️  mktemp が使えないため、Python JSON解析をスキップします。"
+    TEMP_JSON=""
   }
   
   if [[ -n "$TEMP_JSON" ]]; then
-    # スクリプト終了時に一時ファイルを確実に削除
-    trap 'if [[ -n "${TEMP_JSON:-}" && -f "$TEMP_JSON" ]]; then rm -f "$TEMP_JSON"; fi' EXIT
+    # 一時ファイルを追跡リストに追加
+    TEMP_FILES+=("$TEMP_JSON")
     
     echo "$JSON_PAYLOAD" > "$TEMP_JSON"
 
@@ -297,9 +310,13 @@ if __name__ == "__main__":
     main()
 PYCODE
     ); then
-      # NUL文字で分割
-      IFS=$'\0' read -r -d '' TITLE BODY <<< "$PYTHON_RESULT" || true
-      log "  ✓ Python でJSONの解析に成功しました"
+      # NUL文字で分割 - 明示的にエラーをチェック
+      if IFS=$'\0' read -r -d '' TITLE BODY <<< "$PYTHON_RESULT"; then
+        log "  ✓ Python でJSONの解析に成功しました"
+      elif [[ -n "$TITLE" && -n "$BODY" ]]; then
+        # readは最後のフィールドで0以外を返すが、データは正常に読み込まれている
+        log "  ✓ Python でJSONの解析に成功しました"
+      fi
     fi
   fi
 fi
@@ -404,8 +421,8 @@ TEMP_BODY=$(mktemp 2>/dev/null) || {
   echo "❌ 一時ファイルを作成できませんでした。" >&2
   exit 1
 }
-# スクリプト終了時に一時ファイルを確実に削除
-trap 'if [[ -n "${TEMP_BODY:-}" && -f "$TEMP_BODY" ]]; then rm -f "$TEMP_BODY"; fi' EXIT
+# 一時ファイルを追跡リストに追加
+TEMP_FILES+=("$TEMP_BODY")
 echo "$BODY" > "$TEMP_BODY"
 
 log "  PR作成の準備中:"
