@@ -39,16 +39,17 @@ func (r *LiquorsRepository) BoardList(ctx context.Context, id primitive.ObjectID
 
 		// 6. 必要なフィールドだけをプロジェクト
 		bson.M{"$project": bson.M{
-			"_id":           1,
-			"user_id":       1,
-			"user_name":     "$user_info.name", // usersコレクションからのuser_name
-			"liquor_id":     1,
-			"liquor_name":   "$liquor_info.name", // liquorsコレクションからのliquor_name
-			"category_id":   "$liquor_info.category_id",
-			"category_name": "$liquor_info.category_name",
-			"rate":          1,
-			"text":          1,
-			"updated_at":    1,
+			"_id":                1,
+			"user_id":            1,
+			"user_name":          "$user_info.name",           // usersコレクションからのuser_name
+			"user_image_base64":  "$user_info.image_base64",   // usersコレクションからのuser_image_base64
+			"liquor_id":          1,
+			"liquor_name":        "$liquor_info.name",         // liquorsコレクションからのliquor_name
+			"category_id":        "$liquor_info.category_id",
+			"category_name":      "$liquor_info.category_name",
+			"rate":               1,
+			"text":               1,
+			"updated_at":         1,
 		}},
 	}
 

@@ -27,16 +27,17 @@ type BoardModel struct {
 
 // BoardModelWithRelation リレーション込みのモデル(実際に取得してくるデータ)
 type BoardModelWithRelation struct {
-	ID           primitive.ObjectID  `bson:"_id,omitempty"`
-	CategoryID   int                 `bson:"category_id"`
-	CategoryName string              `bson:"category_name"`
-	LiquorID     primitive.ObjectID  `bson:"liquor_id"`
-	LiquorName   string              `bson:"liquor_name"`
-	UserId       *primitive.ObjectID `bson:"user_id"`
-	UserName     *string             `bson:"user_name"`
-	Text         string              `bson:"text"`
-	Rate         *int                `bson:"rate"`
-	UpdatedAt    time.Time           `bson:"updated_at"`
+	ID              primitive.ObjectID  `bson:"_id,omitempty"`
+	CategoryID      int                 `bson:"category_id"`
+	CategoryName    string              `bson:"category_name"`
+	LiquorID        primitive.ObjectID  `bson:"liquor_id"`
+	LiquorName      string              `bson:"liquor_name"`
+	UserId          *primitive.ObjectID `bson:"user_id"`
+	UserName        *string             `bson:"user_name"`
+	UserImageBase64 *string             `bson:"user_image_base64"`
+	Text            string              `bson:"text"`
+	Rate            *int                `bson:"rate"`
+	UpdatedAt       time.Time           `bson:"updated_at"`
 }
 
 // Post 各投稿の詳細

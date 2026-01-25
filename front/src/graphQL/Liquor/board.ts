@@ -16,6 +16,7 @@ export interface PostCore {
 export interface Post extends PostCore {
   readonly userName: string | null;
   readonly userId: string | null;
+  readonly userImageBase64: string | null;
   readonly updatedAt: Date;
 }
 export const Post: DocumentNode = gql`
@@ -37,6 +38,7 @@ export const GET_BOARD: DocumentNode = gql`
     board(liquorId: $liquorId) {
       userId
       userName
+      userImageBase64
       text
       rate
       updatedAt

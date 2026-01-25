@@ -69,17 +69,18 @@ type ComplexityRoot struct {
 	}
 
 	BoardPost struct {
-		CategoryID   func(childComplexity int) int
-		CategoryName func(childComplexity int) int
-		ID           func(childComplexity int) int
-		LiquorID     func(childComplexity int) int
-		LiquorName   func(childComplexity int) int
-		Rate         func(childComplexity int) int
-		Text         func(childComplexity int) int
-		UpdatedAt    func(childComplexity int) int
-		UserID       func(childComplexity int) int
-		UserName     func(childComplexity int) int
-		Youtube      func(childComplexity int) int
+		CategoryID      func(childComplexity int) int
+		CategoryName    func(childComplexity int) int
+		ID              func(childComplexity int) int
+		LiquorID        func(childComplexity int) int
+		LiquorName      func(childComplexity int) int
+		Rate            func(childComplexity int) int
+		Text            func(childComplexity int) int
+		UpdatedAt       func(childComplexity int) int
+		UserID          func(childComplexity int) int
+		UserImageBase64 func(childComplexity int) int
+		UserName        func(childComplexity int) int
+		Youtube         func(childComplexity int) int
 	}
 
 	BookMarkListUser struct {
@@ -461,6 +462,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.BoardPost.UserID(childComplexity), true
+
+	case "BoardPost.userImageBase64":
+		if e.complexity.BoardPost.UserImageBase64 == nil {
+			break
+		}
+
+		return e.complexity.BoardPost.UserImageBase64(childComplexity), true
 
 	case "BoardPost.userName":
 		if e.complexity.BoardPost.UserName == nil {
@@ -1919,6 +1927,7 @@ type BoardPost{
   id:ID!
   userId: ID #名無しの場合もあるので
   userName: String
+  userImageBase64: String # ユーザーのプロフィール画像
   categoryId: Int!
   categoryName: String!
   liquorId:ID!
@@ -3539,6 +3548,47 @@ func (ec *executionContext) _BoardPost_userName(ctx context.Context, field graph
 }
 
 func (ec *executionContext) fieldContext_BoardPost_userName(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "BoardPost",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _BoardPost_userImageBase64(ctx context.Context, field graphql.CollectedField, obj *graphModel.BoardPost) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_BoardPost_userImageBase64(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UserImageBase64, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_BoardPost_userImageBase64(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "BoardPost",
 		Field:      field,
@@ -8704,6 +8754,8 @@ func (ec *executionContext) fieldContext_Query_board(ctx context.Context, field 
 				return ec.fieldContext_BoardPost_userId(ctx, field)
 			case "userName":
 				return ec.fieldContext_BoardPost_userName(ctx, field)
+			case "userImageBase64":
+				return ec.fieldContext_BoardPost_userImageBase64(ctx, field)
 			case "categoryId":
 				return ec.fieldContext_BoardPost_categoryId(ctx, field)
 			case "categoryName":
@@ -8802,6 +8854,8 @@ func (ec *executionContext) fieldContext_Query_getMyBoard(ctx context.Context, f
 				return ec.fieldContext_BoardPost_userId(ctx, field)
 			case "userName":
 				return ec.fieldContext_BoardPost_userName(ctx, field)
+			case "userImageBase64":
+				return ec.fieldContext_BoardPost_userImageBase64(ctx, field)
 			case "categoryId":
 				return ec.fieldContext_BoardPost_categoryId(ctx, field)
 			case "categoryName":
@@ -13820,6 +13874,8 @@ func (ec *executionContext) _BoardPost(ctx context.Context, sel ast.SelectionSet
 			out.Values[i] = ec._BoardPost_userId(ctx, field, obj)
 		case "userName":
 			out.Values[i] = ec._BoardPost_userName(ctx, field, obj)
+		case "userImageBase64":
+			out.Values[i] = ec._BoardPost_userImageBase64(ctx, field, obj)
 		case "categoryId":
 			out.Values[i] = ec._BoardPost_categoryId(ctx, field, obj)
 			if out.Values[i] == graphql.Null {

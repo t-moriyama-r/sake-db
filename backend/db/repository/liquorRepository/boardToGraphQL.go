@@ -113,15 +113,16 @@ func (m *BoardModelWithRelation) ToGraphQL() *graphModel.BoardPost {
 		userId = &id
 	}
 	return &graphModel.BoardPost{
-		ID:           m.ID.Hex(),
-		UserName:     m.UserName,
-		UserID:       userId,
-		CategoryID:   m.CategoryID,
-		CategoryName: m.CategoryName,
-		LiquorID:     m.LiquorID.Hex(),
-		LiquorName:   m.LiquorName,
-		Text:         m.Text,
-		Rate:         m.Rate,
-		UpdatedAt:    m.UpdatedAt,
+		ID:              m.ID.Hex(),
+		UserName:        m.UserName,
+		UserID:          userId,
+		UserImageBase64: m.UserImageBase64,
+		CategoryID:      m.CategoryID,
+		CategoryName:    m.CategoryName,
+		LiquorID:        m.LiquorID.Hex(),
+		LiquorName:      m.LiquorName,
+		Text:            m.Text,
+		Rate:            m.Rate,
+		UpdatedAt:       m.UpdatedAt,
 	}
 }

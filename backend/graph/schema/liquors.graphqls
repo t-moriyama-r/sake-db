@@ -43,6 +43,7 @@ type BoardPost{
   id:ID!
   userId: ID #名無しの場合もあるので
   userName: String
+  userImageBase64: String # ユーザーのプロフィール画像
   categoryId: Int!
   categoryName: String!
   liquorId:ID!

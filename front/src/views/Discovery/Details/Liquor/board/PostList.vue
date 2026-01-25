@@ -11,6 +11,17 @@
           <!-- ユーザー情報 -->
           <div class="flex-shrink-0">
             <div
+              v-if="post.userImageBase64"
+              class="w-10 h-10 rounded-full overflow-hidden bg-gray-200"
+            >
+              <img
+                :src="`data:image/jpeg;base64,${post.userImageBase64}`"
+                :alt="post.userName || '名無し'"
+                class="w-full h-full object-cover"
+              />
+            </div>
+            <div
+              v-else
               class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center"
             >
               <span class="text-gray-600 text-sm font-medium">
