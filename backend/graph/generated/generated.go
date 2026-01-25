@@ -1973,7 +1973,7 @@ type Tag{
 
 extend type Query{
   getTags(liquorId:ID!):[Tag!]! # 一覧などではDBアクセス自体が不要なため、コードの簡単化も兼ねて分けて取得することにした
-  searchLiquorsByTag(tag:String!):[Liquor!]! # タグで日本酒を検索
+  searchLiquorsByTag(tag:String!):[Liquor!]! # タグでお酒を検索
 }
 
 extend type Mutation {

@@ -1,6 +1,6 @@
 <template>
   <div class="px-8 mt-4">
-    <p>「{{ tag }}」タグの日本酒が見つかりませんでした。</p>
+    <p>「{{ tag }}」タグのお酒が見つかりませんでした。</p>
   </div>
 </template>
 

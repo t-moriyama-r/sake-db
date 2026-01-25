@@ -80,7 +80,7 @@ func (r *queryResolver) GetTags(ctx context.Context, liquorID string) ([]*graphM
 
 // SearchLiquorsByTag is the resolver for the searchLiquorsByTag field.
 func (r *queryResolver) SearchLiquorsByTag(ctx context.Context, tag string) ([]*graphModel.Liquor, error) {
-	// タグから日本酒IDのリストを取得
+	// タグからお酒IDのリストを取得
 	liquorIds, err := r.LiquorRepo.SearchLiquorsByTag(ctx, tag)
 	if err != nil {
 		return nil, err
@@ -91,7 +91,7 @@ func (r *queryResolver) SearchLiquorsByTag(ctx context.Context, tag string) ([]*
 		return []*graphModel.Liquor{}, nil
 	}
 
-	// IDから日本酒データを取得
+	// IDからお酒データを取得
 	liquors, err := r.LiquorRepo.GetLiquorsByIds(ctx, liquorIds)
 	if err != nil {
 		return nil, err
