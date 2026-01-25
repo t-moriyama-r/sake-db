@@ -10,7 +10,7 @@
 - **設定方法**: [Copilot自動レビューの設定手順](./document/copilot-review-setup.md)を参照してください
 - レビュー基準のカスタマイズは `.github/copilot-instructions.md` で設定されています
 
-## 自動PR生成
+## 自動PR生成(Claude Code)
 
 Claude CodeのMCPを用いて、`/pr`を用いるとプルリクが自動生成されます。<br/>
 また、`/pr-sh`を用いるとシェルスクリプトを用いてコンテキストの節約を試みます。(試験運用中)<br/>
