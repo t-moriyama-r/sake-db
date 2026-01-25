@@ -41,7 +41,7 @@ export const validationSchema = {
     .transform((value) => (value === '' ? null : value))
     .nullable()
     .test('min-length', '7文字以上で入力してください', (value) => {
-      if (value === null || value === undefined) {
+      if (value === null || value === undefined || value === '') {
         return true; // 空の場合はOK
       }
       return value.length >= 7;
