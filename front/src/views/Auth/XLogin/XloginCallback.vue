@@ -1,4 +1,7 @@
-<template></template>
+<template>
+  <!-- Placeholder template - to be implemented -->
+  <div></div>
+</template>
 
 <script setup lang="ts"></script>
 
