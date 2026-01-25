@@ -1,19 +1,14 @@
-# Lefthook configuration for sake-db project
+# Lefthook configuration for backend
+# Lefthookはリポジトリルートで動作しますが、バックエンドファイルのみをチェックします
 # Refer for explanation: https://github.com/evilmartians/lefthook/blob/master/docs/configuration.md
 
 pre-commit:
   parallel: true
   commands:
-    # フロントエンド: ESLint
-    frontend-lint:
-      tags: frontend
-      glob: "front/**/*.{js,ts,vue}"
-      run: cd front && npx eslint {staged_files}
-    
-    # バックエンド: Go構文チェック
+    # Go構文チェック
     go-fmt:
       tags: backend
-      glob: "**/*.go"
+      glob: "backend/**/*.go"
       root: "backend/"
       run: |
         if ! gofmt -l {staged_files} | grep .; then
@@ -23,10 +18,10 @@ pre-commit:
           exit 1
         fi
     
-    # バックエンド: Go静的解析
+    # Go静的解析
     go-lint:
       tags: backend
-      glob: "**/*.go"
+      glob: "backend/**/*.go"
       root: "backend/"
       run: |
         if command -v golangci-lint &> /dev/null; then
@@ -34,22 +29,22 @@ pre-commit:
           golangci-lint run --new-from-rev=HEAD~1
         else
           echo "⚠ golangci-lint not installed. Skipping linting."
-          echo "  Install with: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest"
+          echo "  Install with: cd backend && make install-tools"
         fi
     
-    # バックエンド: Go vet
+    # Go vet
     go-vet:
       tags: backend
-      glob: "**/*.go"
+      glob: "backend/**/*.go"
       root: "backend/"
       run: go vet {staged_files}
     
-    # バックエンド: GraphQLスキーマ検証
+    # GraphQLスキーマ検証
     graphql-validate:
       tags: backend graphql
       glob: "backend/graph/schema/*.graphqls"
+      root: "backend/"
       run: |
-        cd backend
         echo "Validating GraphQL schema..."
         go run github.com/99designs/gqlgen generate --config gqlgen.yml
         if [ $? -eq 0 ]; then
@@ -65,5 +60,4 @@ pre-commit:
           echo "✗ GraphQL schema validation failed"
           exit 1
         fi
-
 

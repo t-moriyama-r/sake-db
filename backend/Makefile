@@ -4,6 +4,13 @@
 seeder:
 	go run ./seeder.go
 
+# Lefthookと開発ツールのセットアップ
+setup:
+	@echo "Setting up backend development environment..."
+	@./setup-hooks.sh
+	@$(MAKE) install-tools
+	@echo "Setup completed! You can now commit with automatic static analysis."
+
 # 依存関係のインストール
 install-tools:
 	@echo "Installing development tools..."
@@ -36,4 +43,5 @@ deps:
 	go mod download
 	go mod tidy
 
-.PHONY: seeder install-tools fmt lint vet generate check deps
+.PHONY: seeder setup install-tools fmt lint vet generate check deps
+

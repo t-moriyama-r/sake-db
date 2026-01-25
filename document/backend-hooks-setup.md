@@ -4,10 +4,7 @@
 
 ## 概要
 
-このプロジェクトでは、コミット前に以下のチェックを自動実行します：
-
-### フロントエンド
-- **ESLint**: JavaScriptとVueファイルの構文チェック
+バックエンドファイル専用の静的解析システムです。コミット前に以下のチェックを自動実行します：
 
 ### バックエンド
 - **gofmt**: Goコードのフォーマットチェック
@@ -15,10 +12,12 @@
 - **golangci-lint**: 高度なGo静的解析（複数のlinterを統合）
 - **GraphQLスキーマ検証**: gqlgenによるスキーマの妥当性チェック
 
+**重要**: Lefthookはリポジトリルートで動作しますが、`backend/`ディレクトリ内のファイルのみをチェックします。
+
 ## 必要なツール
 
 ### 1. Lefthook
-Git フック管理ツール
+Git フック管理ツール（リポジトリルートにインストール）
 
 ### 2. golangci-lint
 Go言語の包括的な静的解析ツール
@@ -30,19 +29,14 @@ GraphQL スキーマからGoコードを生成するツール
 
 ### クイックセットアップ（推奨）
 
-プロジェクトルートで以下を実行：
+バックエンドディレクトリで以下を実行：
 
 ```bash
-# 1. Lefthookのインストールとセットアップ
-./setup-hooks.sh
-
-# 2. バックエンド開発ツールのインストール
 cd backend
-make install-tools
-cd ..
+make setup
 ```
 
-これで準備完了です！
+これだけで完了です！
 
 ### 手動セットアップ
 
@@ -58,8 +52,12 @@ brew install lefthook
 go install github.com/evilmartians/lefthook@latest
 ```
 
-**Lefthookの有効化:**
+**Lefthookの有効化（リポジトリルートで実行）:**
 ```bash
+# リポジトリルートに移動
+cd /path/to/sake-db
+
+# Lefthookをインストール
 lefthook install
 ```
 
@@ -86,12 +84,13 @@ make install-tools
 
 ### 通常のコミットフロー
 
-コミット時に自動的にチェックが実行されます：
+バックエンドディレクトリ内のファイルをコミットする際、自動的にチェックが実行されます：
 
 ```bash
-git add .
+# どこからでもコミット可能
+git add backend/
 git commit -m "feat: 新機能を追加"
-# → 自動的に静的解析が実行されます
+# → 自動的にバックエンドファイルの静的解析が実行されます
 ```
 
 チェックが失敗した場合、エラーメッセージが表示され、コミットはキャンセルされます。
@@ -133,16 +132,13 @@ make check
 ### Lefthookの手動実行
 
 ```bash
-# すべてのpre-commitフックを実行
+# リポジトリルートで実行
 lefthook run pre-commit
 
-# バックエンドのみ実行
-lefthook run pre-commit --commands go-fmt,go-vet,go-lint
-
-# フロントエンドのみ実行
-lefthook run pre-commit --commands frontend-lint
-
-# GraphQLスキーマ検証のみ
+# または特定のコマンドのみ
+lefthook run pre-commit --commands go-fmt
+lefthook run pre-commit --commands go-vet
+lefthook run pre-commit --commands go-lint
 lefthook run pre-commit --commands graphql-validate
 ```
 
@@ -191,6 +187,7 @@ go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 
 **解決策1: 再インストール**
 ```bash
+# リポジトリルートで
 lefthook uninstall
 lefthook install
 ```
@@ -206,7 +203,7 @@ echo 'export PATH=$PATH:$(go env GOPATH)/bin' >> ~/.bashrc
 
 **解決策3: 設定の確認**
 ```bash
-# 詳細モードで実行して問題を特定
+# リポジトリルートで詳細モードで実行
 lefthook run pre-commit --verbose
 ```
 
@@ -241,42 +238,53 @@ gofmt -w .
 make fmt
 ```
 
+## ディレクトリ構成
+
+```
+/
+├── lefthook.yml          # Lefthook設定（リポジトリルート）
+└── backend/
+    ├── .golangci.yml     # golangci-lint設定
+    ├── setup-hooks.sh    # セットアップスクリプト
+    ├── Makefile          # ビルドとチェックコマンド
+    ├── gqlgen.yml        # GraphQL設定
+    └── graph/
+        └── schema/       # GraphQLスキーマファイル
+```
+
 ## CI/CDとの統合
 
 このフックはローカル開発環境用です。CI/CD環境では以下を実行してください：
 
 ```yaml
 # GitHub Actions の例
-- name: Run Go linters
+- name: Run backend checks
   run: |
     cd backend
     make check
-    
-- name: Validate GraphQL schema
-  run: |
-    cd backend
-    make generate
 ```
 
 ## ベストプラクティス
 
-1. **コミット前に手動チェック**: 大きな変更の場合、コミット前に`make check`を実行
-2. **小さなコミット**: 小さく頻繁にコミットすることで、チェック時間を短縮
-3. **フック無視は避ける**: `--no-verify`の使用は最小限に
-4. **定期的なツール更新**: 開発ツールを定期的に更新
+1. **初回セットアップ**: プロジェクトをクローンしたら`cd backend && make setup`を実行
+2. **コミット前に手動チェック**: 大きな変更の場合、コミット前に`cd backend && make check`を実行
+3. **小さなコミット**: 小さく頻繁にコミットすることで、チェック時間を短縮
+4. **フック無視は避ける**: `--no-verify`の使用は最小限に
+5. **定期的なツール更新**: 開発ツールを定期的に更新
    ```bash
    cd backend
    make install-tools
    ```
-5. **エラーメッセージを読む**: linterのエラーメッセージには改善のヒントが含まれています
-6. **チーム全体で使用**: 全員が同じツールを使用することでコード品質が統一されます
+6. **エラーメッセージを読む**: linterのエラーメッセージには改善のヒントが含まれています
+7. **チーム全体で使用**: 全員が同じツールを使用することでコード品質が統一されます
 
 ## Makefileコマンド一覧
 
 バックエンドディレクトリで使用できるコマンド：
 
 ```bash
-make install-tools  # 開発ツールのインストール
+make setup         # Lefthookと開発ツールの完全セットアップ
+make install-tools # 開発ツールのインストール
 make fmt           # コードフォーマット
 make lint          # golangci-lintの実行
 make vet           # go vetの実行
@@ -307,8 +315,11 @@ make deps          # 依存関係の更新
    echo $PATH | grep go/bin
    ```
 
-3. 詳細ログを確認
+3. リポジトリルートでlefthookが設定されているか
    ```bash
+   cd /path/to/sake-db  # リポジトリルート
    lefthook run pre-commit --verbose
    ```
+
+
 
