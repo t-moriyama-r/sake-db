@@ -1,0 +1,20 @@
+# lefthook.yml
+# This extends the front directory's lefthook configuration
+# Each directory (front, backend, etc.) can have its own .lefthook.yml
+
+# コミット時のフック実行を無効化
+skip_output:
+  - meta
+  - summary
+
+pre-commit:
+  skip: true
+
+prepare-commit-msg:
+  skip: true
+
+commit-msg:
+  skip: true
+
+extends:
+  - front/.lefthook.yml
