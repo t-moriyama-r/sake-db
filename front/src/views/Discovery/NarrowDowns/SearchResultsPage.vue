@@ -42,6 +42,9 @@ import {
   type SearchLiquorsResponse,
 } from '@/graphQL/Liquor/search';
 
+// 定数
+const DEFAULT_SEARCH_LIMIT = 100;
+
 const route = useRoute();
 const { fetch } = useQuery<SearchLiquorsResponse>(SEARCH_LIQUORS);
 
@@ -63,7 +66,7 @@ const fetchData = async (searchKeyword: string): Promise<void> => {
   try {
     const response = await fetch({
       keyword: searchKeyword,
-      limit: 100, // 最大100件まで表示
+      limit: DEFAULT_SEARCH_LIMIT,
     });
     liquors.value = response.searchLiquors;
   } catch (e) {
