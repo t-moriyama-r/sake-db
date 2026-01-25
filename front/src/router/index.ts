@@ -30,15 +30,13 @@ const CATEGORY_CONTEXT_ROUTES = [
 
 //認証ミドルウェア
 router.beforeEach((to, from, next) => {
-  authenticate(to, next);
-
   // カテゴリコンテキストを保持すべきルート以外では、カテゴリ選択をクリア
   if (to.name && !CATEGORY_CONTEXT_ROUTES.includes(to.name as string)) {
     const categoryStore = useSelectedCategoryStore();
     categoryStore.updateContent(null);
   }
 
-  next();
+  authenticate(to, next);
 });
 
 export default router;
