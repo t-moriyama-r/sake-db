@@ -184,6 +184,34 @@ func (r *LiquorsRepository) GetLiquorsFromCategoryIds(ctx context.Context, ids [
 	return liquors, nil
 }
 
+func (r *LiquorsRepository) SearchLiquorsByKeyword(ctx context.Context, keyword string, limit int) ([]*Model, *customError.Error) {
+	// テキストインデックスを使用した検索フィルター
+	filter := bson.M{"$text": bson.M{"$search": keyword}}
+
+	// 検索スコア順でソート、結果を制限
+	opts := options.Find().
+		SetProjection(bson.M{"score": bson.M{"$meta": "textScore"}}).
+		SetSort(bson.M{"score": bson.M{"$meta": "textScore"}}).
+		SetLimit(int64(limit))
+
+	// コレクションからフィルタに一致するドキュメントを取得
+	cursor, err := r.collection.Find(ctx, filter, opts)
+	if err != nil {
+		return nil, errSearchLiquorsByKeyword(err, keyword)
+	}
+	defer cursor.Close(ctx)
+
+	// 結果を格納するスライス
+	var liquors []*Model
+
+	// 取得したドキュメントをスライスにデコード
+	if err = cursor.All(ctx, &liquors); err != nil {
+		return nil, errSearchLiquorsByKeywordDecode(err, keyword)
+	}
+
+	return liquors, nil
+}
+
 func (r *LiquorsRepository) InsertOne(ctx context.Context, liquor *Model) (primitive.ObjectID, *customError.Error) {
 	result, err := r.collection.InsertOne(ctx, liquor)
 	if err != nil {

@@ -171,3 +171,25 @@ func GetMyBoard(ctx context.Context, r liquorRepository.LiquorsRepository, liquo
 
 	return board, nil
 }
+
+func SearchLiquors(ctx context.Context, r liquorRepository.LiquorsRepository, keyword string, limit *int) ([]*graphModel.Liquor, *customError.Error) {
+	// limitのデフォルト値を設定
+	searchLimit := 20
+	if limit != nil && *limit > 0 {
+		searchLimit = *limit
+	}
+
+	// 検索結果を取得
+	liquors, cErr := r.SearchLiquorsByKeyword(ctx, keyword, searchLimit)
+	if cErr != nil {
+		return nil, cErr
+	}
+
+	// GraphQL形式に変換
+	var result []*graphModel.Liquor
+	for _, liquor := range liquors {
+		result = append(result, liquor.ToGraphQL())
+	}
+
+	return result, nil
+}

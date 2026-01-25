@@ -66,6 +66,7 @@ extend type Query {
   liquorHistories(id: String!):LiquorHistory #編集時に実行する、バージョン履歴つきのデータ
   board(liquorId: String!,page:Int):[BoardPost!]
   getMyBoard(liquorId: String!):BoardPost @optionalAuth #未ログイン時にも呼ばれるのでoptionalに
+  searchLiquors(keyword: String!, limit: Int): [Liquor!]! #キーワード検索
 }
 
 extend type Mutation{

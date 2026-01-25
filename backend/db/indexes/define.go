@@ -23,6 +23,11 @@ var IndexDefinitions = []IndexDefinition{
 	},
 	{
 		CollectionName: liquorRepository.CollectionName,
+		IndexKeys:      bson.D{{liquorRepository.Name, "text"}},
+		IsNonUnique:    true,
+	},
+	{
+		CollectionName: liquorRepository.CollectionName,
 		IndexKeys:      bson.D{{liquorRepository.RandomKey, 1}},
 	},
 
