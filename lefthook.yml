@@ -1,21 +1,5 @@
 # lefthook.yml
-# Git hooks configuration managed by lefthook
-# This file is placed in the repository root and manages hooks for the front directory
-pre-commit:
-  parallel: true
-  commands:
-    lint-staged:
-      root: "front/"
-      glob: "*.{js,ts,vue,jsx,tsx,cjs,mjs,cts,mts}"
-      run: |
-        if [ -d "node_modules" ]; then
-          npx lint-staged
-        else
-          echo "⚠️  node_modulesが見つかりません。'cd front && npm install'を実行してください。"
-          exit 1
-        fi
-
-post-commit:
-  commands:
-    message:
-      run: echo "コミットが完了しました。"
+# This extends the front directory's lefthook configuration
+# Each directory (front, backend, etc.) can have its own .lefthook.yml
+extends:
+  - front/.lefthook.yml
