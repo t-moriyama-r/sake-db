@@ -11,8 +11,10 @@ import {
   faPersonCirclePlus,
   faPlus,
   faRightFromBracket,
+  faStar,
   faTrash,
   faUser,
+  faUserFriends,
   faWineBottle,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -30,8 +32,10 @@ library.add(
   faPersonCirclePlus,
   faPlus,
   faRightFromBracket,
+  faStar,
   faTrash,
   faUser,
+  faUserFriends,
   faWineBottle,
 );
 

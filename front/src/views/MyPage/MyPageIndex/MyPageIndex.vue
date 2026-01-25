@@ -34,12 +34,26 @@
       </div>
     </div>
 
-    <!-- ブックマークリストセクション -->
+    <!-- 評価済リストセクション -->
+    <div class="rated-section">
+      <div class="section-header">
+        <h2 class="section-title">
+          <font-awesome-icon :icon="['fas', 'star']" class="icon" />
+          評価済リスト
+        </h2>
+      </div>
+      <div class="section-content">
+        <UserPosts v-if="evaluateList" :evaluates="evaluateList" />
+        <div v-else class="loading-message">読み込み中...</div>
+      </div>
+    </div>
+
+    <!-- ユーザーブックマークリストセクション -->
     <div class="bookmarks-section">
       <div class="section-header">
         <h2 class="section-title">
-          <font-awesome-icon :icon="['fas', 'bookmark']" class="icon" />
-          ブックマーク
+          <font-awesome-icon :icon="['fas', 'user-friends']" class="icon" />
+          ユーザーブックマーク
         </h2>
       </div>
       <div class="section-content">
@@ -50,16 +64,40 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted, ref } from 'vue';
+
 import CommonButton from '@/components/parts/common/CommonButton/CommonButton.vue';
 import RadiusImage from '@/components/parts/common/RadiusImage.vue';
+import useQuery from '@/funcs/composable/useQuery/useQuery';
 import type { AuthUserFull } from '@/graphQL/Auth/auth';
+import {
+  GET_MY_EVALUATE_LIST,
+  type GetMyEvaluateListResponse,
+} from '@/graphQL/MyPage/mypage';
+import type { EvaluateList } from '@/graphQL/User/user';
 import BookmarkList from '@/views/MyPage/MyPageIndex/BookmarkList.vue';
+import UserPosts from '@/views/User/UserPosts.vue';
 
 interface Props {
   user: AuthUserFull;
 }
 
 const props = defineProps<Props>();
+
+// 評価リストの取得
+const evaluateList = ref<EvaluateList | null>(null);
+const { fetch } = useQuery<GetMyEvaluateListResponse>(GET_MY_EVALUATE_LIST, {
+  isAuth: true,
+});
+
+onMounted(async () => {
+  try {
+    const response = await fetch({ id: props.user.id });
+    evaluateList.value = response.getUserByIdDetail.evaluateList;
+  } catch (error) {
+    console.error('評価リストの取得に失敗しました:', error);
+  }
+});
 </script>
 
 <style scoped>
@@ -150,6 +188,15 @@ const props = defineProps<Props>();
   overflow: hidden;
 }
 
+/* 評価済リストセクション */
+.rated-section {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
 .section-header {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 1.5rem 2rem;
@@ -171,6 +218,13 @@ const props = defineProps<Props>();
 
 .section-content {
   padding: 2rem;
+}
+
+.loading-message {
+  text-align: center;
+  padding: 2rem;
+  color: #718096;
+  font-size: 1rem;
 }
 
 /* レスポンシブデザイン */
