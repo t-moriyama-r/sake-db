@@ -123,3 +123,22 @@ func HasIdInTrail(ctx context.Context, r *categoriesRepository.CategoryRepositor
 
 	return false, nil
 }
+
+// GetReadonlyAncestor 指定されたカテゴリIDの祖先でreadonlyフラグが設定されている最初のカテゴリを取得
+// readonlyの祖先がない場合はnilを返す
+func GetReadonlyAncestor(ctx context.Context, categoryId int, r *categoriesRepository.CategoryRepository) (*categoriesRepository.Model, *customError.Error) {
+	// カテゴリまでのパンくずリストを取得
+	categoryTrail, err := GetCategoryTrail(ctx, categoryId, r)
+	if err != nil {
+		return nil, err
+	}
+
+	// 祖先を辿り、readonlyフラグが設定されている最初のカテゴリを探す
+	for _, category := range *categoryTrail {
+		if category.Readonly {
+			return &category, nil
+		}
+	}
+
+	return nil, nil
+}

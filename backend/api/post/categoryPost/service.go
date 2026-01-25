@@ -56,9 +56,28 @@ func (h *Handler) Post(c *gin.Context, ur *userRepository.UsersRepository) (*int
 			return nil, errParentCategoryMove(request)
 		}
 
-		// readonlyフラグが設定されているカテゴリの移動を禁止
-		if old.Readonly && old.Parent != nil && *old.Parent != request.Parent {
-			return nil, errReadonlyCategoryMove(request)
+		// 親が変更される場合のみ、readonlyチェックを行う
+		if old.Parent != nil && *old.Parent != request.Parent {
+			// 現在のカテゴリの祖先にreadonlyフラグがあるかチェック
+			oldReadonlyAncestor, err := categoryService.GetReadonlyAncestor(ctx, *request.Id, &h.CategoryRepo)
+			if err != nil {
+				return nil, err
+			}
+
+			// 新しい親の祖先にreadonlyフラグがあるかチェック
+			newReadonlyAncestor, err := categoryService.GetReadonlyAncestor(ctx, request.Parent, &h.CategoryRepo)
+			if err != nil {
+				return nil, err
+			}
+
+			// 両方のreadonly祖先が異なる場合は移動を禁止
+			// （readonly祖先がある場合、別のreadonly祖先配下には移動できない）
+			if oldReadonlyAncestor != nil {
+				// 新しい親にreadonly祖先がない、または異なるreadonly祖先の場合は禁止
+				if newReadonlyAncestor == nil || oldReadonlyAncestor.ID != newReadonlyAncestor.ID {
+					return nil, errReadonlyCategoryMove(request)
+				}
+			}
 		}
 
 		//nil参照エラー回避が面倒なので、nilは0扱いとする(versionNoがスキーマ上後付なので、nilの可能性がある)
