@@ -1,35 +1,62 @@
-# EXAMPLE USAGE:
-#
-#   Refer for explanation to following link:
-#   https://github.com/evilmartians/lefthook/blob/master/docs/configuration.md
-#
-# pre-push:
-#   commands:
-#     packages-audit:
-#       tags: frontend security
-#       run: yarn audit
-#     gems-audit:
-#       tags: backend security
-#       run: bundle audit
-#
-# pre-commit:
-#   parallel: true
-#   commands:
-#     eslint:
-#       glob: "*.{js,ts,jsx,tsx}"
-#       run: yarn eslint {staged_files}
-#     rubocop:
-#       tags: backend style
-#       glob: "*.rb"
-#       exclude: '(^|/)(application|routes)\.rb$'
-#       run: bundle exec rubocop --force-exclusion {all_files}
-#     govet:
-#       tags: backend style
-#       files: git ls-files -m
-#       glob: "*.go"
-#       run: go vet {files}
-#   scripts:
-#     "hello.js":
-#       runner: node
-#     "any.go":
-#       runner: go run
+# Lefthook configuration for sake-db project
+# Refer for explanation: https://github.com/evilmartians/lefthook/blob/master/docs/configuration.md
+
+pre-commit:
+  parallel: true
+  commands:
+    # フロントエンド: ESLint
+    frontend-lint:
+      tags: frontend
+      glob: "front/**/*.{js,ts,vue}"
+      run: cd front && npx eslint {staged_files}
+    
+    # バックエンド: Go構文チェック
+    go-fmt:
+      tags: backend
+      glob: "backend/**/*.go"
+      run: |
+        cd backend
+        if ! gofmt -l {staged_files} | grep .; then
+          echo "✓ Go formatting check passed"
+        else
+          echo "✗ Go files are not formatted. Run 'gofmt -w' on the files above."
+          exit 1
+        fi
+    
+    # バックエンド: Go静的解析
+    go-lint:
+      tags: backend
+      glob: "backend/**/*.go"
+      run: |
+        cd backend
+        if command -v golangci-lint &> /dev/null; then
+          golangci-lint run --new-from-rev=HEAD~1 {staged_files}
+        else
+          echo "⚠ golangci-lint not installed. Skipping linting."
+          echo "  Install with: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest"
+        fi
+    
+    # バックエンド: Go vet
+    go-vet:
+      tags: backend
+      glob: "backend/**/*.go"
+      run: |
+        cd backend
+        go vet {staged_files}
+    
+    # バックエンド: GraphQLスキーマ検証
+    graphql-validate:
+      tags: backend graphql
+      glob: "backend/graph/schema/*.graphqls"
+      run: |
+        cd backend
+        echo "Validating GraphQL schema..."
+        go run github.com/99designs/gqlgen generate --config gqlgen.yml
+        if [ $? -eq 0 ]; then
+          echo "✓ GraphQL schema validation passed"
+          # 生成されたファイルをgit addする（自動生成ファイルのため）
+          git add graph/generated/ graph/graphModel/ 2>/dev/null || true
+        else
+          echo "✗ GraphQL schema validation failed"
+          exit 1
+        fi

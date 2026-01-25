@@ -10,6 +10,14 @@
 - **設定方法**: [Copilot自動レビューの設定手順](./document/copilot-review-setup.md)を参照してください
 - レビュー基準のカスタマイズは `.github/copilot-instructions.md` で設定されています
 
+## バックエンド静的解析フック
+
+コミット時に自動的にバックエンドコードの品質チェックを実行します。
+
+- Go言語の静的解析（golangci-lint、go vet、gofmt）
+- GraphQLスキーマの検証
+- **セットアップ方法**: [バックエンド静的解析フックのセットアップ](./document/backend-hooks-setup.md)を参照してください
+
 
 
 ## トップページ(ランダムに取得)
