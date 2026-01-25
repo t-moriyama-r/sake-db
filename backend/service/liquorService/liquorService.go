@@ -17,6 +17,13 @@ import (
 	"time"
 )
 
+const (
+	// DefaultSearchLimit デフォルトの検索結果数
+	DefaultSearchLimit = 20
+	// MaxSearchLimit 最大検索結果数
+	MaxSearchLimit = 1000
+)
+
 func GetLiquor(ctx context.Context, lr liquorRepository.LiquorsRepository, cr categoriesRepository.CategoryRepository, id string) (*graphModel.Liquor, *customError.Error) {
 	lid, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
@@ -170,4 +177,30 @@ func GetMyBoard(ctx context.Context, r liquorRepository.LiquorsRepository, liquo
 	}
 
 	return board, nil
+}
+
+func SearchLiquors(ctx context.Context, r liquorRepository.LiquorsRepository, keyword string, limit *int) ([]*graphModel.Liquor, *customError.Error) {
+	// limitのデフォルト値を設定
+	searchLimit := DefaultSearchLimit
+	if limit != nil && *limit > 0 {
+		searchLimit = *limit
+		// 上限を超えている場合は最大値に制限
+		if searchLimit > MaxSearchLimit {
+			searchLimit = MaxSearchLimit
+		}
+	}
+
+	// 検索結果を取得
+	liquors, cErr := r.SearchLiquorsByKeyword(ctx, keyword, searchLimit)
+	if cErr != nil {
+		return nil, cErr
+	}
+
+	// GraphQL形式に変換
+	var result []*graphModel.Liquor
+	for _, liquor := range liquors {
+		result = append(result, liquor.ToGraphQL())
+	}
+
+	return result, nil
 }

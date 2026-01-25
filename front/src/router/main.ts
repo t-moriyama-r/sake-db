@@ -39,6 +39,12 @@ const MainRouter = {
           component: CategoryNarrowDownPage,
         },
         {
+          path: 'search',
+          name: 'SearchResults',
+          component: () =>
+            import('@/views/Discovery/NarrowDowns/SearchResultsPage.vue'),
+        },
+        {
           path: 'tag/:tag',
           name: 'TagSearch',
           component: TagSearchPage,

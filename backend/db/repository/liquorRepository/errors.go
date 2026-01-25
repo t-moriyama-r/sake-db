@@ -36,6 +36,9 @@ const (
 
 	DeleteRate = "REPO-LIQUOR-021-DeleteRate"
 	UpdateRate = "REPO-LIQUOR-022-UpdateRate"
+
+	SearchLiquorsByKeyword       = "REPO-LIQUOR-023-SearchLiquorsByKeyword"
+	SearchLiquorsByKeywordDecode = "REPO-LIQUOR-024-SearchLiquorsByKeywordDecode"
 )
 
 func errGetLiquorById(err error) *customError.Error {
@@ -232,5 +235,25 @@ func errUpdateRate(err error, id primitive.ObjectID) *customError.Error {
 		UserMsg:    "データ更新に失敗しました",
 		Level:      logrus.ErrorLevel,
 		Input:      id,
+	})
+}
+
+func errSearchLiquorsByKeyword(err error, keyword string) *customError.Error {
+	return customError.NewError(err, customError.Params{
+		StatusCode: http.StatusInternalServerError,
+		ErrCode:    SearchLiquorsByKeyword,
+		UserMsg:    "検索に失敗しました",
+		Level:      logrus.ErrorLevel,
+		Input:      keyword,
+	})
+}
+
+func errSearchLiquorsByKeywordDecode(err error, keyword string) *customError.Error {
+	return customError.NewError(err, customError.Params{
+		StatusCode: http.StatusInternalServerError,
+		ErrCode:    SearchLiquorsByKeywordDecode,
+		UserMsg:    "検索結果のデコードに失敗しました",
+		Level:      logrus.ErrorLevel,
+		Input:      keyword,
 	})
 }

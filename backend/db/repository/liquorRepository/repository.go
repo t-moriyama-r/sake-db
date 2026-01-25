@@ -10,6 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"math/rand"
+	"strings"
 	"time"
 )
 
@@ -182,6 +183,86 @@ func (r *LiquorsRepository) GetLiquorsFromCategoryIds(ctx context.Context, ids [
 	}
 
 	return liquors, nil
+}
+
+func (r *LiquorsRepository) SearchLiquorsByKeyword(ctx context.Context, keyword string, limit int) ([]*Model, *customError.Error) {
+	// キーワードをスペース（半角・全角）で分割
+	keywords := splitKeywords(keyword)
+
+	// 複数キーワードの場合はOR検索、単一キーワードの場合は部分一致検索
+	var filter bson.M
+	if len(keywords) > 1 {
+		// 複数キーワード: OR検索（いずれかのキーワードを含む）
+		orConditions := make([]bson.M, 0, len(keywords))
+		for _, kw := range keywords {
+			if kw != "" {
+				// 各キーワードで部分一致検索（大文字小文字区別なし）
+				orConditions = append(orConditions, bson.M{
+					"name": bson.M{"$regex": escapeRegex(kw), "$options": "i"},
+				})
+			}
+		}
+		if len(orConditions) > 0 {
+			filter = bson.M{"$or": orConditions}
+		} else {
+			// キーワードが空の場合は空の結果を返す
+			return []*Model{}, nil
+		}
+	} else {
+		// 単一キーワード: 部分一致検索
+		if keyword == "" {
+			return []*Model{}, nil
+		}
+		filter = bson.M{"name": bson.M{"$regex": escapeRegex(keyword), "$options": "i"}}
+	}
+
+	// 結果を制限
+	opts := options.Find().SetLimit(int64(limit))
+
+	// コレクションからフィルタに一致するドキュメントを取得
+	cursor, err := r.collection.Find(ctx, filter, opts)
+	if err != nil {
+		return nil, errSearchLiquorsByKeyword(err, keyword)
+	}
+	defer cursor.Close(ctx)
+
+	// 結果を格納するスライス
+	var liquors []*Model
+
+	// 取得したドキュメントをスライスにデコード
+	if err = cursor.All(ctx, &liquors); err != nil {
+		return nil, errSearchLiquorsByKeywordDecode(err, keyword)
+	}
+
+	return liquors, nil
+}
+
+// splitKeywords キーワードを半角・全角スペースで分割する
+func splitKeywords(keyword string) []string {
+	// 全角スペースを半角スペースに置換
+	keyword = strings.ReplaceAll(keyword, "　", " ")
+	// 半角スペースで分割
+	parts := strings.Split(keyword, " ")
+	// 空文字列を除外
+	result := make([]string, 0, len(parts))
+	for _, part := range parts {
+		trimmed := strings.TrimSpace(part)
+		if trimmed != "" {
+			result = append(result, trimmed)
+		}
+	}
+	return result
+}
+
+// escapeRegex 正規表現の特殊文字をエスケープする
+func escapeRegex(s string) string {
+	// MongoDB正規表現の特殊文字をエスケープ
+	specialChars := []string{"\\", "^", "$", ".", "|", "?", "*", "+", "(", ")", "[", "]", "{", "}"}
+	result := s
+	for _, char := range specialChars {
+		result = strings.ReplaceAll(result, char, "\\"+char)
+	}
+	return result
 }
 
 func (r *LiquorsRepository) InsertOne(ctx context.Context, liquor *Model) (primitive.ObjectID, *customError.Error) {
