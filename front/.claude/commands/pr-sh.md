@@ -20,7 +20,7 @@
 
 > Executes `./ai-pr-draft-ja.sh` to create a new draft pull request with Japanese AI prompts.
 
-`/ai-pr-draft --debug`
+`/pr-sh --debug`
 
 > Executes `DEBUG=1 ./ai-pr-draft-ja.sh` to run the script in debug mode.
 

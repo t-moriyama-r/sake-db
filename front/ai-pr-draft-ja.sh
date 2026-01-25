@@ -9,14 +9,30 @@
 
 # ---- 実行時オプション ---------------------------------------------------------
 DEBUG=${DEBUG:-0}            # DEBUG=1 ./script … で set -x 有効化
-TRACE_COLOR="\033[1;34m"   # 青
-RESET_COLOR="\033[0m"
+TRACE_COLOR=$'\033[1;34m'   # 青
+RESET_COLOR=$'\033[0m'
 
 set -euo pipefail
 [[ $DEBUG -eq 1 ]] && set -x
 
+# ---- クリーンアップ関数 -------------------------------------------------------
+# 一時ファイルを追跡
+TEMP_FILES=()
+
+cleanup() {
+  if [[ ${#TEMP_FILES[@]} -gt 0 ]]; then
+    local file
+    for file in "${TEMP_FILES[@]}"; do
+      if [[ -n "$file" && -f "$file" ]]; then
+        rm -f "$file"
+      fi
+    done
+  fi
+}
+
 # ---- ヘルパー関数 -------------------------------------------------------------
 log() { echo -e "${TRACE_COLOR}[$(date +%H:%M:%S)] $*${RESET_COLOR}"; }
+trap cleanup EXIT
 trap 'log "❌ Error at line ${LINENO}: \"${BASH_COMMAND}\""' ERR
 
 # ---- ツールチェック -----------------------------------------------------------
@@ -39,6 +55,10 @@ if [[ -z "$DEFAULT_BRANCH" ]]; then
 fi
 
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
+if [[ "$BRANCH" == "HEAD" ]]; then
+  echo "❌ detached HEAD状態ではPRを作成できません。ブランチを作成してから再度実行してください。" >&2
+  exit 1
+fi
 log "  リポジトリ:        $REPO"
 log "  ベースブランチ:    $DEFAULT_BRANCH"
 log "  現在のブランチ:    $BRANCH"
@@ -144,7 +164,12 @@ while [[ $RETRY_COUNT -lt $MAX_RETRIES ]]; do
   else
     log "  ⚠️  Claude リクエストが失敗しました (試行 $RETRY_COUNT/$MAX_RETRIES)"
     if [[ $RETRY_COUNT -lt $MAX_RETRIES ]]; then
-      SLEEP_TIME=$((2 ** (RETRY_COUNT - 1)))  # 指数バックオフ: 1, 2, 4 秒
+      # 指数バックオフ: 1, 2, 4 秒（Bash 3.x互換）
+      case $RETRY_COUNT in
+        1) SLEEP_TIME=1 ;;
+        2) SLEEP_TIME=2 ;;
+        *) SLEEP_TIME=4 ;;
+      esac
       log "  ${SLEEP_TIME} 秒後に再試行します..."
       sleep $SLEEP_TIME
     else
@@ -190,10 +215,10 @@ fi
 # 新しい Claude CLI 形式のエスケープされたJSONを処理
 JSON_PAYLOAD=""
 
-# まず、コードフェンスからの抽出を試行（複数行対応）
+# まず、コードフェンスからの抽出を試行（複数行対応、より堅牢なパターン）
 CODE_FENCE_CONTENT=$(
   printf '%s\n' "$RAW" \
-  | sed -n '/```json[[:space:]]*$/,/```[[:space:]]*$/p' \
+  | sed -n '/^```json/,/^```$/p' \
   | sed '1d;$d'
 )
 
@@ -230,8 +255,8 @@ if [[ $DEBUG -eq 1 ]]; then
 fi
 
 # ---- JSON クリーンアップと検証 -----------------------------------------------
-# 末尾のカンマを削除するが、適切なJSON解析のため改行は保持
-JSON_PAYLOAD=$(echo "$JSON_PAYLOAD" | sed 's/,$//' | tr -d '\r')
+# 末尾のカンマを削除
+JSON_PAYLOAD=$(echo "$JSON_PAYLOAD" | sed 's/,$//')
 
 # 優先順位に従って複数の解析方法を試行
 TITLE=""
@@ -248,10 +273,18 @@ elif command -v python3 >/dev/null 2>&1; then
   log "  ⚠️  jq 解析が失敗しました、Python json を試行中..."
 
   # シェルエスケープ問題を回避するため一時ファイルを作成
-  TEMP_JSON=$(mktemp)
-  echo "$JSON_PAYLOAD" > "$TEMP_JSON"
+  TEMP_JSON=$(mktemp 2>/dev/null) || {
+    log "  ⚠️  mktemp が使えないため、Python JSON解析をスキップします。"
+    TEMP_JSON=""
+  }
+  
+  if [[ -n "$TEMP_JSON" ]]; then
+    # 一時ファイルを追跡リストに追加
+    TEMP_FILES+=("$TEMP_JSON")
+    
+    echo "$JSON_PAYLOAD" > "$TEMP_JSON"
 
-  if PYTHON_RESULT=$(python3 - "$TEMP_JSON" 2>/dev/null << 'PYCODE'
+    if PYTHON_RESULT=$(python3 - "$TEMP_JSON" 2>/dev/null << 'PYCODE'
 import json
 import sys
 
@@ -267,8 +300,8 @@ def main() -> None:
         title = data.get("title")
         body = data.get("body")
         if title and body:
-            # 競合を避けるため一意のセパレータを使用
-            print(f"{title}###SEPARATOR###{body}")
+            # NUL文字をセパレータとして使用（より安全）
+            print(f"{title}\0{body}", end='')
         else:
             sys.exit(1)
     except Exception as e:
@@ -278,13 +311,17 @@ def main() -> None:
 if __name__ == "__main__":
     main()
 PYCODE
-  ); then
-    TITLE=${PYTHON_RESULT%%###SEPARATOR###*}
-    BODY=${PYTHON_RESULT#*###SEPARATOR###}
-    rm -f "$TEMP_JSON"
-    log "  ✓ Python でJSONの解析に成功しました"
-  else
-    rm -f "$TEMP_JSON"
+    ); then
+      # NUL文字で分割 - 明示的にエラーをチェック
+      # 変数を初期化してset -uに対応
+      TITLE=""
+      BODY=""
+      # readは-d ''で最後のフィールドを読むときに常に失敗するが、変数には正しくデータが入る
+      IFS=$'\0' read -r -d '' TITLE BODY <<< "$PYTHON_RESULT" || true
+      if [[ -n "$TITLE" && -n "$BODY" ]]; then
+        log "  ✓ Python でJSONの解析に成功しました"
+      fi
+    fi
   fi
 fi
 
@@ -323,8 +360,15 @@ if [[ -z "$TITLE" || -z "$BODY" ]]; then
      [[ "$JSON_PAYLOAD" =~ body[[:space:]]*:[[:space:]]*\"(.*)\" ]] ||
      [[ "$RAW" =~ \\\"body\\\"[[:space:]]*:[[:space:]]*\\\"(.*)\\\" ]]; then
     BODY="${BASH_REMATCH[1]}"
-    # JSON文字列を適切にアンエスケープ - バックスラッシュエスケープ全体を処理
-    BODY=$(printf '%b' "$BODY")
+    # JSON文字列を適切にアンエスケープ - 一般的なエスケープシーケンスを処理
+    # 注: このフォールバック処理は基本的なエスケープのみを扱います
+    # より複雑なJSONの場合はjqまたはPythonパーサーが優先されます
+    BODY=$(printf '%s' "$BODY" \
+      | sed 's/\\n/\n/g' \
+      | sed 's/\\t/\t/g' \
+      | sed 's/\\"/"/g' \
+      | sed 's/\\\\/\\/g' \
+      | sed 's/\\r/\r/g')
     log "    ✓ 本文を抽出しました: ${#BODY} 文字"
 
     # デバッグ: DEBUG=1 の場合、処理された本文を表示
@@ -360,12 +404,12 @@ log "  本文の長さ: $(echo "$BODY" | wc -c) 文字"
 
 # ---- ブランチをリモートにプッシュ ---------------------------------------------
 log "ステップ 5: ブランチをリモートに公開中…"
-if git push -u origin "$BRANCH" 2>/dev/null; then
+if git push -u origin "$BRANCH"; then
   log "  ✓ ブランチの公開に成功しました"
-elif git push origin "$BRANCH" 2>/dev/null; then
+elif git push origin "$BRANCH"; then
   log "  ✓ リモートのブランチが更新されました"
 else
-  echo "❌ ブランチのリモートプッシュに失敗しました。権限、ネットワーク接続、およびリモートの状態を確認してください。" >&2
+  echo "❌ ブランチのリモートプッシュに失敗しました。上記の git push のエラーメッセージを確認し、権限、ネットワーク接続、およびリモートの状態を確認してください。" >&2
   exit 1
 fi
 
@@ -381,7 +425,12 @@ if [[ $DEBUG -eq 1 ]]; then
 fi
 
 # シェルエスケープ問題を回避するため本文を一時ファイルに保存
-TEMP_BODY=$(mktemp)
+TEMP_BODY=$(mktemp 2>/dev/null) || {
+  echo "❌ 一時ファイルを作成できませんでした。" >&2
+  exit 1
+}
+# 一時ファイルを追跡リストに追加
+TEMP_FILES+=("$TEMP_BODY")
 echo "$BODY" > "$TEMP_BODY"
 
 log "  PR作成の準備中:"
@@ -405,7 +454,6 @@ if [[ $PR_CREATE_EXIT_CODE -eq 0 ]]; then
   PR_URL="$PR_CREATE_OUTPUT"
   log "✅ ドラフトPRが正常に作成されました！"
   log "   URL: $PR_URL"
-  rm -f "$TEMP_BODY"
 else
   echo "❌ PRの作成に失敗しました (終了コード: $PR_CREATE_EXIT_CODE)" >&2
   echo "エラー出力:" >&2
@@ -425,7 +473,6 @@ else
   echo "リモートにブランチが存在するかを確認中..." >&2
   git ls-remote --heads origin "$BRANCH" >&2 || echo "ヘッドブランチがリモートに見つかりません" >&2
   git ls-remote --heads origin "$DEFAULT_BRANCH" >&2 || echo "ベースブランチがリモートに見つかりません" >&2
-  rm -f "$TEMP_BODY"
   exit 1
 fi
 
