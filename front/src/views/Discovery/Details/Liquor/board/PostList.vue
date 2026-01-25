@@ -14,9 +14,7 @@
               class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center"
             >
               <span class="text-gray-600 text-sm font-medium">
-                {{
-                  post.userName ? post.userName.charAt(0).toUpperCase() : '?'
-                }}
+                {{ getUserInitial(post.userName) }}
               </span>
             </div>
           </div>
@@ -68,6 +66,12 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+
+// ユーザー名のイニシャルを取得する
+const getUserInitial = (userName: string | null | undefined): string => {
+  if (!userName) return '?';
+  return userName.charAt(0).toUpperCase();
+};
 </script>
 
 <style scoped></style>

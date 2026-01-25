@@ -8,7 +8,7 @@
         </div>
         <div class="flex gap-2 items-end w-full sm:w-auto">
           <RatingButton :name="FormKeys.RATE" label="評価" ref="ratingButton" />
-          <SubmitButton class="h-10 whitespace-nowrap">送信</SubmitButton>
+          <SubmitButton class="whitespace-nowrap">送信</SubmitButton>
         </div>
       </div>
     </form>

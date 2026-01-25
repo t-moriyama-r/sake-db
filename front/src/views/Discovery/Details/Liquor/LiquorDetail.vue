@@ -51,7 +51,7 @@
         </div>
 
         <!-- 説明文 -->
-        <div class="prose max-w-none">
+        <div>
           <p class="text-gray-700 leading-relaxed whitespace-pre-line">
             {{ liquor.description }}
           </p>
