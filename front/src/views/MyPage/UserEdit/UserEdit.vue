@@ -1,5 +1,5 @@
 <template>
-  <div class="flex">
+  <div class="flex items-center gap-2">
     <BackButton />
     <h1>ユーザー情報編集</h1>
   </div>

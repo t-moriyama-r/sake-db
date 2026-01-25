@@ -81,10 +81,12 @@ const onSubmit: SubmissionHandler = async (values: FormValues) => {
       isReFetch: true,
     });
     // ユーザーページへ遷移
-    router.push({
-      name: 'UserPage',
-      params: { id: userStore.user?.id },
-    });
+    if (userStore.user?.id) {
+      router.push({
+        name: 'UserPage',
+        params: { id: userStore.user.id },
+      });
+    }
   });
 };
 </script>
