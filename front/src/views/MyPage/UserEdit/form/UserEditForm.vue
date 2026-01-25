@@ -24,6 +24,7 @@
 
 <script setup lang="ts">
 import { Form, type SubmissionHandler } from 'vee-validate';
+import { useRouter } from 'vue-router';
 
 import UploadWithImage from '@/components/parts/forms/common/UploadWithImage.vue';
 import FormField from '@/components/parts/forms/core/FormField.vue';
@@ -48,6 +49,7 @@ const props = defineProps<Props>();
 
 const toast = useToast();
 const userStore = useUserStore();
+const router = useRouter();
 
 const { execute } = useMutation<AuthUser>(Update, {
   isUseSpinner: true,
@@ -77,6 +79,11 @@ const onSubmit: SubmissionHandler = async (values: FormValues) => {
     //ユーザー情報のリフレッシュ
     userStore.restoreUserData({
       isReFetch: true,
+    });
+    // ユーザーページへ遷移
+    router.push({
+      name: 'UserPage',
+      params: { id: userStore.user?.id },
     });
   });
 };
