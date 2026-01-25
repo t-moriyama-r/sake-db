@@ -50,8 +50,8 @@ HMRが効いているので開発中は特に何も意識しなくてOKのはず
 
 ### Git hooks (lefthook)
 プロジェクトではlefthookを使用してGit hooksを管理しています。<br>
-初回セットアップ時は`npm install`を実行すると、`prepare`スクリプトによって自動的にlefthookのGit hooksがインストールされます。<br>
-pre-commitフックでは、ステージングされたフロントエンドのファイル（js, ts, vue）に対してlint-stagedが実行され、自動的にESLintによるコードチェックが行われます。
+初回セットアップ時は`front`ディレクトリで`npm install`を実行すると、`prepare`スクリプトによって自動的にlefthookのGit hooksがインストールされます。<br>
+pre-commitフックでは、フロントエンドのコードに対して`npm run lint`および`npm run format`が実行され、コミット前にLintとフォーマットが自動で行われます。
 
 ## 諸々の経緯
 ### リバースプロキシサーバーを採用した理由

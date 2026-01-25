@@ -24,7 +24,14 @@
         class="w-full aspect-video"
         :src="embedUrl ?? undefined"
         title="YouTube video player"
-        allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allow="
+          accelerometer;
+          clipboard-write;
+          encrypted-media;
+          gyroscope;
+          picture-in-picture;
+          web-share;
+        "
         allowfullscreen
       />
     </div>
