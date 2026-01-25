@@ -1960,7 +1960,9 @@ extend type Mutation {
 
 type Query
 
-type Mutation`, BuiltIn: false},
+type Mutation
+
+`, BuiltIn: false},
 	{Name: "../schema/tags.graphqls", Input: `input TagInput{
   liquorId:ID!
   text:String!

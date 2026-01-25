@@ -1,0 +1,37 @@
+run:
+  timeout: 5m
+  tests: true
+  modules-download-mode: readonly
+
+linters-settings:
+  govet:
+    enable:
+      - shadow
+  gofmt:
+    simplify: true
+  goimports:
+    local-prefixes: backend
+  errcheck:
+    check-type-assertions: true
+  gocritic:
+    enabled-tags:
+      - diagnostic
+      - performance
+      - style
+
+linters:
+  enable:
+    - govet        # Go標準のvetツール
+    - errcheck     # エラーチェックの検証
+    - staticcheck  # 静的解析
+    - gosimple     # コードの簡略化提案
+    - unused       # 未使用コードの検出
+    - ineffassign  # 無効な代入の検出
+    - typecheck    # 型チェック
+    - gofmt        # コードフォーマット
+    - goimports    # インポート整理
+
+issues:
+  exclude-use-default: false
+  max-issues-per-linter: 0
+  max-same-issues: 0
