@@ -185,7 +185,6 @@ onMounted(async () => {
   background: white;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
 }
 
 /* 評価済リストセクション */
@@ -193,13 +192,13 @@ onMounted(async () => {
   background: white;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
   margin-bottom: 2rem;
 }
 
 .section-header {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 1.5rem 2rem;
+  border-radius: 12px 12px 0 0;
 }
 
 .section-title {
