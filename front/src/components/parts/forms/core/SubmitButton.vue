@@ -1,14 +1,14 @@
 <template>
   <CommonButton
     v-bind="props"
-    :is-disabled="props.isDisabled || !isReady || !isValid || !isDirty"
+    :is-disabled="props.isDisabled || !isReady || !isValid"
     :class="props.class"
     ><slot>送信</slot></CommonButton
   >
 </template>
 
 <script setup lang="ts">
-import { useIsFormDirty, useIsFormValid } from 'vee-validate';
+import { useIsFormValid } from 'vee-validate';
 import { onMounted, ref, watch } from 'vue';
 
 import CommonButton from '@/components/parts/common/CommonButton/CommonButton.vue';
@@ -19,7 +19,6 @@ const props = defineProps<ButtonProps>();
 const isReady = ref(false); // フォームの検証が完了するまでボタンを表示しない
 const isValid = ref<boolean>(false); //初期状態はfalseで定義する(直接useIsFormValidを使うと、非同期なので一瞬validになってしまう)
 const formValid = useIsFormValid(); //memo:なんか初期値はtrueらしいので、描画直後はtrueになる。ボタンのチラつきを抑えるには、これを考慮したオプションを渡す必要がある
-const isDirty = useIsFormDirty();
 
 onMounted(() => {
   // フォームの検証結果が取得されたら isValid を更新し、isReady を true に設定
