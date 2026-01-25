@@ -20,12 +20,14 @@ set -euo pipefail
 TEMP_FILES=()
 
 cleanup() {
-  local file
-  for file in "${TEMP_FILES[@]}"; do
-    if [[ -n "$file" && -f "$file" ]]; then
-      rm -f "$file"
-    fi
-  done
+  if [[ ${#TEMP_FILES[@]} -gt 0 ]]; then
+    local file
+    for file in "${TEMP_FILES[@]}"; do
+      if [[ -n "$file" && -f "$file" ]]; then
+        rm -f "$file"
+      fi
+    done
+  fi
 }
 
 # ---- ヘルパー関数 -------------------------------------------------------------
@@ -311,6 +313,9 @@ if __name__ == "__main__":
 PYCODE
     ); then
       # NUL文字で分割 - 明示的にエラーをチェック
+      # 変数を初期化してset -uに対応
+      TITLE=""
+      BODY=""
       if IFS=$'\0' read -r -d '' TITLE BODY <<< "$PYTHON_RESULT"; then
         log "  ✓ Python でJSONの解析に成功しました"
       elif [[ -n "$TITLE" && -n "$BODY" ]]; then
@@ -446,7 +451,6 @@ if [[ $PR_CREATE_EXIT_CODE -eq 0 ]]; then
   PR_URL="$PR_CREATE_OUTPUT"
   log "✅ ドラフトPRが正常に作成されました！"
   log "   URL: $PR_URL"
-  rm -f "$TEMP_BODY"
 else
   echo "❌ PRの作成に失敗しました (終了コード: $PR_CREATE_EXIT_CODE)" >&2
   echo "エラー出力:" >&2
@@ -466,7 +470,6 @@ else
   echo "リモートにブランチが存在するかを確認中..." >&2
   git ls-remote --heads origin "$BRANCH" >&2 || echo "ヘッドブランチがリモートに見つかりません" >&2
   git ls-remote --heads origin "$DEFAULT_BRANCH" >&2 || echo "ベースブランチがリモートに見つかりません" >&2
-  rm -f "$TEMP_BODY"
   exit 1
 fi
 
