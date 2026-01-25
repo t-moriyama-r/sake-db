@@ -1,6 +1,7 @@
 import { gql } from '@apollo/client/core';
 import type { DocumentNode } from 'graphql/index';
 
+import { type Liquor as CardLiquor } from '@/graphQL/Index/random';
 import type { Tag } from '@/graphQL/Liquor/liquor';
 
 //Formでも使い回すため、相互参照を防止するためにこちらで定義
@@ -43,3 +44,21 @@ export const DeleteTag: DocumentNode = gql`
     deleteTag(id: $id)
   }
 `;
+
+export const SearchLiquorsByTag: DocumentNode = gql`
+  query searchLiquorsByTag($tag: String!) {
+    searchLiquorsByTag(tag: $tag) {
+      id
+      name
+      categoryId
+      categoryName
+      description
+      imageBase64
+      updatedAt
+    }
+  }
+`;
+
+export interface SearchLiquorsByTagResponse {
+  readonly searchLiquorsByTag: CardLiquor[];
+}

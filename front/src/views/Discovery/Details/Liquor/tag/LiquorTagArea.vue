@@ -1,7 +1,7 @@
 <template>
   <div>
     タグ一覧
-    <div v-if="tags.length > 0">
+    <div>
       <LiquorTag
         v-for="tag in tags"
         :tag="tag"
@@ -12,8 +12,8 @@
         :liquor-id="props.liquorId"
         @submitted="submitted"
       />
+      <div v-if="tags.length === 0">登録されたタグはありません</div>
     </div>
-    <div v-else>登録されたタグはありません</div>
   </div>
 </template>
 <script setup lang="ts">

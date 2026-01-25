@@ -41,6 +41,7 @@ import CommonDialog from '@/components/parts/common/CommonDialog/CommonDialog.vu
 import CommonTag from '@/components/parts/common/CommonTag/CommonTag.vue';
 import FormField from '@/components/parts/forms/core/FormField.vue';
 import SubmitButton from '@/components/parts/forms/core/SubmitButton.vue';
+import { clearTagSearchCache } from '@/funcs/composable/useCacheManagement';
 import { useMutation } from '@/funcs/composable/useQuery/useQuery';
 import { useToast } from '@/funcs/composable/useToast';
 import {
@@ -66,6 +67,10 @@ const isDialogOpen = ref<boolean>(false);
 
 async function onSubmit(values: FormValues) {
   const response = await execute({ input: values });
+  
+  // タグ検索のキャッシュをクリア
+  clearTagSearchCache(values.text);
+  
   toast.showToast({
     message: 'タグの登録に成功しました',
   });
