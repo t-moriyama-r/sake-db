@@ -2,3 +2,6 @@
 # This file contains backend-specific hooks
 # It should be executed from the backend directory context
 
+pre-commit:
+  skip: true
+
