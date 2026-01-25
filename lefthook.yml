@@ -13,9 +13,9 @@ pre-commit:
     # バックエンド: Go構文チェック
     go-fmt:
       tags: backend
-      glob: "backend/**/*.go"
+      glob: "**/*.go"
+      root: "backend/"
       run: |
-        cd backend
         if ! gofmt -l {staged_files} | grep .; then
           echo "✓ Go formatting check passed"
         else
@@ -26,9 +26,9 @@ pre-commit:
     # バックエンド: Go静的解析
     go-lint:
       tags: backend
-      glob: "backend/**/*.go"
+      glob: "**/*.go"
+      root: "backend/"
       run: |
-        cd backend
         if command -v golangci-lint &> /dev/null; then
           golangci-lint run --new-from-rev=HEAD~1 {staged_files}
         else
@@ -39,10 +39,9 @@ pre-commit:
     # バックエンド: Go vet
     go-vet:
       tags: backend
-      glob: "backend/**/*.go"
-      run: |
-        cd backend
-        go vet {staged_files}
+      glob: "**/*.go"
+      root: "backend/"
+      run: go vet {staged_files}
     
     # バックエンド: GraphQLスキーマ検証
     graphql-validate:
@@ -60,3 +59,5 @@ pre-commit:
           echo "✗ GraphQL schema validation failed"
           exit 1
         fi
+
+

@@ -1,1 +1,13 @@
-cd front && npx lint-staged
+#!/usr/bin/env sh
+
+# Lefthook for backend and frontend hooks
+if command -v lefthook &> /dev/null; then
+  lefthook run pre-commit
+elif [ -f ~/go/bin/lefthook ]; then
+  ~/go/bin/lefthook run pre-commit
+else
+  # Fallback to lint-staged for frontend only if lefthook is not available
+  echo "Warning: lefthook not found. Using lint-staged for frontend only."
+  cd front && npx lint-staged
+fi
+
