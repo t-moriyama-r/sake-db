@@ -1,4 +1,6 @@
-# .lefthook.yml
+# lefthook.yml
+# Git hooks configuration managed by lefthook
+# This file is placed in the repository root and manages hooks for the front directory
 pre-commit:
   parallel: true
   commands:
