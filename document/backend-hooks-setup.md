@@ -4,7 +4,7 @@
 
 ## 概要
 
-バックエンドファイル専用の静的解析システムです。コミット前に以下のチェックを自動実行します：
+バックエンド専用の静的解析システムです。フロントエンドと同様に、バックエンドディレクトリ内で完結する設定になっています。
 
 ### バックエンド
 - **gofmt**: Goコードのフォーマットチェック
@@ -12,7 +12,7 @@
 - **golangci-lint**: 高度なGo静的解析（複数のlinterを統合）
 - **GraphQLスキーマ検証**: gqlgenによるスキーマの妥当性チェック
 
-**重要**: Lefthookはリポジトリルートで動作しますが、`backend/`ディレクトリ内のファイルのみをチェックします。
+**重要**: バックエンドの静的解析設定は`backend/.lefthook.yml`に記述され、リポジトリルートの`lefthook.yml`から参照されます。これはフロントエンドの`front/.lefthook.yml`と同じパターンです。
 
 ## 必要なツール
 
@@ -242,15 +242,20 @@ make fmt
 
 ```
 /
-├── lefthook.yml          # Lefthook設定（リポジトリルート）
+├── lefthook.yml               # ルート設定（front/とbackend/を参照）
+├── front/
+│   └── .lefthook.yml         # フロントエンド専用設定
 └── backend/
-    ├── .golangci.yml     # golangci-lint設定
-    ├── setup-hooks.sh    # セットアップスクリプト
-    ├── Makefile          # ビルドとチェックコマンド
-    ├── gqlgen.yml        # GraphQL設定
+    ├── .lefthook.yml         # バックエンド専用設定
+    ├── .golangci.yml         # golangci-lint設定
+    ├── setup-hooks.sh        # セットアップスクリプト
+    ├── Makefile              # ビルドとチェックコマンド
+    ├── gqlgen.yml            # GraphQL設定
     └── graph/
-        └── schema/       # GraphQLスキーマファイル
+        └── schema/           # GraphQLスキーマファイル
 ```
+
+**設計思想**: フロントエンドと同様に、バックエンドの静的解析設定は`backend/.lefthook.yml`に記述され、リポジトリルートの`lefthook.yml`から参照されます。これにより各ディレクトリが独立して管理できます。
 
 ## CI/CDとの統合
 
