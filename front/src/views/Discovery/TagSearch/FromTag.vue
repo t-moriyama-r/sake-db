@@ -1,7 +1,6 @@
 <template>
   <div id="tag-search-area" v-if="liquors.length > 0">
     <CardContainer
-      columns="repeat(auto-fill, minmax(100px, 1fr)"
       gap="0.5em"
       min="200px"
     >
