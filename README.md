@@ -2,6 +2,14 @@
 
 [環境構築・開発プロセス](./document/README.md)
 
+## GitHub Copilot 自動コードレビュー
+
+このリポジトリでは、プルリクエストを作成すると自動的にGitHub Copilotによるコードレビューが実行されます。
+
+- Copilotがコードの品質、潜在的な問題、改善提案などを自動的にレビューします
+- **設定方法**: [Copilot自動レビューの設定手順](./document/copilot-review-setup.md)を参照してください
+- レビュー基準のカスタマイズは `.github/copilot-instructions.md` で設定されています
+
 
 
 ## トップページ(ランダムに取得)
