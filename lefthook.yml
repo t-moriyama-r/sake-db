@@ -4,15 +4,15 @@
 pre-commit:
   parallel: true
   commands:
-    lint-and-format:
+    lint-staged:
       root: "front/"
       glob: "*.{js,ts,vue,jsx,tsx,cjs,mjs,cts,mts}"
       run: |
         if [ -d "node_modules" ]; then
-          npm run lint && npm run format
+          npx lint-staged
         else
           echo "⚠️  node_modulesが見つかりません。'cd front && npm install'を実行してください。"
-          exit 0
+          exit 1
         fi
 
 post-commit:
