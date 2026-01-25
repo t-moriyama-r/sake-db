@@ -1,10 +1,12 @@
-# .lefthook.yml
+# lefthook.yml
 pre-push:
   parallel: true
   commands:
     eslint:
+      root: "front/"
       run: npm run lint --fix
     prettier:
+      root: "front/"
       run: npm run format
 
 post-push:

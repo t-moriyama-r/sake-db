@@ -49,9 +49,28 @@ HMRが効いているので開発中は特に何も意識しなくてOKのはず
 これも起動さえしていれば特に何も意識しなくてOK。
 
 ### Git hooks (lefthook)
-プロジェクトではlefthookを使用してGit hooksを管理しています。<br>
-初回セットアップ時は`front`ディレクトリで`npm install`を実行すると、`prepare`スクリプトによって自動的にlefthookのGit hooksがインストールされます。<br>
-pre-commitフックでは、フロントエンドのコードに対して`npm run lint`および`npm run format`が実行され、コミット前にLintとフォーマットが自動で行われます。
+プロジェクトではlefthookを使用してGit hooksを管理しています。
+
+#### 初回セットアップ
+`front`ディレクトリで`npm install`を実行すると、`prepare`スクリプトによって自動的にlefthookのGit hooksがリポジトリルート(`.git/hooks/`)にインストールされます。
+
+もし`npm install`後に`.git/hooks/`にフックが見当たらない場合は、リポジトリルートで以下のコマンドを手動で実行してください：
+```bash
+npx --prefix front lefthook install
+```
+
+#### 実行タイミング
+pre-pushフックでは、フロントエンドのコードに対して`npm run lint --fix`および`npm run format`が実行され、プッシュ前にLintとフォーマットが自動で行われます。
+
+#### 設定ファイル
+- `lefthook.yml`（リポジトリルート）: Git hooksの設定
+- `front/.lefthook.yml`: 削除済み（lefthook.ymlに統合）
+
+#### 一時的に無効化する方法
+特定のプッシュでフックを無効化したい場合：
+```bash
+LEFTHOOK=0 git push
+```
 
 ## 諸々の経緯
 ### リバースプロキシサーバーを採用した理由
