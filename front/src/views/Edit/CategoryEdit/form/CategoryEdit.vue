@@ -33,14 +33,18 @@ import CategoryForm from '@/views/Edit/CategoryEdit/form/CategoryForm.vue';
 import CategoryLogs from '@/views/Edit/CategoryEdit/form/CategoryLogs.vue';
 
 // propsから受け取る初期値
-const { historyData } = defineProps<{
+const { historyData, initialParentId } = defineProps<{
   historyData: CategoryHistoryData | null;
+  initialParentId?: number | null;
 }>();
 
 const route = useRoute(); // 現在のルートを取得
 
 // 初期値を定義
-const initialValues = ref<Category | null>(historyData?.now ?? null);
+const initialValues = ref<Category | null>(
+  historyData?.now ??
+    (initialParentId ? ({ parent: initialParentId } as Category) : null),
+);
 
 const reflectLog = (log: Category) => {
   if (historyData?.now.readonly) {

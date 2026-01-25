@@ -32,7 +32,7 @@
       </section>
     </aside>
     <aside class="new-post">
-      <router-link :to="{ name: 'CategoryEdit' }" @click="emitCloseSidebar"
+      <router-link :to="categoryAddButtonRoute" @click="emitCloseSidebar"
         >+新規カテゴリ追加</router-link
       >
     </aside>
@@ -96,6 +96,18 @@ const filteredCategoryIdList: ComputedRef<number[]> = computed(() => {
   if (!categoryList.value) return []; //そもそも存在していなければ処理終了
   if (!sidebarStore.content) return categoryList.value.map((c) => c.id); // contentがない場合は全ての大カテゴリを返す
   return getDisplayCategoryIds(categoryList.value, sidebarStore.content);
+});
+
+// 現在のカテゴリに応じてカテゴリ追加ボタンのルートを決定
+const categoryAddButtonRoute = computed(() => {
+  const categoryId = sidebarStore.content;
+  if (categoryId && typeof categoryId === 'number' && categoryId > 0) {
+    return {
+      name: 'CategoryPostByParent',
+      params: { parentCategoryId: String(categoryId) },
+    };
+  }
+  return { name: 'CategoryEdit' };
 });
 </script>
 
