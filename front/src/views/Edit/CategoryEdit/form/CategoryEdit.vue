@@ -41,14 +41,9 @@ const { historyData, initialParentId } = defineProps<{
 const route = useRoute(); // 現在のルートを取得
 
 // 初期値を定義
-// initialParentIdが指定されている場合は、parentフィールドのみを持つ部分的なオブジェクトを作成
-// generateInitialValues関数がnull以外のオブジェクトから必要なフィールドを抽出する
-const initialValues = ref<Category | null>(
-  historyData?.now ??
-    (initialParentId
-      ? ({ parent: initialParentId } as Partial<Category> as Category)
-      : null),
-);
+// historyData が存在する場合はその値を、そのほかの場合は null を渡す
+// CategoryForm 側で null から初期値（id: null など）を生成することを前提とする
+const initialValues = ref<Category | null>(historyData?.now ?? null);
 
 const reflectLog = (log: Category) => {
   if (historyData?.now.readonly) {
