@@ -37,6 +37,12 @@ const MainRouter = {
           name: 'CategoryNarrowDown',
           component: CategoryNarrowDownPage,
         },
+        {
+          path: 'search',
+          name: 'SearchResults',
+          component: () =>
+            import('@/views/Discovery/NarrowDowns/SearchResultsPage.vue'),
+        },
       ],
     },
     {
