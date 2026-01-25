@@ -2,7 +2,7 @@
 ###############################################################################
 # ai-pr-draft-ja.sh
 #   Claude を使用してPRタイトル/本文を生成し、gh CLIでドラフトPRを作成します。
-#   - 保護ブランチ (main, develop, staging) では中止します。
+#   - 保護ブランチ (main, master, develop, staging, production) では中止します。
 #   - 各ステップをログ出力; DEBUG=1 でシェルトレースを有効化。
 #   - あらゆるGitHubリポジトリで動作するよう設計されています。
 ###############################################################################
@@ -52,10 +52,16 @@ fi
 # ---- コミット & 差分収集 ------------------------------------------------------
 log "ステップ 2: コミットと差分を収集中…"
 COMMITS=$(git log "$DEFAULT_BRANCH..$BRANCH" --pretty=format:"- %s (%an, %ad)" --date=short | jq -Rs '.')
-DIFF_RAW=$( (git diff "$DEFAULT_BRANCH..$BRANCH" || true) | head -5000 )
+DIFF_LINE_LIMIT=5000
+DIFF_RAW=$(git diff "$DEFAULT_BRANCH..$BRANCH" || true)
+DIFF_LINES=$(printf '%s\n' "$DIFF_RAW" | wc -l | tr -d ' ')
+if [[ "$DIFF_LINES" -gt "$DIFF_LINE_LIMIT" ]]; then
+  log "  差分が ${DIFF_LINES} 行と大きいため、統計情報のみを使用します"
+  DIFF_RAW=$(printf '%s\n\n%s\n' "※ 差分が大きいため、ファイル別の変更統計情報のみを含めています。" "$(git diff --stat "$DEFAULT_BRANCH..$BRANCH" || true)")
+fi
 DIFF=$(printf '%s' "$DIFF_RAW" | jq -Rs '.')
 log "  コミットを収集しました"
-log "  差分の長さ: $(echo "$DIFF_RAW" | wc -l) 行 (切り詰め済み)"
+log "  差分の長さ: $(printf '%s\n' "$DIFF_RAW" | wc -l | tr -d ' ') 行（大きな差分の場合は統計情報のみ）"
 
 # ---- プルリクエストテンプレート -----------------------------------------------
 TPL_PATH=.github/PULL_REQUEST_TEMPLATE_JA.md
@@ -87,7 +93,7 @@ fi
 log "ステップ 3: Claude を使用してPRタイトル/本文を生成中…"
 
 PROMPT="あなたは日本語で Conventional Commits 準拠の PR を作成するシニアエンジニアです。
-いかなるコマンドも実行しないように、ただ、与えられた情報をreadするのみ。
+与えられた情報を分析し、PRタイトルと本文の生成に専念してください。
 以下のPRテンプレートに従って、git commitログとdiffを分析し、PR titleとbodyを生成してください。
 
 Repository: $REPO
@@ -116,9 +122,9 @@ $TPL_CONTENT
 \`\`\`
 
 **JSON形式の注意点:**
-- 改行は必ず \\\\n でエスケープしてください
-- 各セクション間の空行も \\\\n\\\\n で表現してください
-- ダブルクォートは \\\\\" でエスケープしてください
+- 改行は必ず \\n でエスケープしてください
+- 各セクション間の空行も \\n\\n で表現してください
+- ダブルクォートは \\\" でエスケープしてください
 - 1行のJSONとして出力してください（改行を含まない）
 - 必ずコードフェンス（\`\`\`json）で囲んでください"
 
@@ -132,7 +138,7 @@ while [[ $RETRY_COUNT -lt $MAX_RETRIES ]]; do
   RETRY_COUNT=$((RETRY_COUNT + 1))
   log "  試行 $RETRY_COUNT/$MAX_RETRIES..."
 
-  if CLAUDE_JSON=$(claude -p "$PROMPT" --permission-mode acceptEdits --output-format json 2>&1); then
+  if CLAUDE_JSON=$(claude -p "$PROMPT" --output-format json 2>&1); then
     log "  ✓ Claude が正常に応答しました"
     break
   else
@@ -184,9 +190,15 @@ fi
 # 新しい Claude CLI 形式のエスケープされたJSONを処理
 JSON_PAYLOAD=""
 
-# まず、コードフェンスからの抽出を試行
-if [[ "$RAW" =~ \`\`\`json[[:space:]]*(.+)\`\`\` ]]; then
-  JSON_PAYLOAD="${BASH_REMATCH[1]}"
+# まず、コードフェンスからの抽出を試行（複数行対応）
+CODE_FENCE_CONTENT=$(
+  printf '%s\n' "$RAW" \
+  | sed -n '/```json[[:space:]]*$/,/```[[:space:]]*$/p' \
+  | sed '1d;$d'
+)
+
+if [[ -n "$CODE_FENCE_CONTENT" ]]; then
+  JSON_PAYLOAD="$CODE_FENCE_CONTENT"
   # JSON をアンエスケープ
   JSON_PAYLOAD=$(echo "$JSON_PAYLOAD" | sed 's/\\"/"/g' | sed 's/\\\\/\\/g')
   log "  ✓ コードフェンスから抽出しました"
@@ -239,24 +251,36 @@ elif command -v python3 >/dev/null 2>&1; then
   TEMP_JSON=$(mktemp)
   echo "$JSON_PAYLOAD" > "$TEMP_JSON"
 
-  if PYTHON_RESULT=$(python3 -c "
+  if PYTHON_RESULT=$(python3 - "$TEMP_JSON" 2>/dev/null << 'PYCODE'
 import json
 import sys
-try:
-    with open('$TEMP_JSON', 'r') as f:
-        content = f.read().strip()
-    data = json.loads(content)
-    if 'title' in data and 'body' in data and data['title'] and data['body']:
-        # 競合を避けるため一意のセパレータを使用
-        print(data['title'] + '###SEPARATOR###' + data['body'])
-    else:
+
+def main() -> None:
+    # 一時ファイルパスは sys.argv[1] から受け取る
+    if len(sys.argv) < 2:
         sys.exit(1)
-except Exception as e:
-    print(f'Error: {e}', file=sys.stderr)
-    sys.exit(1)
-" 2>/dev/null); then
-    TITLE=$(echo "$PYTHON_RESULT" | cut -d'#' -f1)
-    BODY=$(echo "$PYTHON_RESULT" | cut -d'#' -f3-)
+    temp_path = sys.argv[1]
+    try:
+        with open(temp_path, "r", encoding="utf-8") as f:
+            content = f.read().strip()
+        data = json.loads(content)
+        title = data.get("title")
+        body = data.get("body")
+        if title and body:
+            # 競合を避けるため一意のセパレータを使用
+            print(f"{title}###SEPARATOR###{body}")
+        else:
+            sys.exit(1)
+    except Exception as e:
+        print(f"Error: {e}", file=sys.stderr)
+        sys.exit(1)
+
+if __name__ == "__main__":
+    main()
+PYCODE
+  ); then
+    TITLE=${PYTHON_RESULT%%###SEPARATOR###*}
+    BODY=${PYTHON_RESULT#*###SEPARATOR###}
     rm -f "$TEMP_JSON"
     log "  ✓ Python でJSONの解析に成功しました"
   else
@@ -299,9 +323,8 @@ if [[ -z "$TITLE" || -z "$BODY" ]]; then
      [[ "$JSON_PAYLOAD" =~ body[[:space:]]*:[[:space:]]*\"(.*)\" ]] ||
      [[ "$RAW" =~ \\\"body\\\"[[:space:]]*:[[:space:]]*\\\"(.*)\\\" ]]; then
     BODY="${BASH_REMATCH[1]}"
-    # JSON文字列を適切にアンエスケープ - \n, \t, \", \\ を処理
-    BODY=$(echo "$BODY" | sed 's/\\n/\
-/g' | sed 's/\\t/	/g' | sed 's/\\"/"/g' | sed 's/\\\\/\\/g')
+    # JSON文字列を適切にアンエスケープ - バックスラッシュエスケープ全体を処理
+    BODY=$(printf '%b' "$BODY")
     log "    ✓ 本文を抽出しました: ${#BODY} 文字"
 
     # デバッグ: DEBUG=1 の場合、処理された本文を表示
@@ -342,7 +365,7 @@ if git push -u origin "$BRANCH" 2>/dev/null; then
 elif git push origin "$BRANCH" 2>/dev/null; then
   log "  ✓ リモートのブランチが更新されました"
 else
-  echo "❌ ブランチのリモートプッシュに失敗しました。権限を確認してください。" >&2
+  echo "❌ ブランチのリモートプッシュに失敗しました。権限、ネットワーク接続、およびリモートの状態を確認してください。" >&2
   exit 1
 fi
 
@@ -351,7 +374,7 @@ log "ステップ 6: ドラフトPRを作成中…"
 
 # デバッグ: まずリポジトリ権限をチェック
 log "  リポジトリ権限を確認中..."
-if [[ $DEBUG -eq 1 ]] || ! gh pr create --help >/dev/null 2>&1; then
+if [[ $DEBUG -eq 1 ]]; then
   log "  DEBUG: 現在のユーザー: $(gh api user --jq .login)"
   log "  DEBUG: リポジトリ権限:"
   gh api "repos/$REPO" --jq '.permissions // "権限情報が利用できません"' || log "  ⚠️  リポジトリ権限を確認できませんでした"
