@@ -4,7 +4,7 @@ pre-push:
   commands:
     eslint:
       root: "front/"
-      run: npm run lint --fix
+      run: npm run lint
     prettier:
       root: "front/"
       run: npm run format
