@@ -316,10 +316,9 @@ PYCODE
       # 変数を初期化してset -uに対応
       TITLE=""
       BODY=""
-      if IFS=$'\0' read -r -d '' TITLE BODY <<< "$PYTHON_RESULT"; then
-        log "  ✓ Python でJSONの解析に成功しました"
-      elif [[ -n "$TITLE" && -n "$BODY" ]]; then
-        # readは最後のフィールドで0以外を返すが、データは正常に読み込まれている
+      # readは-d ''で最後のフィールドを読むときに常に失敗するが、変数には正しくデータが入る
+      IFS=$'\0' read -r -d '' TITLE BODY <<< "$PYTHON_RESULT" || true
+      if [[ -n "$TITLE" && -n "$BODY" ]]; then
         log "  ✓ Python でJSONの解析に成功しました"
       fi
     fi
@@ -361,11 +360,15 @@ if [[ -z "$TITLE" || -z "$BODY" ]]; then
      [[ "$JSON_PAYLOAD" =~ body[[:space:]]*:[[:space:]]*\"(.*)\" ]] ||
      [[ "$RAW" =~ \\\"body\\\"[[:space:]]*:[[:space:]]*\\\"(.*)\\\" ]]; then
     BODY="${BASH_REMATCH[1]}"
-    # JSON文字列を適切にアンエスケープ - 明示的に必要なエスケープだけを解除
+    # JSON文字列を適切にアンエスケープ - 一般的なエスケープシーケンスを処理
+    # 注: このフォールバック処理は基本的なエスケープのみを扱います
+    # より複雑なJSONの場合はjqまたはPythonパーサーが優先されます
     BODY=$(printf '%s' "$BODY" \
       | sed 's/\\n/\n/g' \
       | sed 's/\\t/\t/g' \
-      | sed 's/\\"/"/g')
+      | sed 's/\\"/"/g' \
+      | sed 's/\\\\/\\/g' \
+      | sed 's/\\r/\r/g')
     log "    ✓ 本文を抽出しました: ${#BODY} 文字"
 
     # デバッグ: DEBUG=1 の場合、処理された本文を表示
