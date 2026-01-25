@@ -1,21 +1,25 @@
 <!--カテゴリ一覧のパンくずリスト-->
 <template>
-  <div class="category-trail">
+  <nav class="flex items-center text-sm text-gray-600" aria-label="Breadcrumb">
     <div
       v-for="(category, index) in categoryTrails"
       :key="category.id"
-      class="inline-block category-trail-item"
+      class="inline-flex items-center"
     >
       <router-link
         :to="{ name: 'CategoryNarrowDown', params: { id: category.id } }"
+        class="hover:text-blue-600 transition-colors"
       >
         {{ category.name }}
       </router-link>
-      <span v-if="index !== categoryTrails.length - 1" class="mx-2">
+      <span
+        v-if="index !== categoryTrails.length - 1"
+        class="mx-2 text-gray-400"
+      >
         &gt;
       </span>
     </div>
-  </div>
+  </nav>
 </template>
 
 <script setup lang="ts">
