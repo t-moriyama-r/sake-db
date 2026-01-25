@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "prepare": "git rev-parse --git-dir > /dev/null 2>&1 && npx lefthook install || true",
+    "prepare": "git rev-parse --git-dir > NUL 2>&1 && npx lefthook install || exit 0",
     "dev": "vite",
     "build": "run-p type-check \"build-only {@}\" --",
     "preview": "vite preview",
