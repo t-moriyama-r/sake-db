@@ -1,5 +1,5 @@
 <template>
-  認証済ユーザートップページ <MyPageIndex v-if="user" :user="user" />
+  <MyPageIndex v-if="user" :user="user" />
 </template>
 
 <script setup lang="ts">

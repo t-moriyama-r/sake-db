@@ -1,9 +1,6 @@
 <template>
   <div id="tag-search-area" v-if="liquors.length > 0">
-    <CardContainer
-      gap="0.5em"
-      min="200px"
-    >
+    <CardContainer gap="0.5em" min="200px">
       <LiquorCard v-for="liquor in liquors" :liquor="liquor" :key="liquor.id" />
     </CardContainer>
   </div>
