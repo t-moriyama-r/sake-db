@@ -13,8 +13,8 @@
   </div>
 </template>
 <script setup lang="ts">
-import type { AffiliateItem } from '@/graphQL/Amazon/affiliate';
 import truncateString from '@/funcs/util/transform/truncateString';
+import type { AffiliateItem } from '@/graphQL/Amazon/affiliate';
 
 interface Props {
   item: AffiliateItem; //商品名

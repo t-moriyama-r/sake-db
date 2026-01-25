@@ -1,5 +1,5 @@
-import type { APIType } from '@/type/api/APIType/APIType';
 import createURL from '@/funcs/util/core/createURL';
+import type { APIType } from '@/type/api/APIType/APIType';
 
 export interface CategoryRequest {
   id: number | null;

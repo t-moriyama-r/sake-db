@@ -32,7 +32,7 @@
       </section>
     </aside>
     <aside class="new-post">
-      <router-link :to="{ name: 'CategoryEdit' }" @click="emitCloseSidebar"
+      <router-link :to="categoryAddButtonRoute" @click="emitCloseSidebar"
         >+新規カテゴリ追加</router-link
       >
     </aside>
@@ -46,6 +46,7 @@ import { computed, type ComputedRef, onMounted, ref, watch } from 'vue';
 import CategoryParent from '@/components/layouts/main/sideBar/CategoryParent.vue';
 import { getDisplayCategoryIds } from '@/components/layouts/main/sideBar/func/sideBarFunc';
 import useQuery from '@/funcs/composable/useQuery/useQuery';
+import { sortCategoriesWithOtherLast } from '@/funcs/util/sortCategories';
 import {
   type Categories,
   type Category,
@@ -70,7 +71,7 @@ async function fetchData() {
   const { categories: response } = await fetch(null, {
     fetchPolicy: 'network-only',
   });
-  categoryList.value = [...response];
+  categoryList.value = sortCategoriesWithOtherLast([...response]);
   sidebarStore.setReloadFlgFalse();
 }
 
@@ -95,6 +96,18 @@ const filteredCategoryIdList: ComputedRef<number[]> = computed(() => {
   if (!categoryList.value) return []; //そもそも存在していなければ処理終了
   if (!sidebarStore.content) return categoryList.value.map((c) => c.id); // contentがない場合は全ての大カテゴリを返す
   return getDisplayCategoryIds(categoryList.value, sidebarStore.content);
+});
+
+// 現在のカテゴリに応じてカテゴリ追加ボタンのルートを決定
+const categoryAddButtonRoute = computed(() => {
+  const categoryId = sidebarStore.content;
+  if (categoryId && typeof categoryId === 'number' && categoryId > 0) {
+    return {
+      name: 'CategoryPostByParent',
+      params: { parentCategoryId: String(categoryId) },
+    };
+  }
+  return { name: 'CategoryEdit' };
 });
 </script>
 

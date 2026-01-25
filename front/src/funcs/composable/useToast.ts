@@ -1,4 +1,5 @@
 import { inject } from 'vue';
+
 import { TOAST_INJECT_KEY, type ToastCommand } from '@/plugins/toast';
 
 export const useToast = (): ToastCommand => {

@@ -70,3 +70,8 @@ pre-commit:
 
 
 
+# lefthook.yml
+# This extends the front directory's lefthook configuration
+# Each directory (front, backend, etc.) can have its own .lefthook.yml
+extends:
+  - front/.lefthook.yml

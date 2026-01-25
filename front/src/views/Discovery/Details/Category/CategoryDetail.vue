@@ -21,7 +21,7 @@
   <div class="mt-2 mb-2">
     <CategoryChildren
       v-if="category.children"
-      :category-list="category.children"
+      :category-list="sortedChildren"
     />
   </div>
   <div class="p-2">
@@ -37,6 +37,7 @@ import { computed } from 'vue';
 import AffiliateContainer from '@/components/blocks/common/amazon/AffiliateContainer.vue';
 import BackButton from '@/components/parts/common/BackButton.vue';
 import CommonButton from '@/components/parts/common/CommonButton/CommonButton.vue';
+import { sortCategoriesWithOtherLast } from '@/funcs/util/sortCategories';
 import type { Category } from '@/graphQL/Category/categories';
 import CategoryChildren from '@/views/Discovery/Details/Category/CategoryChildren.vue';
 
@@ -48,6 +49,11 @@ const { category } = defineProps<Props>();
 const descriptionLines = computed<string[]>(() => {
   if (category.description.length === 0) return ['説明なし'];
   return category.description.split('\n');
+});
+
+const sortedChildren = computed(() => {
+  if (!category.children) return [];
+  return sortCategoriesWithOtherLast(category.children);
 });
 </script>
 
