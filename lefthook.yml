@@ -54,8 +54,13 @@ pre-commit:
         go run github.com/99designs/gqlgen generate --config gqlgen.yml
         if [ $? -eq 0 ]; then
           echo "✓ GraphQL schema validation passed"
-          # 生成されたファイルをgit addする（自動生成ファイルのため）
-          git add graph/generated/ graph/graphModel/ 2>/dev/null || true
+          # 注意: 生成されたファイルは手動でgit addする必要があります
+          if git diff --quiet graph/generated/ graph/graphModel/; then
+            echo "  No changes in generated files"
+          else
+            echo "  ⚠ Generated files have been updated. Please add them to your commit:"
+            echo "    git add backend/graph/generated/ backend/graph/graphModel/"
+          fi
         else
           echo "✗ GraphQL schema validation failed"
           exit 1
