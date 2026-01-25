@@ -2,6 +2,8 @@ package ses
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/sesv2"
@@ -20,11 +22,39 @@ type emailContent struct {
 	Text string
 }
 
+// ValidateSESConfig AWS SES設定が正しく設定されているかチェックします
+// パスワードリセット機能を使用する前に呼び出すことを推奨します
+func ValidateSESConfig() error {
+	var missingVars []string
+
+	if os.Getenv("AWS_REGION") == "" {
+		missingVars = append(missingVars, "AWS_REGION")
+	}
+	if os.Getenv("AWS_SES_ACCESS_KEY") == "" {
+		missingVars = append(missingVars, "AWS_SES_ACCESS_KEY")
+	}
+	if os.Getenv("AWS_SES_ACCESS_SECRET") == "" {
+		missingVars = append(missingVars, "AWS_SES_ACCESS_SECRET")
+	}
+	if os.Getenv("AWS_SES_FROM") == "" {
+		missingVars = append(missingVars, "AWS_SES_FROM")
+	}
+
+	if len(missingVars) > 0 {
+		return fmt.Errorf("以下のAWS SES環境変数が設定されていません: %v\n設定方法の詳細は document/aws-ses-setup.md を参照してください", missingVars)
+	}
+
+	return nil
+}
+
 func SendPasswordReset(ctx context.Context, email string, token string) error {
 	//メールテンプレートを作る
 	msg, err := pwRstTemp(&passwordReset{
 		Token: token,
 	})
+	if err != nil {
+		return fmt.Errorf("メールテンプレートの生成に失敗しました: %w", err)
+	}
 	//メールを送信する
 	err = sendMail(ctx, &emailContent{
 		Subject: pwResetTitle,
@@ -35,17 +65,35 @@ func SendPasswordReset(ctx context.Context, email string, token string) error {
 }
 
 func sendMail(ctx context.Context, content *emailContent) error {
+	// 環境変数の検証
+	region := os.Getenv("AWS_REGION")
+	accessKey := os.Getenv("AWS_SES_ACCESS_KEY")
+	secretKey := os.Getenv("AWS_SES_ACCESS_SECRET")
+	from := os.Getenv("AWS_SES_FROM")
+
+	if region == "" {
+		return errors.New("AWS_REGION環境変数が設定されていません。詳細は document/aws-ses-setup.md を参照してください")
+	}
+	if accessKey == "" {
+		return errors.New("AWS_SES_ACCESS_KEY環境変数が設定されていません。詳細は document/aws-ses-setup.md を参照してください")
+	}
+	if secretKey == "" {
+		return errors.New("AWS_SES_ACCESS_SECRET環境変数が設定されていません。詳細は document/aws-ses-setup.md を参照してください")
+	}
+	if from == "" {
+		return errors.New("AWS_SES_FROM環境変数が設定されていません。詳細は document/aws-ses-setup.md を参照してください")
+	}
+
 	// 1. AWSの設定を読み込む
-	cfg, err := config.LoadDefaultConfig(ctx, config.WithRegion(os.Getenv("AWS_REGION")), config.WithCredentialsProvider(
-		credentials.NewStaticCredentialsProvider(os.Getenv("AWS_SES_ACCESS_KEY"), os.Getenv("AWS_SES_ACCESS_SECRET"), ""),
+	cfg, err := config.LoadDefaultConfig(ctx, config.WithRegion(region), config.WithCredentialsProvider(
+		credentials.NewStaticCredentialsProvider(accessKey, secretKey, ""),
 	))
 	if err != nil {
-		return err
+		return fmt.Errorf("AWS設定の読み込みに失敗しました: %w", err)
 	}
 
 	// 2. SESクライアントを作成
 	client := sesv2.NewFromConfig(cfg)
-	from := os.Getenv("AWS_SES_FROM")
 
 	input := &sesv2.SendEmailInput{
 		Destination: &types.Destination{
@@ -67,6 +115,9 @@ func sendMail(ctx context.Context, content *emailContent) error {
 	}
 
 	_, err = client.SendEmail(ctx, input)
+	if err != nil {
+		return fmt.Errorf("メール送信に失敗しました (送信先: %s): %w", content.To, err)
+	}
 
-	return err
+	return nil
 }

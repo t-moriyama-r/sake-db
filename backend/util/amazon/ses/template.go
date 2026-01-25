@@ -2,6 +2,7 @@ package ses
 
 import (
 	"bytes"
+	"errors"
 	"os"
 	"text/template"
 )
@@ -11,12 +12,21 @@ type passwordReset struct {
 }
 
 // generatePwRstStr はパスワードリセットメール本文のテンプレートです
-func generatePwRstStr() string {
-	return "URLは " + os.Getenv("FRONT_URI") + "/auth/password/reset/{{ .Token }} です"
+func generatePwRstStr() (string, error) {
+	frontURI := os.Getenv("FRONT_URI")
+	if frontURI == "" {
+		return "", errors.New("FRONT_URI環境変数が設定されていません。詳細は document/aws-ses-setup.md を参照してください")
+	}
+	return "URLは " + frontURI + "/auth/password/reset/{{ .Token }} です", nil
 }
 
 func pwRstTemp(cfg *passwordReset) (string, error) {
-	tmpl, err := template.New("psw-rst-template").Parse(generatePwRstStr())
+	templateStr, err := generatePwRstStr()
+	if err != nil {
+		return "", err
+	}
+
+	tmpl, err := template.New("psw-rst-template").Parse(templateStr)
 	if err != nil {
 		return "", err
 	}
