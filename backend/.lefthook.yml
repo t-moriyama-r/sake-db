@@ -26,7 +26,12 @@ pre-commit:
       run: |
         if command -v golangci-lint &> /dev/null; then
           # --new-from-rev を使用して変更されたファイルのみをチェック
-          golangci-lint run --new-from-rev=HEAD~1
+          # 初回コミットの場合はスキップ
+          if git rev-parse HEAD~1 >/dev/null 2>&1; then
+            golangci-lint run --new-from-rev=HEAD~1
+          else
+            echo "⚠ Skipping golangci-lint (no previous commit to compare)"
+          fi
         else
           echo "⚠ golangci-lint not installed. Skipping linting."
           echo "  Install with: make install-tools"
@@ -45,7 +50,8 @@ pre-commit:
       run: |
         echo "Validating GraphQL schema..."
         go run github.com/99designs/gqlgen generate --config gqlgen.yml
-        if [ $? -eq 0 ]; then
+        EXIT_CODE=$?
+        if [ $EXIT_CODE -eq 0 ]; then
           echo "✓ GraphQL schema validation passed"
           # 注意: 生成されたファイルは手動でgit addする必要があります
           if git diff --quiet graph/generated/ graph/graphModel/; then
@@ -56,5 +62,6 @@ pre-commit:
           fi
         else
           echo "✗ GraphQL schema validation failed"
-          exit 1
+          exit $EXIT_CODE
         fi
+
