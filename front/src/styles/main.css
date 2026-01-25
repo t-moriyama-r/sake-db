@@ -1,4 +1,5 @@
-html, body {
+html,
+body {
   height: 100%;
 }
 
@@ -17,14 +18,14 @@ html {
 input,
 textarea,
 select,
-[contenteditable="true"] {
+[contenteditable='true'] {
   cursor: text;
 }
 
 /* ボタン系はポインターカーソル */
 button,
 a,
-[role="button"],
+[role='button'],
 .cursor-pointer {
   cursor: pointer;
 }

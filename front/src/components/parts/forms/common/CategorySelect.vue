@@ -38,6 +38,7 @@ import { computed, type ComputedRef, ref, watch } from 'vue';
 
 import FormField from '@/components/parts/forms/core/FormField.vue';
 import useQuery from '@/funcs/composable/useQuery/useQuery';
+import { sortCategoriesWithOtherLast } from '@/funcs/util/sortCategories';
 import {
   type Categories,
   type Category,
@@ -69,7 +70,7 @@ watch(
     const { categories: response } = await fetch({
       fetchPolicy: 'network-only', //カテゴリが途中で変更されると、意図しない変更になるリスクがあるので再取得
     });
-    levels.value = [response]; // 最初の階層を設定
+    levels.value = [sortCategoriesWithOtherLast(response)]; // 最初の階層を設定(ソート適用)
     initializeSelections(newVal, response); // 初期値で選択肢を初期化
     hiddenField.value = newVal?.toString(); // hiddenFieldにも設定
     //idが空値の場合、セレクトボックスの初期化が必要
@@ -99,7 +100,7 @@ const handleChange = (index: number) => {
 
   //見つかったカテゴリが子カテゴリを持っていれば、選択肢に追加
   if (selectedCategory && selectedCategory.children) {
-    levels.value.push(selectedCategory.children);
+    levels.value.push(sortCategoriesWithOtherLast(selectedCategory.children));
   }
 };
 
@@ -149,8 +150,10 @@ const initializeSelections = (
     path.forEach((category, index) => {
       selectedValues.value[index] = category.id.toString();
       if (category.children) {
-        //見つかった子配列を上書き
-        levels.value[index + 1] = category.children;
+        //見つかった子配列を上書き(ソート適用)
+        levels.value[index + 1] = sortCategoriesWithOtherLast(
+          category.children,
+        );
       }
     });
   }

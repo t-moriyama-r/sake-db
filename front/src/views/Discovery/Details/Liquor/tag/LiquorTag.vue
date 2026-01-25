@@ -2,6 +2,7 @@
   <CommonTag
     :text="tag.text"
     :is-close="!!user"
+    @click="searchByTag"
     @close="isShowDeleteDialog = true"
   />
   <YesNoDialog v-model="isShowDeleteDialog" :on-yes="deleteTag">
@@ -10,16 +11,20 @@
 </template>
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 
 import YesNoDialog from '@/components/parts/common/CommonDialog/Variations/YesNoDialog.vue';
 import CommonTag from '@/components/parts/common/CommonTag/CommonTag.vue';
+import { clearTagSearchCache } from '@/funcs/composable/useCacheManagement';
 import { useMutation } from '@/funcs/composable/useQuery/useQuery';
 import { useToast } from '@/funcs/composable/useToast';
 import type { Tag } from '@/graphQL/Liquor/liquor';
 import { DeleteTag } from '@/graphQL/Liquor/tags';
 import { useUserStore } from '@/stores/userStore/userStore';
+
 const { user } = useUserStore();
 const toast = useToast();
+const router = useRouter();
 const { execute } = useMutation(DeleteTag, {
   isAuth: true,
 });
@@ -37,10 +42,21 @@ const isShowDeleteDialog = ref<boolean>(false);
 async function deleteTag() {
   // ここに削除処理を書く
   await execute({ id: tag.id });
+
+  // タグ検索のキャッシュをクリア
+  clearTagSearchCache(tag.text);
+
   toast.showToast({
     message: 'タグの削除に成功しました',
   });
   emit('delete', tag.id);
+}
+
+function searchByTag() {
+  router.push({
+    name: 'TagSearch',
+    params: { tag: tag.text },
+  });
 }
 </script>
 
