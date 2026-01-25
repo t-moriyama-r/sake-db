@@ -57,7 +57,7 @@ func (h *Handler) Post(c *gin.Context, ur *userRepository.UsersRepository) (*int
 		}
 
 		// 親が変更される場合のみ、readonlyチェックを行う
-		if old.Parent != nil && *old.Parent != request.Parent {
+		if *old.Parent != request.Parent {
 			// 現在のカテゴリの祖先にreadonlyフラグがあるかチェック
 			oldReadonlyAncestor, err := categoryService.GetReadonlyAncestor(ctx, *request.Id, &h.CategoryRepo)
 			if err != nil {
