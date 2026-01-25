@@ -71,10 +71,10 @@ import RadiusImage from '@/components/parts/common/RadiusImage.vue';
 import useQuery from '@/funcs/composable/useQuery/useQuery';
 import type { AuthUserFull } from '@/graphQL/Auth/auth';
 import {
-  GET_MY_EVALUATE_LIST,
-  type GetMyEvaluateListResponse,
-} from '@/graphQL/MyPage/mypage';
-import type { EvaluateList } from '@/graphQL/User/user';
+  type EvaluateList,
+  GET_USERDATA_FULL,
+  type GetUserDetailResponse,
+} from '@/graphQL/User/user';
 import BookmarkList from '@/views/MyPage/MyPageIndex/BookmarkList.vue';
 import UserPosts from '@/views/User/UserPosts.vue';
 
@@ -86,7 +86,7 @@ const props = defineProps<Props>();
 
 // 評価リストの取得
 const evaluateList = ref<EvaluateList | null>(null);
-const { fetch } = useQuery<GetMyEvaluateListResponse>(GET_MY_EVALUATE_LIST, {
+const { fetch } = useQuery<GetUserDetailResponse>(GET_USERDATA_FULL, {
   isAuth: true,
 });
 
