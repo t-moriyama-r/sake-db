@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "prepare": "git rev-parse --git-dir > /dev/null 2>&1 && npx lefthook install || true",
     "dev": "vite",
     "build": "run-p type-check \"build-only {@}\" --",
     "preview": "vite preview",
@@ -101,6 +102,9 @@
     "@rollup/rollup-linux-x64-gnu": "^4.19.0"
   },
   "lint-staged": {
-    "*.{js,vue,ts}": "eslint --fix --ignore-pattern src/graphQL/auto-generated.ts"
+    "*.{js,vue,ts}": [
+      "eslint --fix --ignore-pattern src/graphQL/auto-generated.ts",
+      "prettier --write --ignore-path .prettierignore"
+    ]
   }
 }
