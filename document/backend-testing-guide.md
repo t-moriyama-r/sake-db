@@ -438,7 +438,7 @@ assert.True(t, condition)
    - ベンチマークテストの拡充
    - 負荷テストの追加
 
-## 参考リンュース
+## 参考リンク
 
 - [Go Testing Package](https://pkg.go.dev/testing)
 - [Testify Documentation](https://github.com/stretchr/testify)
