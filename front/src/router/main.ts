@@ -64,6 +64,11 @@ const MainRouter = {
           name: 'CategoryEdit',
           component: CategoryEditPage,
         },
+        {
+          path: 'create/:parentCategoryId',
+          name: 'CategoryPostByParent',
+          component: CategoryEditPage,
+        },
       ],
     },
   ],
