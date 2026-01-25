@@ -15,6 +15,7 @@ import { useRouter } from 'vue-router';
 
 import YesNoDialog from '@/components/parts/common/CommonDialog/Variations/YesNoDialog.vue';
 import CommonTag from '@/components/parts/common/CommonTag/CommonTag.vue';
+import { clearTagSearchCache } from '@/funcs/composable/useCacheManagement';
 import { useMutation } from '@/funcs/composable/useQuery/useQuery';
 import { useToast } from '@/funcs/composable/useToast';
 import type { Tag } from '@/graphQL/Liquor/liquor';
@@ -41,6 +42,10 @@ const isShowDeleteDialog = ref<boolean>(false);
 async function deleteTag() {
   // ここに削除処理を書く
   await execute({ id: tag.id });
+  
+  // タグ検索のキャッシュをクリア
+  clearTagSearchCache(tag.text);
+  
   toast.showToast({
     message: 'タグの削除に成功しました',
   });
