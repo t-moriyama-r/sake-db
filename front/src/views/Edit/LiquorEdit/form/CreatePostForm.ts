@@ -24,8 +24,10 @@ export const FormKeys = {
   SELECTED_VERSION_NO: 'selected_version_no',
 } as const;
 
-export interface FormValues
-  extends Omit<PostRequest, typeof FormKeys.CATEGORY> {
+export interface FormValues extends Omit<
+  PostRequest,
+  typeof FormKeys.CATEGORY
+> {
   [FormKeys.CATEGORY]: number | null;
 }
 

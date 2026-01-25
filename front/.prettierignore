@@ -1,0 +1,9 @@
+# Auto-generated files
+src/graphQL/auto-generated.ts
+
+# Build output
+dist/
+build/
+
+# Dependencies
+node_modules/
