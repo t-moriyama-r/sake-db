@@ -4,7 +4,6 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "prepare": "cd $(git rev-parse --show-toplevel 2>/dev/null || echo .) && npx lefthook install || exit 0",
     "dev": "vite",
     "build": "run-p type-check \"build-only {@}\" --",
     "preview": "vite preview",
@@ -82,7 +81,6 @@
     "eslint-plugin-simple-import-sort": "^12.1.1",
     "eslint-plugin-vue": "^9.0.0",
     "jsdom": "^24.1.0",
-    "lefthook": "^1.7.18",
     "lint-staged": "^15.2.7",
     "npm-run-all2": "^6.2.0",
     "postcss": "^8.4.40",
