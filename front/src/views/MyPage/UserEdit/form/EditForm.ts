@@ -40,5 +40,10 @@ export const validationSchema = {
   [FormKeys.PASSWORD]: string()
     .transform((value) => (value === '' ? null : value))
     .nullable()
-    .min(7),
+    .test('min-length', '7文字以上で入力してください', (value) => {
+      if (value === null || value === undefined) {
+        return true; // 空の場合はOK
+      }
+      return value.length >= 7;
+    }),
 };

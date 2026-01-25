@@ -3,6 +3,7 @@
     @submit="onSubmit"
     :initial-values="generateInitialValues(props.user)"
     :validation-schema="validationSchema"
+    validate-on-input
   >
     <FormField :name="FormKeys.NAME" label="名前" />
     <FormField :name="FormKeys.MAIL" label="メールアドレス" type="email" />
