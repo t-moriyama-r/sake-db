@@ -5,25 +5,22 @@
 pre-commit:
   parallel: true
   commands:
-    # Go構文チェック
+    # Go構文チェック  
     go-fmt:
       tags: backend
-      glob: "backend/**/*.go"
-      root: "backend/"
+      files: git diff --name-only --cached backend/
+      glob: "*.go"
       run: |
-        if ! gofmt -l {staged_files} | grep .; then
-          echo "✓ Go formatting check passed"
-        else
-          echo "✗ Go files are not formatted. Run 'gofmt -w' on the files above."
-          exit 1
-        fi
+        cd backend
+        gofmt -l . | grep '.go$' && echo "✗ Go files are not formatted. Run 'cd backend && make fmt'" && exit 1 || echo "✓ Go formatting check passed"
     
     # Go静的解析
     go-lint:
       tags: backend
-      glob: "backend/**/*.go"
-      root: "backend/"
+      files: git diff --name-only --cached backend/
+      glob: "*.go"
       run: |
+        cd backend
         if command -v golangci-lint &> /dev/null; then
           # --new-from-rev を使用して変更されたファイルのみをチェック
           golangci-lint run --new-from-rev=HEAD~1
@@ -35,16 +32,17 @@ pre-commit:
     # Go vet
     go-vet:
       tags: backend
-      glob: "backend/**/*.go"
-      root: "backend/"
-      run: go vet {staged_files}
+      files: git diff --name-only --cached backend/
+      glob: "*.go"
+      run: cd backend && go vet ./...
     
     # GraphQLスキーマ検証
     graphql-validate:
       tags: backend graphql
-      glob: "backend/graph/schema/*.graphqls"
-      root: "backend/"
+      files: git diff --name-only --cached backend/graph/schema/
+      glob: "*.graphqls"
       run: |
+        cd backend
         echo "Validating GraphQL schema..."
         go run github.com/99designs/gqlgen generate --config gqlgen.yml
         if [ $? -eq 0 ]; then
@@ -60,4 +58,7 @@ pre-commit:
           echo "✗ GraphQL schema validation failed"
           exit 1
         fi
+
+
+
 
