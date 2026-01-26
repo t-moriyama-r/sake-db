@@ -90,6 +90,39 @@ func (r *LiquorsRepository) GetLiquorsByIds(ctx context.Context, ids []primitive
 	return liquors, nil
 }
 
+// GetLiquorsByIdsWithPagination はIDのリストから、ページネーション付きでリカーを取得する
+func (r *LiquorsRepository) GetLiquorsByIdsWithPagination(ctx context.Context, ids []primitive.ObjectID, limit *int, offset *int) ([]Model, *customError.Error) {
+	if len(ids) == 0 {
+		return nil, nil
+	}
+
+	// FindOptionsを設定してページネーションを実装
+	findOptions := options.Find()
+	if limit != nil && *limit > 0 {
+		findOptions.SetLimit(int64(*limit))
+	}
+	if offset != nil && *offset >= 0 {
+		findOptions.SetSkip(int64(*offset))
+	}
+
+	// コレクションからフィルタに一致するドキュメントを取得
+	cursor, err := r.collection.Find(ctx, bson.M{ID: bson.M{"$in": ids}}, findOptions)
+	if err != nil {
+		return nil, errGetLiquorByIds(err)
+	}
+	defer cursor.Close(ctx)
+
+	// 結果を格納するスライス
+	var liquors []Model
+
+	// 取得したドキュメントをスライスにデコード
+	if err = cursor.All(ctx, &liquors); err != nil {
+		return nil, errGetLiquorByIdsDecode(err, ids)
+	}
+
+	return liquors, nil
+}
+
 func (r *LiquorsRepository) GetRandomLiquors(ctx context.Context, limit int) ([]*Model, *customError.Error) {
 	var collections []*Model
 
@@ -169,6 +202,38 @@ func (r *LiquorsRepository) GetLiquorsFromCategoryIds(ctx context.Context, ids [
 
 	// コレクションからフィルタに一致するドキュメントを取得
 	cursor, err := r.collection.Find(ctx, filter)
+	if err != nil {
+		return nil, errGetLiquorsFromCategoryIds(err)
+	}
+	defer cursor.Close(ctx)
+
+	// 結果を格納するスライス
+	var liquors []*Model
+
+	// 取得したドキュメントをスライスにデコード
+	if err = cursor.All(ctx, &liquors); err != nil {
+		return nil, errGetLiquorsFromCategoryIdsDecode(err, ids)
+	}
+
+	return liquors, nil
+}
+
+// GetLiquorsFromCategoryIdsWithPagination はカテゴリIDのリストから、ページネーション付きでリカーを取得する
+func (r *LiquorsRepository) GetLiquorsFromCategoryIdsWithPagination(ctx context.Context, ids []int, limit *int, offset *int) ([]*Model, *customError.Error) {
+	// クエリフィルターを作成。カテゴリIDがidsのいずれかに一致するリカーを取得
+	filter := bson.M{"category_id": bson.M{"$in": ids}}
+
+	// FindOptionsを設定してページネーションを実装
+	findOptions := options.Find()
+	if limit != nil && *limit > 0 {
+		findOptions.SetLimit(int64(*limit))
+	}
+	if offset != nil && *offset >= 0 {
+		findOptions.SetSkip(int64(*offset))
+	}
+
+	// コレクションからフィルタに一致するドキュメントを取得
+	cursor, err := r.collection.Find(ctx, filter, findOptions)
 	if err != nil {
 		return nil, errGetLiquorsFromCategoryIds(err)
 	}

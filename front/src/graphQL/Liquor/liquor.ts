@@ -61,8 +61,8 @@ export const LIQUOR_DETAIL_GET: DocumentNode = gql`
 `;
 
 export const LIQUOR_LIST_FROM_CATEGORY: DocumentNode = gql`
-  query listFromCategory($id: Int!) {
-    listFromCategory(categoryId: $id) {
+  query listFromCategory($id: Int!, $limit: Int, $offset: Int) {
+    listFromCategory(categoryId: $id, limit: $limit, offset: $offset) {
       categoryName
       categoryDescription
       liquors {

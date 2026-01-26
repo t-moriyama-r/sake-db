@@ -9,12 +9,12 @@ import (
 )
 
 const (
-	GetTags       = "REPO-LIQUOR-TAG-001-GetTags"
-	GetTagsDecode = "REPO-LIQUOR-TAG-002-GetTagsDecode"
-	PostTag       = "REPO-LIQUOR-TAG-003-PostTag"
-	DeleteTag     = "REPO-LIQUOR-TAG-004-DeleteTag"
-	ZeroDelete    = "REPO-LIQUOR-TAG-005-ZeroDelete"
-	SearchByTag   = "REPO-LIQUOR-TAG-006-SearchByTag"
+	GetTags           = "REPO-LIQUOR-TAG-001-GetTags"
+	GetTagsDecode     = "REPO-LIQUOR-TAG-002-GetTagsDecode"
+	PostTag           = "REPO-LIQUOR-TAG-003-PostTag"
+	DeleteTag         = "REPO-LIQUOR-TAG-004-DeleteTag"
+	ZeroDelete        = "REPO-LIQUOR-TAG-005-ZeroDelete"
+	SearchByTag       = "REPO-LIQUOR-TAG-006-SearchByTag"
 	SearchByTagDecode = "REPO-LIQUOR-TAG-007-SearchByTagDecode"
 )
 

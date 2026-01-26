@@ -48,12 +48,22 @@ func (r *queryResolver) RandomRecommendList(ctx context.Context, limit int) ([]*
 }
 
 // ListFromCategory is the resolver for the listFromCategory field.
-func (r *queryResolver) ListFromCategory(ctx context.Context, categoryID int) (*graphModel.ListFromCategory, error) {
+func (r *queryResolver) ListFromCategory(ctx context.Context, categoryID int, limit *int, offset *int) (*graphModel.ListFromCategory, error) {
+	// デフォルト値を設定
+	defaultLimit := 20
+	if limit == nil {
+		limit = &defaultLimit
+	}
+	defaultOffset := 0
+	if offset == nil {
+		offset = &defaultOffset
+	}
+
 	ids, err := categoryService.GetBelongCategoryIdList(ctx, categoryID, &r.CategoryRepo)
 	if err != nil {
 		return nil, err
 	}
-	list, err := r.LiquorRepo.GetLiquorsFromCategoryIds(ctx, ids)
+	list, err := r.LiquorRepo.GetLiquorsFromCategoryIdsWithPagination(ctx, ids, limit, offset)
 	if err != nil {
 		return nil, err
 	}

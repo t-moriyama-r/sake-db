@@ -204,10 +204,10 @@ type ComplexityRoot struct {
 		Histories              func(childComplexity int, id int) int
 		Liquor                 func(childComplexity int, id string) int
 		LiquorHistories        func(childComplexity int, id string) int
-		ListFromCategory       func(childComplexity int, categoryID int) int
+		ListFromCategory       func(childComplexity int, categoryID int, limit *int, offset *int) int
 		RandomRecommendList    func(childComplexity int, limit int) int
 		SearchLiquors          func(childComplexity int, keyword string, limit *int) int
-		SearchLiquorsByTag     func(childComplexity int, tag string) int
+		SearchLiquorsByTag     func(childComplexity int, tag string, limit *int, offset *int) int
 	}
 
 	Recommend struct {
@@ -314,14 +314,14 @@ type QueryResolver interface {
 	GetVoted(ctx context.Context, liquorID string) (*graphModel.VotedData, error)
 	Liquor(ctx context.Context, id string) (*graphModel.Liquor, error)
 	RandomRecommendList(ctx context.Context, limit int) ([]*graphModel.Liquor, error)
-	ListFromCategory(ctx context.Context, categoryID int) (*graphModel.ListFromCategory, error)
+	ListFromCategory(ctx context.Context, categoryID int, limit *int, offset *int) (*graphModel.ListFromCategory, error)
 	LiquorHistories(ctx context.Context, id string) (*graphModel.LiquorHistory, error)
 	Board(ctx context.Context, liquorID string, page *int) ([]*graphModel.BoardPost, error)
 	GetMyBoard(ctx context.Context, liquorID string) (*graphModel.BoardPost, error)
 	SearchLiquors(ctx context.Context, keyword string, limit *int) ([]*graphModel.Liquor, error)
 	GetMyData(ctx context.Context) (*graphModel.User, error)
 	GetTags(ctx context.Context, liquorID string) ([]*graphModel.Tag, error)
-	SearchLiquorsByTag(ctx context.Context, tag string) ([]*graphModel.Liquor, error)
+	SearchLiquorsByTag(ctx context.Context, tag string, limit *int, offset *int) ([]*graphModel.Liquor, error)
 	GetUserByID(ctx context.Context, id string) (*graphModel.User, error)
 	GetUserByIDDetail(ctx context.Context, id string) (*graphModel.UserPageData, error)
 }
@@ -1250,7 +1250,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.ListFromCategory(childComplexity, args["categoryId"].(int)), true
+		return e.complexity.Query.ListFromCategory(childComplexity, args["categoryId"].(int), args["limit"].(*int), args["offset"].(*int)), true
 
 	case "Query.randomRecommendList":
 		if e.complexity.Query.RandomRecommendList == nil {
@@ -1286,7 +1286,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.SearchLiquorsByTag(childComplexity, args["tag"].(string)), true
+		return e.complexity.Query.SearchLiquorsByTag(childComplexity, args["tag"].(string), args["limit"].(*int), args["offset"].(*int)), true
 
 	case "Recommend.comment":
 		if e.complexity.Recommend.Comment == nil {
@@ -1952,7 +1952,7 @@ input BoardInput{
 extend type Query {
   liquor(id: String!): Liquor!
   randomRecommendList(limit: Int!): [Liquor!]! #ランダムなリスト
-  listFromCategory(categoryId: Int!): ListFromCategory! #カテゴリで絞り込んだリスト
+  listFromCategory(categoryId: Int!, limit: Int, offset: Int): ListFromCategory! #カテゴリで絞り込んだリスト
   liquorHistories(id: String!):LiquorHistory #編集時に実行する、バージョン履歴つきのデータ
   board(liquorId: String!,page:Int):[BoardPost!]
   getMyBoard(liquorId: String!):BoardPost @optionalAuth #未ログイン時にも呼ばれるのでoptionalに
@@ -1990,7 +1990,7 @@ type Tag{
 
 extend type Query{
   getTags(liquorId:ID!):[Tag!]! # 一覧などではDBアクセス自体が不要なため、コードの簡単化も兼ねて分けて取得することにした
-  searchLiquorsByTag(tag:String!):[Liquor!]! # タグでお酒を検索
+  searchLiquorsByTag(tag:String!, limit: Int, offset: Int):[Liquor!]! # タグでお酒を検索
 }
 
 extend type Mutation {
@@ -2880,6 +2880,16 @@ func (ec *executionContext) field_Query_listFromCategory_args(ctx context.Contex
 		return nil, err
 	}
 	args["categoryId"] = arg0
+	arg1, err := ec.field_Query_listFromCategory_argsLimit(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["limit"] = arg1
+	arg2, err := ec.field_Query_listFromCategory_argsOffset(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["offset"] = arg2
 	return args, nil
 }
 func (ec *executionContext) field_Query_listFromCategory_argsCategoryID(
@@ -2897,6 +2907,42 @@ func (ec *executionContext) field_Query_listFromCategory_argsCategoryID(
 	}
 
 	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_listFromCategory_argsLimit(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*int, error) {
+	if _, ok := rawArgs["limit"]; !ok {
+		var zeroVal *int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+	if tmp, ok := rawArgs["limit"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_listFromCategory_argsOffset(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*int, error) {
+	if _, ok := rawArgs["offset"]; !ok {
+		var zeroVal *int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+	if tmp, ok := rawArgs["offset"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
 	return zeroVal, nil
 }
 
@@ -2936,6 +2982,16 @@ func (ec *executionContext) field_Query_searchLiquorsByTag_args(ctx context.Cont
 		return nil, err
 	}
 	args["tag"] = arg0
+	arg1, err := ec.field_Query_searchLiquorsByTag_argsLimit(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["limit"] = arg1
+	arg2, err := ec.field_Query_searchLiquorsByTag_argsOffset(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["offset"] = arg2
 	return args, nil
 }
 func (ec *executionContext) field_Query_searchLiquorsByTag_argsTag(
@@ -2953,6 +3009,42 @@ func (ec *executionContext) field_Query_searchLiquorsByTag_argsTag(
 	}
 
 	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_searchLiquorsByTag_argsLimit(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*int, error) {
+	if _, ok := rawArgs["limit"]; !ok {
+		var zeroVal *int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+	if tmp, ok := rawArgs["limit"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_searchLiquorsByTag_argsOffset(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*int, error) {
+	if _, ok := rawArgs["offset"]; !ok {
+		var zeroVal *int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+	if tmp, ok := rawArgs["offset"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
 	return zeroVal, nil
 }
 
@@ -8621,7 +8713,7 @@ func (ec *executionContext) _Query_listFromCategory(ctx context.Context, field g
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().ListFromCategory(rctx, fc.Args["categoryId"].(int))
+		return ec.resolvers.Query().ListFromCategory(rctx, fc.Args["categoryId"].(int), fc.Args["limit"].(*int), fc.Args["offset"].(*int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -9154,7 +9246,7 @@ func (ec *executionContext) _Query_searchLiquorsByTag(ctx context.Context, field
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().SearchLiquorsByTag(rctx, fc.Args["tag"].(string))
+		return ec.resolvers.Query().SearchLiquorsByTag(rctx, fc.Args["tag"].(string), fc.Args["limit"].(*int), fc.Args["offset"].(*int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)

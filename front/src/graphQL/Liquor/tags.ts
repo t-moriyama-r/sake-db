@@ -46,8 +46,8 @@ export const DeleteTag: DocumentNode = gql`
 `;
 
 export const SearchLiquorsByTag: DocumentNode = gql`
-  query searchLiquorsByTag($tag: String!) {
-    searchLiquorsByTag(tag: $tag) {
+  query searchLiquorsByTag($tag: String!, $limit: Int, $offset: Int) {
+    searchLiquorsByTag(tag: $tag, limit: $limit, offset: $offset) {
       id
       name
       categoryId
