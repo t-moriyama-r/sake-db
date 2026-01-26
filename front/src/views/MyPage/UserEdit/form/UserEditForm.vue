@@ -70,7 +70,7 @@ const onSubmit: SubmissionHandler = async (values: FormValues) => {
     input: {
       name: values[FormKeys.NAME],
       email: values[FormKeys.MAIL],
-      password: values[FormKeys.PASSWORD],
+      password: values[FormKeys.PASSWORD] || null, // 空文字列の場合はnullに変換
       profile: values[FormKeys.PROFILE],
       imageBase64: base64ImageData ?? null,
     },
