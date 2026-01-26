@@ -5,7 +5,7 @@
       :imageSrc="userStore.user.imageBase64"
       radius="10px"
     />
-    <span class="hidden sm:inline">
+    <span>
       {{ truncateString({ str: userStore.user.name, maxLength: 10 }) }}
     </span>
   </div>

@@ -13,7 +13,7 @@
         ></router-link
       >
     </section>
-    <section class="shrink-0 overflow-hidden">
+    <section class="shrink-0">
       <LoginAndSignUpButton v-if="!userStore.isLogin" />
       <AccountMenu v-else />
     </section>
