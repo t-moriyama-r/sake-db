@@ -8,7 +8,7 @@
       <p>読み込み中...</p>
     </div>
   </div>
-  <EmptyTag v-else-if="!isLoading" :tag="tag" />
+  <EmptyTag v-else-if="!isLoading && liquors.length === 0" :tag="tag" />
 </template>
 
 <script setup lang="ts">

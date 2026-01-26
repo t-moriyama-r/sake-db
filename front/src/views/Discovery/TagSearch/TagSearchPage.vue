@@ -7,13 +7,16 @@
   </div>
   <FromTag
     :key="tag"
-    v-if="liquors"
+    v-if="liquors !== null"
     :tag="tag"
     :liquors="liquors"
     :has-more="hasMore"
     :is-loading="isLoading"
     @load-more="loadMore"
   />
+  <div v-else class="loading-initial">
+    <p>読み込み中...</p>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -33,7 +36,7 @@ const route = useRoute();
 const { fetch } = useQuery<SearchLiquorsByTagResponse>(SearchLiquorsByTag);
 
 const tag = ref<string>('');
-const liquors = ref<Liquor[]>([]);
+const liquors = ref<Liquor[] | null>(null);
 const isLoading = ref<boolean>(false);
 const hasMore = ref<boolean>(true);
 const offset = ref<number>(0);
@@ -65,7 +68,7 @@ const fetchData = async (searchTag: string): Promise<void> => {
 
 // 追加データフェッチ
 const loadMore = async (): Promise<void> => {
-  if (!tag.value || isLoading.value || !hasMore.value) {
+  if (!tag.value || isLoading.value || !hasMore.value || !liquors.value) {
     return;
   }
 
@@ -100,7 +103,7 @@ watch(
     const tagParam = to as string;
     if (!tagParam) {
       tag.value = '';
-      liquors.value = [];
+      liquors.value = null;
       return;
     }
     tag.value = tagParam;
@@ -110,4 +113,10 @@ watch(
 );
 </script>
 
-<style scoped></style>
+<style scoped>
+.loading-initial {
+  text-align: center;
+  padding: 2em;
+  color: #666;
+}
+</style>

@@ -101,7 +101,7 @@ func (r *LiquorsRepository) GetLiquorsByIdsWithPagination(ctx context.Context, i
 	if limit != nil && *limit > 0 {
 		findOptions.SetLimit(int64(*limit))
 	}
-	if offset != nil && *offset > 0 {
+	if offset != nil && *offset >= 0 {
 		findOptions.SetSkip(int64(*offset))
 	}
 
@@ -228,7 +228,7 @@ func (r *LiquorsRepository) GetLiquorsFromCategoryIdsWithPagination(ctx context.
 	if limit != nil && *limit > 0 {
 		findOptions.SetLimit(int64(*limit))
 	}
-	if offset != nil && *offset > 0 {
+	if offset != nil && *offset >= 0 {
 		findOptions.SetSkip(int64(*offset))
 	}
 

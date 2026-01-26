@@ -12,7 +12,10 @@
       <p>読み込み中...</p>
     </div>
   </div>
-  <EmptyCategory v-else-if="!isLoading" :category-id="categoryId" />
+  <EmptyCategory
+    v-else-if="!isLoading && liquors.length === 0"
+    :category-id="categoryId"
+  />
 </template>
 
 <script setup lang="ts">
