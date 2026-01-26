@@ -2,12 +2,18 @@
   <div class="sm:hidden">
     <select
       id="tabs"
+      v-model="selectedRate"
+      @change="onRateSelect(selectedRate)"
       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
     >
-      <option v-for="rate in [5, 4, 3, 2, 1]" :key="`smart_rate_${rate}`">
-        <DisplayStar :rate="rate" />
+      <option
+        v-for="rate in [5, 4, 3, 2, 1]"
+        :key="`smart_rate_${rate}`"
+        :value="rate"
+      >
+        ★{{ rate }}
       </option>
-      <option>未評価</option>
+      <option :value="null">未評価</option>
     </select>
   </div>
   <ul
