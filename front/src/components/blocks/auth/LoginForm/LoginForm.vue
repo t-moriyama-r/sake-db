@@ -4,24 +4,23 @@
     :initial-values="initialValues"
     :validation-schema="validationSchema"
     :validate-on-mount="false"
-    v-slot="{ values }"
+    validate-on-input
+    v-slot="{ meta }"
   >
     <FormField
       :name="FormKeys.MAIL"
       label="メールアドレス"
       type="email"
-      :showErrors="shouldValidate(values) ? 'show' : 'hidden'"
+      :showErrors="'hidden'"
     />
     <FormField
       :name="FormKeys.PASSWORD"
       label="パスワード"
       type="password"
-      :showErrors="shouldValidate(values) ? 'show' : 'hidden'"
+      :showErrors="'hidden'"
     />
     <div class="mt-2 flex justify-center">
-      <SubmitButton :isDisabled="!shouldValidate(values)"
-        >ログイン</SubmitButton
-      >
+      <SubmitButton :isDisabled="!meta.valid">ログイン</SubmitButton>
     </div>
   </Form>
   <div class="mt-2 text-center">
@@ -64,10 +63,6 @@ import {
   initialValues,
   validationSchema,
 } from './LoginForm';
-
-const shouldValidate = (values: FormValues) => {
-  return Boolean(values[FormKeys.MAIL] && values[FormKeys.PASSWORD]);
-};
 
 defineProps<{
   isModal?: boolean;
