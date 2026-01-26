@@ -26,7 +26,7 @@
       </div>
       <div class="profile-actions">
         <router-link :to="{ name: 'MyPageEdit' }" class="edit-button-link">
-          <CommonButton color="primary" size="default" class="edit-button">
+          <CommonButton :color="ColorType.Primary" class="edit-button">
             <font-awesome-icon :icon="['fas', 'edit']" class="icon" />
             ユーザー情報を編集
           </CommonButton>
@@ -64,17 +64,19 @@
 </template>
 
 <script setup lang="ts">
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { onMounted, ref } from 'vue';
 
 import CommonButton from '@/components/parts/common/CommonButton/CommonButton.vue';
 import RadiusImage from '@/components/parts/common/RadiusImage.vue';
 import useQuery from '@/funcs/composable/useQuery/useQuery';
-import type { AuthUserFull } from '@/graphQL/Auth/auth';
+import type { AuthUserFull } from '@/graphQL/Auth/types';
 import {
   type EvaluateList,
   GET_USERDATA_FULL,
   type GetUserDetailResponse,
 } from '@/graphQL/User/user';
+import { ColorType } from '@/type/common/ColorType';
 import BookmarkList from '@/views/MyPage/MyPageIndex/BookmarkList.vue';
 import UserPosts from '@/views/User/UserPosts.vue';
 
