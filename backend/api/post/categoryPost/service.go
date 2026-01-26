@@ -56,26 +56,34 @@ func (h *Handler) Post(c *gin.Context, ur *userRepository.UsersRepository) (*int
 			return nil, errParentCategoryMove(request)
 		}
 
-		// 親が変更される場合のみ、readonlyチェックを行う
+		// 親が変更される場合のみ、フレーバーマップチェックを行う
 		if *old.Parent != request.Parent {
-			// 現在のカテゴリの祖先にreadonlyフラグがあるかチェック
-			oldReadonlyAncestor, err := categoryService.GetReadonlyAncestor(ctx, *request.Id, &h.CategoryRepo)
+			// 現在のカテゴリの祖先でflavor_map_masterに存在するカテゴリを取得
+			oldFlavorMapAncestor, err := categoryService.GetFlavorMapAncestor(ctx, *request.Id, &h.CategoryRepo, &h.FlavorMapMasterRepo)
 			if err != nil {
 				return nil, err
 			}
 
-			// 新しい親の祖先にreadonlyフラグがあるかチェック
-			newReadonlyAncestor, err := categoryService.GetReadonlyAncestor(ctx, request.Parent, &h.CategoryRepo)
+			// 新しい親の祖先でflavor_map_masterに存在するカテゴリを取得
+			newFlavorMapAncestor, err := categoryService.GetFlavorMapAncestor(ctx, request.Parent, &h.CategoryRepo, &h.FlavorMapMasterRepo)
 			if err != nil {
 				return nil, err
 			}
 
-			// 両方のreadonly祖先が異なる場合は移動を禁止
-			// （readonly祖先がある場合、別のreadonly祖先配下には移動できない）
-			if oldReadonlyAncestor != nil {
-				// 新しい親にreadonly祖先がない、または異なるreadonly祖先の場合は禁止
-				if newReadonlyAncestor == nil || oldReadonlyAncestor.ID != newReadonlyAncestor.ID {
-					return nil, errReadonlyCategoryMove(request)
+			// 両方のflavor_map祖先が異なる場合は移動を禁止
+			// （flavor_map祖先がある場合、別のflavor_map祖先配下には移動できない）
+			if oldFlavorMapAncestor != nil {
+				// 新しい親にflavor_map祖先がない、または異なるflavor_map祖先の場合は禁止
+				if newFlavorMapAncestor == nil || oldFlavorMapAncestor.ID != newFlavorMapAncestor.ID {
+					oldName := "不明"
+					newName := "不明"
+					if oldFlavorMapAncestor != nil {
+						oldName = oldFlavorMapAncestor.Name
+					}
+					if newFlavorMapAncestor != nil {
+						newName = newFlavorMapAncestor.Name
+					}
+					return nil, errFlavorMapCategoryMove(request, oldName, newName)
 				}
 			}
 		}

@@ -16,6 +16,7 @@ const (
 	Update               = "REPO-FLAVOR-MAP-004-Update"
 	GetVotedDataByLiquor = "REPO-FLAVOR-MAP-005-GetVotedDataByLiquor"
 	Upsert               = "REPO-FLAVOR-MAP-006-Upsert"
+	ExistsCategoryID     = "REPO-FLAVOR-MAP-007-ExistsCategoryID"
 )
 
 func errMasterFind(err error) *customError.Error {
@@ -73,5 +74,15 @@ func errUpsert(err error, tying TyingModel) *customError.Error {
 		UserMsg:    errorMsg.SERVER,
 		Level:      logrus.ErrorLevel,
 		Input:      tying,
+	})
+}
+
+func errExistsCategoryID(err error, categoryID int) *customError.Error {
+	return customError.NewError(err, customError.Params{
+		StatusCode: http.StatusInternalServerError,
+		ErrCode:    ExistsCategoryID,
+		UserMsg:    errorMsg.SERVER,
+		Level:      logrus.ErrorLevel,
+		Input:      categoryID,
 	})
 }

@@ -79,3 +79,20 @@ func (r *FlavorToLiquorRepository) UpsertData(ctx context.Context, tying TyingMo
 
 	return nil
 }
+
+// ExistsCategoryID 指定されたcategory_idがflavor_map_masterに存在するかチェック
+func (r *FlavorMapMasterRepository) ExistsCategoryID(ctx context.Context, categoryID int) (bool, *customError.Error) {
+	var model MasterModel
+	err := r.Collection.FindOne(ctx, bson.M{
+		CategoryID: categoryID,
+	}).Decode(&model)
+	
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return false, nil
+		}
+		return false, errExistsCategoryID(err, categoryID)
+	}
+	
+	return true, nil
+}

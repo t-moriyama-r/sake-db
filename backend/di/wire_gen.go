@@ -50,7 +50,7 @@ func InitializeHandler() (*gin.Engine, error) {
 		return nil, err
 	}
 	handler := liquorPost.NewHandler(database, s3S3, categoryRepository, liquorsRepository, usersRepository)
-	categoryPostHandler := categoryPost.NewHandler(database, s3S3, categoryRepository)
+	categoryPostHandler := categoryPost.NewHandler(database, s3S3, categoryRepository, flavorMapMasterRepository)
 	userHandler := api.NewUserHandler(database, usersRepository)
 	errorsRepository := errorRepository.New(dbDB)
 	handlersHandlers := handlers.NewHandlers(handler, categoryPostHandler, tokenConfigTokenConfig, userHandler, errorsRepository)

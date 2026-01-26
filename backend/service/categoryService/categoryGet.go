@@ -142,3 +142,28 @@ func GetReadonlyAncestor(ctx context.Context, categoryId int, r *categoriesRepos
 
 	return nil, nil
 }
+
+// GetFlavorMapAncestor 指定されたカテゴリIDの祖先でflavor_map_masterに存在する最初のカテゴリを取得
+// flavor_map_masterに存在する祖先がない場合はnilを返す
+func GetFlavorMapAncestor(ctx context.Context, categoryId int, categoryRepo *categoriesRepository.CategoryRepository, flavorMapRepo interface {
+	ExistsCategoryID(ctx context.Context, categoryID int) (bool, *customError.Error)
+}) (*categoriesRepository.Model, *customError.Error) {
+	// カテゴリまでのパンくずリストを取得
+	categoryTrail, err := GetCategoryTrail(ctx, categoryId, categoryRepo)
+	if err != nil {
+		return nil, err
+	}
+
+	// 祖先を辿り、flavor_map_masterに存在する最初のカテゴリを探す
+	for _, category := range *categoryTrail {
+		exists, err := flavorMapRepo.ExistsCategoryID(ctx, category.ID)
+		if err != nil {
+			return nil, err
+		}
+		if exists {
+			return &category, nil
+		}
+	}
+
+	return nil, nil
+}

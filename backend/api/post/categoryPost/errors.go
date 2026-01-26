@@ -10,14 +10,14 @@ import (
 )
 
 const (
-	ParseFailInput       = "CATEGORY-POST-001-ParseFailInput"
-	InvalidInput         = "CATEGORY-POST-002-InvalidInput"
-	InvalidParent        = "CATEGORY-POST-003-InvalidParent"
-	InvalidVersion       = "CATEGORY-POST-004-InvalidVersion"
-	InvalidFile          = "CATEGORY-POST-005-InvalidFile"
-	DuplicateName        = "CATEGORY-POST-006-DuplicateName"
-	ParentCategoryMove   = "CATEGORY-POST-007-ParentCategoryMove"
-	ReadonlyCategoryMove = "CATEGORY-POST-008-ReadonlyCategoryMove"
+	ParseFailInput         = "CATEGORY-POST-001-ParseFailInput"
+	InvalidInput           = "CATEGORY-POST-002-InvalidInput"
+	InvalidParent          = "CATEGORY-POST-003-InvalidParent"
+	InvalidVersion         = "CATEGORY-POST-004-InvalidVersion"
+	InvalidFile            = "CATEGORY-POST-005-InvalidFile"
+	DuplicateName          = "CATEGORY-POST-006-DuplicateName"
+	ParentCategoryMove     = "CATEGORY-POST-007-ParentCategoryMove"
+	FlavorMapCategoryMove  = "CATEGORY-POST-008-FlavorMapCategoryMove"
 )
 
 func errInvalidInput(c *gin.Context, err error) *customError.Error {
@@ -89,11 +89,11 @@ func errParentCategoryMove(input RequestData) *customError.Error {
 	})
 }
 
-func errReadonlyCategoryMove(input RequestData) *customError.Error {
-	return customError.NewError(errors.New("このカテゴリは移動できません"), customError.Params{
+func errFlavorMapCategoryMove(input RequestData, oldCategoryName string, newCategoryName string) *customError.Error {
+	return customError.NewError(errors.New("異なるフレーバーマップカテゴリへの移動はできません"), customError.Params{
 		StatusCode: http.StatusBadRequest,
-		ErrCode:    ReadonlyCategoryMove,
-		UserMsg:    "このカテゴリは移動できません",
+		ErrCode:    FlavorMapCategoryMove,
+		UserMsg:    "このカテゴリは「" + oldCategoryName + "」カテゴリに属しているため、「" + newCategoryName + "」カテゴリには移動できません。フレーバーマップの意味が異なるカテゴリへの移動は禁止されています。",
 		Level:      logrus.InfoLevel,
 		Input:      input,
 	})
