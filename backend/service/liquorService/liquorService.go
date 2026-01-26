@@ -23,6 +23,8 @@ const (
 	DefaultSearchLimit = 20
 	// MaxSearchLimit 最大検索結果数
 	MaxSearchLimit = 1000
+	// MaxRelatedLiquors 関連銘柄の最大表示数
+	MaxRelatedLiquors = 5
 )
 
 func GetLiquor(ctx context.Context, lr liquorRepository.LiquorsRepository, cr categoriesRepository.CategoryRepository, id string) (*graphModel.Liquor, *customError.Error) {
@@ -282,10 +284,9 @@ func GetRelatedLiquors(ctx context.Context, lr liquorRepository.LiquorsRepositor
 		filteredLiquors[i], filteredLiquors[j] = filteredLiquors[j], filteredLiquors[i]
 	})
 
-	// 最大5件に制限
-	maxResults := 5
-	if len(filteredLiquors) > maxResults {
-		filteredLiquors = filteredLiquors[:maxResults]
+	// 最大件数に制限
+	if len(filteredLiquors) > MaxRelatedLiquors {
+		filteredLiquors = filteredLiquors[:MaxRelatedLiquors]
 	}
 
 	// GraphQL形式に変換
