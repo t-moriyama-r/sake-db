@@ -77,14 +77,12 @@ const userStore = useUserStore();
 const toast = useToast();
 const { execute } = useMutation<LoginMutation>(LOGIN);
 
-// extends GenericObjectは型が広すぎるのでキャストして対応する
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-//@ts-expect-error
-const onSubmit: SubmissionHandler = async (values: FormValues) => {
+const onSubmit: SubmissionHandler = async (values) => {
+  const formValues = values as FormValues;
   await execute({
     input: {
-      email: values[FormKeys.MAIL],
-      password: values[FormKeys.PASSWORD],
+      email: formValues[FormKeys.MAIL],
+      password: formValues[FormKeys.PASSWORD],
     },
   })
     .then((res) => {
