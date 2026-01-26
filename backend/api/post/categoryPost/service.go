@@ -75,11 +75,8 @@ func (h *Handler) Post(c *gin.Context, ur *userRepository.UsersRepository) (*int
 			if oldFlavorMapAncestor != nil {
 				// 新しい親にflavor_map祖先がない、または異なるflavor_map祖先の場合は禁止
 				if newFlavorMapAncestor == nil || oldFlavorMapAncestor.ID != newFlavorMapAncestor.ID {
-					oldName := "不明"
+					oldName := oldFlavorMapAncestor.Name
 					newName := "不明"
-					if oldFlavorMapAncestor != nil {
-						oldName = oldFlavorMapAncestor.Name
-					}
 					if newFlavorMapAncestor != nil {
 						newName = newFlavorMapAncestor.Name
 					}
