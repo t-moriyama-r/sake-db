@@ -25,6 +25,24 @@ git commit -m "feat: 新機能を追加"
 
 バックエンドファイルを変更した場合、`backend/.lefthook.yml`に定義された静的解析が自動実行されます。
 
+#### GraphQLスキーマを変更した場合
+
+スキーマファイル（`graph/schema/*.graphqls`）を変更した場合、フロントエンドの型定義を更新する必要があります。
+
+コミット後に自動的に警告が表示されますが、以下のコマンドで簡単に更新できます：
+
+```bash
+# backend ディレクトリで実行
+make update-frontend
+```
+
+このコマンドは：
+1. バックエンドが起動しているかチェック
+2. フロントエンドのスキーマを取得（`npm run fetch-schema`）
+3. TypeScript型定義を生成（`npm run codegen`）
+
+を自動的に実行します。
+
 ### 手動チェック
 
 ```bash

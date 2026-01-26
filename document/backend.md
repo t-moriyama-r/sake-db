@@ -55,6 +55,27 @@
 1. `schema/*.graphqls`を編集する。取得系は`Query`、更新系は`Mutation`を`extend`して定義すればOK。<br>
 返却型はtypeを使って定義する。<br>
 <br>
+**⚠️ 重要：スキーマ変更後の必須手順**<br>
+スキーマファイル（`schema/*.graphqls`）を変更した場合、フロントエンドの型定義を更新する必要があります。<br>
+以下のいずれかの方法で実行してください：<br>
+<br>
+**方法1：自動スクリプトを使用（推奨）**<br>
+```bash
+# backend ディレクトリで実行
+make update-frontend
+```
+このコマンドは、バックエンドが起動しているかチェックし、自動的に`fetch-schema`と`codegen`を実行します。<br>
+<br>
+**方法2：手動で実行**<br>
+```bash
+# バックエンドを起動（Docker Composeまたは go run main.go）
+cd front
+npm run fetch-schema  # スキーマを取得（バックエンドが起動している必要があります）
+npm run codegen       # 型定義を生成
+```
+<br>
+これを実行しないと、フロントエンドでビルドエラーや型エラーが発生します。<br>
+<br>
 ```graphqls
 # typeの例
 type ListFromCategory{
