@@ -14,6 +14,7 @@ import (
 	"errors"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"math/rand"
 	"time"
 )
 
@@ -22,6 +23,8 @@ const (
 	DefaultSearchLimit = 20
 	// MaxSearchLimit 最大検索結果数
 	MaxSearchLimit = 1000
+	// MaxRelatedLiquors 関連銘柄の最大表示数
+	MaxRelatedLiquors = 5
 )
 
 func GetLiquor(ctx context.Context, lr liquorRepository.LiquorsRepository, cr categoriesRepository.CategoryRepository, id string) (*graphModel.Liquor, *customError.Error) {
@@ -200,6 +203,96 @@ func SearchLiquors(ctx context.Context, r liquorRepository.LiquorsRepository, ke
 	var result []*graphModel.Liquor
 	for _, liquor := range liquors {
 		result = append(result, liquor.ToGraphQL())
+	}
+
+	return result, nil
+}
+
+// GetRelatedLiquors 関連銘柄を取得する
+// 自身が属するカテゴリの子・兄弟・あるいは1階層上までの親カテゴリ配下に属する酒から最大5つピックアップする
+func GetRelatedLiquors(ctx context.Context, lr liquorRepository.LiquorsRepository, cr categoriesRepository.CategoryRepository, liquorID string) ([]*graphModel.Liquor, *customError.Error) {
+	// 対象の酒を取得
+	lid, err := primitive.ObjectIDFromHex(liquorID)
+	if err != nil {
+		return nil, errGetLiquorIdHex(err, liquorID)
+	}
+	
+	liquor, cErr := lr.GetLiquorById(ctx, lid)
+	if cErr != nil {
+		return nil, cErr
+	}
+
+	// 関連カテゴリIDのリストを収集
+	relatedCategoryIds := make(map[int]bool)
+
+	// 1. 自身のカテゴリの子カテゴリ
+	childCategoryIds, cErr := categoryService.GetBelongCategoryIdList(ctx, liquor.CategoryID, &cr)
+	if cErr != nil {
+		return nil, cErr
+	}
+	for _, id := range childCategoryIds {
+		// 自身のカテゴリIDは除外
+		if id != liquor.CategoryID {
+			relatedCategoryIds[id] = true
+		}
+	}
+
+	// 2. 自身のカテゴリを取得して、親・兄弟カテゴリを探す
+	category, cErr := cr.GetCategoryByID(ctx, liquor.CategoryID)
+	if cErr != nil {
+		return nil, cErr
+	}
+
+	// 親カテゴリが存在する場合
+	if category.Parent != nil {
+		// 親カテゴリとその子カテゴリ（兄弟カテゴリ）を取得
+		parentCategoryIds, cErr := categoryService.GetBelongCategoryIdList(ctx, *category.Parent, &cr)
+		if cErr != nil {
+			return nil, cErr
+		}
+		for _, id := range parentCategoryIds {
+			// 自身のカテゴリIDは除外
+			if id != liquor.CategoryID {
+				relatedCategoryIds[id] = true
+			}
+		}
+	}
+
+	// マップをスライスに変換
+	var categoryIdList []int
+	for id := range relatedCategoryIds {
+		categoryIdList = append(categoryIdList, id)
+	}
+
+	// カテゴリIDリストから酒を取得
+	liquors, cErr := lr.GetLiquorsFromCategoryIds(ctx, categoryIdList)
+	if cErr != nil {
+		return nil, cErr
+	}
+
+	// 自身を除外してシャッフル
+	var filteredLiquors []*liquorRepository.Model
+	for _, l := range liquors {
+		if l.ID != lid {
+			filteredLiquors = append(filteredLiquors, l)
+		}
+	}
+
+	// ランダムに並び替え
+	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
+	rng.Shuffle(len(filteredLiquors), func(i, j int) {
+		filteredLiquors[i], filteredLiquors[j] = filteredLiquors[j], filteredLiquors[i]
+	})
+
+	// 最大件数に制限
+	if len(filteredLiquors) > MaxRelatedLiquors {
+		filteredLiquors = filteredLiquors[:MaxRelatedLiquors]
+	}
+
+	// GraphQL形式に変換
+	var result []*graphModel.Liquor
+	for _, l := range filteredLiquors {
+		result = append(result, l.ToGraphQL())
 	}
 
 	return result, nil

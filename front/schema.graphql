@@ -1,133 +1,181 @@
-directive @adminAuth(role: String) on FIELD_DEFINITION
-
-directive @auth on FIELD_DEFINITION
-
-"""
-Directs the executor to defer this fragment when the `if` argument is true or undefined.
-"""
-directive @defer(
-  """Deferred when true or undefined."""
-  if: Boolean = true
-
-  """Unique name"""
-  label: String
-) on FRAGMENT_SPREAD | INLINE_FRAGMENT
-
-"""
-Indicates exactly one field must be supplied and this field must not be `null`.
-"""
-directive @oneOf on INPUT_OBJECT
-
-directive @optionalAuth on FIELD_DEFINITION
-
-"""Exposes a URL that specifies the behavior of this scalar."""
-directive @specifiedBy(
-  """The URL that specifies the behavior of this scalar."""
-  url: String!
-) on SCALAR
-
+extend type Query {
+  checkAdmin: Boolean! @adminAuth(role: "admin")
+}
 type AffiliateData {
   items: [AffiliateItem!]
   lowestPrice: Int
 }
 
-type AffiliateItem {
+type AffiliateItem{
   name: String!
   price: Int
-  URL: String!
-  imageURL: String
+  URL:String!
+  imageURL:String
 }
 
+extend type Query {
+  data(name: String!,limit:Int): AffiliateData!
+}input RegisterInput {
+  name: String!
+  email: String!
+  password: String #新規と登録の差分はロジックで吸収する
+  profile: String
+  imageBase64: String
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+# ログイン時に返ってくるデータ
 type AuthPayload {
   accessToken: String!
   user: User!
 }
 
-input BoardInput {
-  liquorID: String!
-  text: String!
-  rate: Int
+
+extend type Mutation {
+  registerUser(input: RegisterInput!): AuthPayload!
+  login(input: LoginInput!): AuthPayload!
+  refreshToken: String!
+  loginWithRefreshToken: AuthPayload!
+  logout: Boolean! @auth
+  resetEmail(email:String!):Boolean!
+  resetExe(token:String!,password:String!): AuthPayload! #一旦ログインさせる方針に
+}
+# ブックマークリストに表示するユーザー情報(将来的に統計情報とか出す構想あるのでインターフェースは分離しておく)
+type BookMarkListUser{
+  userId:ID!
+  name:String!
+  imageBase64:String
+  createdAt:DateTime!
 }
 
-type BoardPost {
-  id: ID!
-  userId: ID
-  userName: String
-  categoryId: Int!
-  categoryName: String!
-  liquorId: ID!
-  liquorName: String!
-  text: String!
-  youtube: String
-  rate: Int
-  updatedAt: DateTime!
+type Recommend{
+  rate:Int!
+  comment:String!
+  liquor:RecommendLiquor!
+  user:RecommendUser!
+  updatedAt:DateTime!
 }
 
-type BookMarkListUser {
-  userId: ID!
-  name: String!
-  imageBase64: String
-  createdAt: DateTime!
+type RecommendLiquor{
+  id:ID!
+  name:String!
+  categoryId:Int!
+  categoryName:String!
+  imageBase64:String
+  description:String!
 }
 
+type RecommendUser{
+  id:ID!
+  name:String!
+  imageBase64:String
+}
+
+extend type Query {
+  getIsBookMarked(id:String!):Boolean! @auth #対象ユーザーがブックマーク済かどうか判定する
+  getRecommendLiquorList: [Recommend!]! @auth #ブックマークユーザーを考慮したランダムリスト
+  getBookMarkList: [BookMarkListUser!] @auth
+  getBookMarkedList(id:ID!):[BookMarkListUser!] #ブックマークされたユーザーの一覧
+}
+
+extend type Mutation {
+  addBookMark(id:String!): Boolean! @auth
+  removeBookMark(id:String!): Boolean! @auth
+}
 type Category {
   id: Int!
   name: String!
   parent: Int
   description: String
-  imageUrl: String
-  imageBase64: String
+  imageUrl: String        # S3に保存された画像のURL
+  imageBase64: String     # 縮小された画像のBase64エンコードデータ
   versionNo: Int
-  readonly: Boolean!
+  readonly:Boolean!
   createUserId: ID
   createUserName: String
   updateUserId: ID
   updateUserName: String
-  updatedAt: DateTime
+  updatedAt: DateTime #初期セットには存在しない可能性がある
   children: [Category!]
 }
 
-type CategoryHistory {
-  now: Category!
-  histories: [Category]
+type CategoryHistory{
+  now:Category!
+  histories:[Category]
 }
 
-type CategoryTrail {
-  id: Int!
-  name: String!
-}
+extend type Query {
+  category(id: Int!): Category!
+  categories: [Category!]!
+  histories(id: Int!):CategoryHistory
+}directive @auth on FIELD_DEFINITION
+directive @optionalAuth on FIELD_DEFINITION
+directive @adminAuth(role: String) on FIELD_DEFINITION
 
 scalar Coordinate
 
-scalar DateTime
-
-type FlavorCellData {
-  x: Coordinate!
-  y: Coordinate!
-  rate: Float!
-  userAmount: Int!
-  guestAmount: Int!
+input PostFlavorMap{
+  liquorId:ID!
+  x:Coordinate!
+  y:Coordinate!
 }
 
-type FlavorMapData {
-  categoryId: Int!
-  xNames: [String!]!
-  yNames: [String!]!
-  userFullAmount: Int!
-  guestFullAmount: Int!
-  mapData: [FlavorCellData!]!
+type FlavorMapData{
+  categoryId:Int!
+  xNames:[String!]!
+  yNames:[String!]!
+  userFullAmount:Int!
+  guestFullAmount:Int!
+  mapData:[FlavorCellData!]!
+}
+
+type FlavorCellData{
+  # DBの構造と合わせた方が変換しやすそうなので、このようになった
+  x:Coordinate!
+  y:Coordinate!
+  rate:Float! #0～100の浮動小数点
+  userAmount:Int!
+  guestAmount:Int!
+}
+
+type VotedData{
+  liquorId:ID!
+  userId:ID!
+  categoryId:Int!
+  x:Coordinate!
+  y:Coordinate!
+  updatedAt:DateTime!
+}
+
+extend type Query{
+  getFlavorMap(liquorId:ID!):FlavorMapData
+  getVoted(liquorId:ID!):VotedData @auth
+}
+
+extend type Mutation {
+  postFlavor(input:PostFlavorMap!):Boolean! @optionalAuth
+}
+scalar DateTime
+
+type CategoryTrail {
+  id:Int!
+  name:String!
 }
 
 type Liquor {
   id: String!
   categoryId: Int!
   categoryName: String!
-  categoryTrail: [CategoryTrail!]
+  categoryTrail:[CategoryTrail!]
   name: String!
   description: String
-  imageUrl: String
-  imageBase64: String
-  youtube: String
+  imageUrl: String        # S3に保存された画像のURL
+  imageBase64: String     # 縮小された画像のBase64エンコードデータ
+  youtube:String
   updatedAt: DateTime!
   rate5Users: [ID!]!
   rate4Users: [ID!]!
@@ -141,152 +189,121 @@ type Liquor {
   versionNo: Int!
 }
 
-type LiquorHistory {
-  now: Liquor!
-  histories: [Liquor]
+type ListFromCategory{
+  categoryName:String!
+  categoryDescription:String
+  liquors:[Liquor]!
 }
 
-type ListFromCategory {
+type LiquorHistory{
+  now:Liquor!
+  histories:[Liquor]
+}
+
+type BoardPost{
+  id:ID!
+  userId: ID #名無しの場合もあるので
+  userName: String
+  categoryId: Int!
   categoryName: String!
-  categoryDescription: String
-  liquors: [Liquor]!
-}
-
-input LoginInput {
-  email: String!
-  password: String!
-}
-
-type Mutation {
-  registerUser(input: RegisterInput!): AuthPayload!
-  login(input: LoginInput!): AuthPayload!
-  refreshToken: String!
-  loginWithRefreshToken: AuthPayload!
-  logout: Boolean!
-  resetEmail(email: String!): Boolean!
-  resetExe(token: String!, password: String!): AuthPayload!
-  addBookMark(id: String!): Boolean!
-  removeBookMark(id: String!): Boolean!
-  postFlavor(input: PostFlavorMap!): Boolean!
-  postBoard(input: BoardInput!): Boolean!
-  updateUser(input: RegisterInput!): Boolean!
-  postTag(input: TagInput!): Tag!
-  deleteTag(id: ID!): Boolean!
-}
-
-input PostFlavorMap {
-  liquorId: ID!
-  x: Coordinate!
-  y: Coordinate!
-}
-
-type Query {
-  checkAdmin: Boolean!
-  data(name: String!, limit: Int): AffiliateData!
-  getIsBookMarked(id: String!): Boolean!
-  getRecommendLiquorList: [Recommend!]!
-  getBookMarkList: [BookMarkListUser!]
-  getBookMarkedList(id: ID!): [BookMarkListUser!]
-  category(id: Int!): Category!
-  categories: [Category!]!
-  histories(id: Int!): CategoryHistory
-  getFlavorMap(liquorId: ID!): FlavorMapData
-  getVoted(liquorId: ID!): VotedData
-  liquor(id: String!): Liquor!
-  randomRecommendList(limit: Int!): [Liquor!]!
-  listFromCategory(categoryId: Int!): ListFromCategory!
-  liquorHistories(id: String!): LiquorHistory
-  board(liquorId: String!, page: Int): [BoardPost!]
-  getMyBoard(liquorId: String!): BoardPost
-  getMyData: User!
-  getTags(liquorId: ID!): [Tag!]!
-  getUserById(id: String!): User!
-  getUserByIdDetail(id: String!): UserPageData!
-}
-
-type Recommend {
-  rate: Int!
-  comment: String!
-  liquor: RecommendLiquor!
-  user: RecommendUser!
+  liquorId:ID!
+  liquorName:String!
+  text: String! #descriptionで良かった気がするが、一旦このままで
+  youtube:String
+  rate: Int #評価なしの場合もある
   updatedAt: DateTime!
 }
 
-type RecommendLiquor {
-  id: ID!
-  name: String!
-  categoryId: Int!
-  categoryName: String!
-  imageBase64: String
-  description: String!
-}
-
-type RecommendUser {
-  id: ID!
-  name: String!
-  imageBase64: String
-}
-
-input RegisterInput {
-  name: String!
-  email: String!
-  password: String
-  profile: String
-  imageBase64: String
-}
-
-type Tag {
-  id: ID!
+input BoardInput{
+  liquorID: String!
   text: String!
+  rate: Int
 }
 
-input TagInput {
-  liquorId: ID!
-  text: String!
+extend type Query {
+  liquor(id: String!): Liquor!
+  randomRecommendList(limit: Int!): [Liquor!]! #ランダムなリスト
+  listFromCategory(categoryId: Int!): ListFromCategory! #カテゴリで絞り込んだリスト
+  liquorHistories(id: String!):LiquorHistory #編集時に実行する、バージョン履歴つきのデータ
+  board(liquorId: String!,page:Int):[BoardPost!]
+  getMyBoard(liquorId: String!):BoardPost @optionalAuth #未ログイン時にも呼ばれるのでoptionalに
+  searchLiquors(keyword: String!, limit: Int): [Liquor!]! #キーワード検索
+  relatedLiquors(liquorId: String!): [Liquor!]! #関連銘柄
 }
 
+extend type Mutation{
+  postBoard(input: BoardInput!):Boolean! @optionalAuth
+}extend type Query {
+    getMyData: User!  @auth
+}
+
+extend type Mutation {
+    updateUser(input: RegisterInput!): Boolean! @auth
+}# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+type Query
+
+type Mutation
+
+input TagInput{
+  liquorId:ID!
+  text:String!
+}
+
+type Tag{
+  id:ID!
+  text:String!
+}
+
+extend type Query{
+  getTags(liquorId:ID!):[Tag!]! # 一覧などではDBアクセス自体が不要なため、コードの簡単化も兼ねて分けて取得することにした
+  searchLiquorsByTag(tag:String!):[Liquor!]! # タグでお酒を検索
+}
+
+extend type Mutation {
+  postTag(input:TagInput!):Tag! @auth
+  deleteTag(id:ID!):Boolean! @auth
+}
 type User {
   id: ID!
   name: String!
   email: String!
   profile: String
-  imageBase64: String
+  imageBase64: String # 縮小された画像のBase64エンコードデータ
   roles: [String!]
 }
 
-type UserEvaluateList {
-  recentComments: [UserLiquor!]
-  rate5Liquors: [UserLiquor!]
-  rate4Liquors: [UserLiquor!]
-  rate3Liquors: [UserLiquor!]
-  rate2Liquors: [UserLiquor!]
-  rate1Liquors: [UserLiquor!]
-  noRateLiquors: [UserLiquor!]
+type UserPageData{
+  evaluateList:UserEvaluateList!
+  user:User!
+}
+
+type UserEvaluateList{
+  recentComments:[UserLiquor!]
+  rate5Liquors:[UserLiquor!]
+  rate4Liquors:[UserLiquor!]
+  rate3Liquors:[UserLiquor!]
+  rate2Liquors:[UserLiquor!]
+  rate1Liquors:[UserLiquor!]
+  noRateLiquors:[UserLiquor!] #評価なし
 }
 
 type UserLiquor {
-  id: ID!
+  id:ID!
   liquorId: ID!
   name: String!
   categoryId: Int!
   categoryName: String!
-  imageBase64: String
-  comment: String
-  rate: Int
-  updatedAt: DateTime!
+  imageBase64: String     # 縮小された画像のBase64エンコードデータ
+  comment: String #評価がnullの場合は空になる
+  rate:Int #recentCommnts用 rate～系では常にnil(このためにリレーションを取るのがコストでしかないので)
+  updatedAt:DateTime!
 }
 
-type UserPageData {
-  evaluateList: UserEvaluateList!
-  user: User!
-}
 
-type VotedData {
-  liquorId: ID!
-  userId: ID!
-  categoryId: Int!
-  x: Coordinate!
-  y: Coordinate!
-  updatedAt: DateTime!
+extend type Query {
+  getUserById(id:String!): User! #単純に外部公開可能なユーザー基本情報を取得する(使わない...？)
+  getUserByIdDetail(id:String!): UserPageData! #ユーザーページに表示するフルデータ
 }
-

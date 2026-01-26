@@ -41,6 +41,7 @@
     <LiquorTags :liquor-id="liquor.id" />
     <AffiliateContainer :name="liquor.name" />
     <LiquorBoard :liquorId="liquor.id" />
+    <RelatedLiquors :liquor-id="liquor.id" />
   </div>
 </template>
 
@@ -54,6 +55,7 @@ import type { Liquor } from '@/graphQL/Liquor/liquor';
 import LiquorBoard from '@/views/Discovery/Details/Liquor/board/LiquorBoard.vue';
 import CategoryTrail from '@/views/Discovery/Details/Liquor/CategoryTrail.vue';
 import FlavorMap from '@/views/Discovery/Details/Liquor/flavorMap/FlavorMap.vue';
+import RelatedLiquors from '@/views/Discovery/Details/Liquor/RelatedLiquors.vue';
 import LiquorTags from '@/views/Discovery/Details/Liquor/tag/LiquorTagArea.vue';
 
 interface Props {
