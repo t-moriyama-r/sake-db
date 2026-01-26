@@ -1,6 +1,6 @@
-# Command: /pr-sh
+# コマンド: /pr-sh
 
-# Purpose: AI-powered Pull Request Draft Creation
+# 目的: AIによる日本語プルリクエストのドラフト作成
 
 > **使い分けのガイド:**
 > - `/pr`: Claude AIが直接gitコマンドとgh CLIを実行してPRを作成します。各ステップでユーザーの確認を求めるため、より安全ですが手動操作が必要です。
@@ -8,33 +8,43 @@
 >
 > 初めての利用や重要な変更の場合は `/pr` を、日常的な作業や信頼できる環境では `/pr-sh` を推奨します。
 
-## Command Execution
+## コマンド実行
 
-- **Execute**: immediate
-- **Purpose**: "Create an AI-generated draft PR for the current branch using Japanese prompts"
-- **Legend**: Generated based on symbols used in command
+- **実行タイミング**: 即座
+- **目的**: "現在のブランチに対して日本語プロンプトを使用したAI生成のドラフトPRを作成"
+- **説明**: コマンドで使用されるシンボルに基づいて生成
 
-## Examples
+## 使用例
 
 `/pr-sh`
 
-> Executes `./ai-pr-draft-ja.sh` to create a new draft pull request with Japanese AI prompts.
+> リポジトリルートの `ai-pr-draft-ja.sh` を実行して、日本語のAIプロンプトで新しいドラフトプルリクエストを作成します。
 
 `/pr-sh --debug`
 
-> Executes `DEBUG=1 ./ai-pr-draft-ja.sh` to run the script in debug mode.
+> `DEBUG=1` でスクリプトをデバッグモードで実行します。
 
-## Core Operation
+## 主要な動作
 
-This command's only function is to execute the `ai-pr-draft-ja.sh` script.
+このコマンドの唯一の機能は、リポジトリルートにある `ai-pr-draft-ja.sh` スクリプトを実行することです。
 
-All logic for PR creation, AI communication, and git operations is contained within the script itself. Please refer to the `ai-pr-draft-ja.sh` file for implementation details.
+PR作成、AI通信、git操作のすべてのロジックはスクリプト自体に含まれています。実装の詳細については、`ai-pr-draft-ja.sh` ファイルを参照してください。
 
-This Japanese version uses Japanese prompts for Claude AI and searches for Japanese PR templates (`PULL_REQUEST_TEMPLATE_JA.md`).
+この日本語版は、日本語プロンプトをClaude AIに送信し、日本語のPRテンプレート（`PULL_REQUEST_TEMPLATE_JA.md`）を検索します。
 
-## Flags
+## プロンプト
+
+リポジトリのルートディレクトリにある `ai-pr-draft-ja.sh` スクリプトを実行してください。
+
+**重要な実行手順:**
+1. `REPO_ROOT=$(git rev-parse --show-toplevel)` でリポジトリのルートディレクトリを取得してください
+2. `--debug` フラグが指定されている場合は `DEBUG=1 "$REPO_ROOT/ai-pr-draft-ja.sh"` を、それ以外の場合は `"$REPO_ROOT/ai-pr-draft-ja.sh"` を実行してください
+3. **確認を求めずに即座に実行してください** - このコマンドは完全に自動化されているため、ユーザーに実行確認を求める必要はありません
+4. スクリプトの実行結果（成功またはエラー）をそのまま表示してください
+
+## フラグ
 
 ### `--debug`
 
-- **Purpose**: Enables debug mode for the `ai-pr-draft-ja.sh` script.
-- **Action**: Sets the `DEBUG=1` environment variable before executing the script.
+- **目的**: `ai-pr-draft-ja.sh` スクリプトのデバッグモードを有効化
+- **動作**: スクリプト実行前に `DEBUG=1` 環境変数を設定
