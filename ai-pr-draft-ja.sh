@@ -9,8 +9,16 @@
 
 # ---- 実行時オプション ---------------------------------------------------------
 DEBUG=${DEBUG:-0}            # DEBUG=1 ./script … で set -x 有効化
-TRACE_COLOR=$'\033[1;34m'   # 青
-RESET_COLOR=$'\033[0m'
+USE_COLOR=${USE_COLOR:-0}    # USE_COLOR=1 ./script … でカラー出力を有効化（Windows環境ではデフォルトOFF）
+
+# カラー設定（USE_COLOR=1 で有効化）
+if [[ $USE_COLOR -eq 1 ]]; then
+  TRACE_COLOR=$'\033[1;34m'   # 青
+  RESET_COLOR=$'\033[0m'
+else
+  TRACE_COLOR=""
+  RESET_COLOR=""
+fi
 
 set -euo pipefail
 [[ $DEBUG -eq 1 ]] && set -x
@@ -31,19 +39,25 @@ cleanup() {
 }
 
 # ---- ヘルパー関数 -------------------------------------------------------------
-log() { echo -e "${TRACE_COLOR}[$(date +%H:%M:%S)] $*${RESET_COLOR}"; }
+# Windows環境での互換性のため、シンプルな echo を使用
+log() {
+  echo "[$(date +%H:%M:%S)] $*"
+}
 trap cleanup EXIT
-trap 'log "❌ Error at line ${LINENO}: \"${BASH_COMMAND}\""' ERR
+trap 'echo "[$(date +%H:%M:%S)] Error at line ${LINENO}: \"${BASH_COMMAND}\"" >&2' ERR
 
 # ---- ツールチェック -----------------------------------------------------------
-log "ステップ 0: 必要なツールを確認中…"
+log "ステップ 0: 必要なツールを確認中..."
 for cmd in gh claude jq; do
-  command -v "$cmd" >/dev/null || { echo "❌ $cmd が見つかりません" >&2; exit 1; }
+  if ! command -v "$cmd" >/dev/null 2>&1; then
+    printf "Error: %s が見つかりません\n" "$cmd" >&2
+    exit 1
+  fi
   log "  ✓ $cmd が見つかりました"
 done
 
 # ---- 変数設定 -----------------------------------------------------------------
-log "ステップ 1: リポジトリ情報を収集中…"
+log "ステップ 1: リポジトリ情報を収集中..."
 REPO=$(gh repo view --json nameWithOwner --jq .nameWithOwner)
 
 # デフォルトブランチを自動検出
@@ -51,12 +65,12 @@ DEFAULT_BRANCH=$(gh repo view --json defaultBranchRef --jq .defaultBranchRef.nam
 if [[ -z "$DEFAULT_BRANCH" ]]; then
   # 検出できない場合は main にフォールバック
   DEFAULT_BRANCH="main"
-  log "  ⚠️  デフォルトブランチを検出できませんでした、'main' を使用します"
+  log "  デフォルトブランチを検出できませんでした、'main' を使用します"
 fi
 
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
 if [[ "$BRANCH" == "HEAD" ]]; then
-  echo "❌ detached HEAD状態ではPRを作成できません。ブランチを作成してから再度実行してください。" >&2
+  printf "Error: detached HEAD状態ではPRを作成できません。ブランチを作成してから再度実行してください。\n" >&2
   exit 1
 fi
 log "  リポジトリ:        $REPO"
@@ -65,7 +79,7 @@ log "  現在のブランチ:    $BRANCH"
 
 # ---- 保護ブランチガード -------------------------------------------------------
 if [[ "$BRANCH" =~ ^(main|master|develop|staging|production)$ ]]; then
-  echo "❌ '$BRANCH' は保護ブランチのため PR を直接作成できません。別ブランチで作業してください。" >&2
+  printf "Error: '%s' は保護ブランチのため PR を直接作成できません。別ブランチで作業してください。\n" "$BRANCH" >&2
   exit 1
 fi
 
@@ -173,8 +187,8 @@ while [[ $RETRY_COUNT -lt $MAX_RETRIES ]]; do
       log "  ${SLEEP_TIME} 秒後に再試行します..."
       sleep $SLEEP_TIME
     else
-      echo "❌ $MAX_RETRIES 回の試行後、Claude リクエストが失敗しました:" >&2
-      echo "$CLAUDE_JSON" >&2
+      printf "Error: %d 回の試行後、Claude リクエストが失敗しました:\n" "$MAX_RETRIES" >&2
+      printf "%s\n" "$CLAUDE_JSON" >&2
       exit 1
     fi
   fi
@@ -182,9 +196,9 @@ done
 
 # デバッグ: DEBUG=1 の場合、Claude の生出力を表示
 if [[ $DEBUG -eq 1 ]]; then
-  echo "DEBUG: Claude raw output:" >&2
-  echo "$CLAUDE_JSON" | head -c 1000 >&2
-  echo "..." >&2
+  printf "DEBUG: Claude raw output:\n" >&2
+  printf "%s\n" "$CLAUDE_JSON" | head -c 1000 >&2
+  printf "...\n" >&2
 fi
 
 # レスポンスが配列形式（旧）か単一オブジェクト形式（新）かをチェック
@@ -201,14 +215,14 @@ fi
 
 # デバッグ: 改行解析付きで抽出されたテキストを表示
 if [[ $DEBUG -eq 1 ]]; then
-  echo "DEBUG: Extracted text length: $(echo "$RAW" | wc -c)" >&2
-  echo "DEBUG: Line count in RAW: $(echo "$RAW" | wc -l)" >&2
-  echo "DEBUG: Checking for \\n sequences in RAW:" >&2
-  echo "$RAW" | head -c 800 | sed 's/\\n/<NEWLINE>/g' >&2
-  echo "..." >&2
-  echo "DEBUG: First 500 chars of RAW:" >&2
-  echo "$RAW" | head -c 500 >&2
-  echo "..." >&2
+  printf "DEBUG: Extracted text length: %s\n" "$(printf "%s" "$RAW" | wc -c)" >&2
+  printf "DEBUG: Line count in RAW: %s\n" "$(printf "%s" "$RAW" | wc -l)" >&2
+  printf "DEBUG: Checking for \\\\n sequences in RAW:\n" >&2
+  printf "%s" "$RAW" | head -c 800 | sed 's/\\n/<NEWLINE>/g' >&2
+  printf "...\n" >&2
+  printf "DEBUG: First 500 chars of RAW:\n" >&2
+  printf "%s" "$RAW" | head -c 500 >&2
+  printf "...\n" >&2
 fi
 
 # ---- Claude レスポンスからJSONを抽出 ------------------------------------------
@@ -248,10 +262,10 @@ log "  JSON: $(echo "$JSON_PAYLOAD" | head -c 100)..."
 
 # デバッグ: DEBUG=1 の場合、JSONペイロードを表示
 if [[ $DEBUG -eq 1 ]]; then
-  echo "DEBUG: JSON_PAYLOAD length: $(echo "$JSON_PAYLOAD" | wc -c)" >&2
-  echo "DEBUG: JSON_PAYLOAD (first 300 chars):" >&2
-  echo "$JSON_PAYLOAD" | head -c 300 >&2
-  echo "..." >&2
+  printf "DEBUG: JSON_PAYLOAD length: %s\n" "$(printf "%s" "$JSON_PAYLOAD" | wc -c)" >&2
+  printf "DEBUG: JSON_PAYLOAD (first 300 chars):\n" >&2
+  printf "%s" "$JSON_PAYLOAD" | head -c 300 >&2
+  printf "...\n" >&2
 fi
 
 # ---- JSON クリーンアップと検証 -----------------------------------------------
@@ -331,9 +345,9 @@ if [[ -z "$TITLE" || -z "$BODY" ]]; then
 
   # デバッグ: 解析しようとしているものを表示
   if [[ $DEBUG -eq 1 ]]; then
-    echo "DEBUG: JSON_PAYLOAD length: $(echo "$JSON_PAYLOAD" | wc -c)" >&2
-    echo "DEBUG: First 200 chars: $(echo "$JSON_PAYLOAD" | head -c 200)" >&2
-    echo "DEBUG: Last 200 chars: $(echo "$JSON_PAYLOAD" | tail -c 200)" >&2
+    printf "DEBUG: JSON_PAYLOAD length: %s\n" "$(printf "%s" "$JSON_PAYLOAD" | wc -c)" >&2
+    printf "DEBUG: First 200 chars: %s\n" "$(printf "%s" "$JSON_PAYLOAD" | head -c 200)" >&2
+    printf "DEBUG: Last 200 chars: %s\n" "$(printf "%s" "$JSON_PAYLOAD" | tail -c 200)" >&2
   fi
 
   # より柔軟なタイトル抽出 - エスケープされたJSONと非エスケープJSONの両方を処理
@@ -342,15 +356,15 @@ if [[ -z "$TITLE" || -z "$BODY" ]]; then
      [[ "$JSON_PAYLOAD" =~ title[[:space:]]*:[[:space:]]*\"([^\"]+)\" ]] ||
      [[ "$RAW" =~ \\\"title\\\"[[:space:]]*:[[:space:]]*\\\"([^\\\"]+)\\\" ]]; then
     TITLE="${BASH_REMATCH[1]}"
-    TITLE=$(echo "$TITLE" | sed 's/\\"/"/g' | sed 's/\\\\/\\/g')
+    TITLE=$(printf "%s" "$TITLE" | sed 's/\\"/"/g' | sed 's/\\\\/\\/g')
     log "    ✓ タイトルを抽出しました: ${TITLE:0:50}..."
   else
-    echo "❌ JSONからタイトルを抽出できませんでした。" >&2
-    echo "生レスポンス（最初の500文字）:" >&2
-    echo "$RAW" | head -c 500 >&2
-    echo "" >&2
-    echo "JSONペイロード:" >&2
-    echo "$JSON_PAYLOAD" >&2
+    printf "Error: JSONからタイトルを抽出できませんでした。\n" >&2
+    printf "生レスポンス（最初の500文字）:\n" >&2
+    printf "%s" "$RAW" | head -c 500 >&2
+    printf "\n" >&2
+    printf "JSONペイロード:\n" >&2
+    printf "%s\n" "$JSON_PAYLOAD" >&2
     exit 1
   fi
 
@@ -373,17 +387,17 @@ if [[ -z "$TITLE" || -z "$BODY" ]]; then
 
     # デバッグ: DEBUG=1 の場合、処理された本文を表示
     if [[ $DEBUG -eq 1 ]]; then
-      echo "DEBUG: Processed body (first 500 chars):" >&2
-      echo "$BODY" | head -c 500 >&2
-      echo "..." >&2
+      printf "DEBUG: Processed body (first 500 chars):\n" >&2
+      printf "%s" "$BODY" | head -c 500 >&2
+      printf "...\n" >&2
     fi
   else
-    echo "❌ JSONから本文を抽出できませんでした。" >&2
-    echo "生レスポンス（最初の500文字）:" >&2
-    echo "$RAW" | head -c 500 >&2
-    echo "" >&2
-    echo "JSONペイロード:" >&2
-    echo "$JSON_PAYLOAD" >&2
+    printf "Error: JSONから本文を抽出できませんでした。\n" >&2
+    printf "生レスポンス（最初の500文字）:\n" >&2
+    printf "%s" "$RAW" | head -c 500 >&2
+    printf "\n" >&2
+    printf "JSONペイロード:\n" >&2
+    printf "%s\n" "$JSON_PAYLOAD" >&2
     exit 1
   fi
 
@@ -392,41 +406,41 @@ fi
 
 # 最終検証
 if [[ -z "$TITLE" || -z "$BODY" ]]; then
-  echo "❌ レスポンスからタイトルまたは本文の抽出に失敗しました:" >&2
-  echo "$RAW" >&2
+  printf "Error: レスポンスからタイトルまたは本文の抽出に失敗しました:\n" >&2
+  printf "%s\n" "$RAW" >&2
   exit 1
 fi
 
 # ---- 抽出された情報を表示 -----------------------------------------------------
 log "ステップ 4: PR情報を抽出しました"
 log "  タイトル: $TITLE"
-log "  本文の長さ: $(echo "$BODY" | wc -c) 文字"
+log "  本文の長さ: $(printf "%s" "$BODY" | wc -c) 文字"
 
 # ---- ブランチをリモートにプッシュ ---------------------------------------------
-log "ステップ 5: ブランチをリモートに公開中…"
-if git push -u origin "$BRANCH"; then
+log "ステップ 5: ブランチをリモートに公開中..."
+if git push -u origin "$BRANCH" 2>&1; then
   log "  ✓ ブランチの公開に成功しました"
-elif git push origin "$BRANCH"; then
+elif git push origin "$BRANCH" 2>&1; then
   log "  ✓ リモートのブランチが更新されました"
 else
-  echo "❌ ブランチのリモートプッシュに失敗しました。上記の git push のエラーメッセージを確認し、権限、ネットワーク接続、およびリモートの状態を確認してください。" >&2
+  printf "Error: ブランチのリモートプッシュに失敗しました。上記の git push のエラーメッセージを確認し、権限、ネットワーク接続、およびリモートの状態を確認してください。\n" >&2
   exit 1
 fi
 
 # ---- ドラフトPR作成 -----------------------------------------------------------
-log "ステップ 6: ドラフトPRを作成中…"
+log "ステップ 6: ドラフトPRを作成中..."
 
 # デバッグ: まずリポジトリ権限をチェック
 log "  リポジトリ権限を確認中..."
 if [[ $DEBUG -eq 1 ]]; then
   log "  DEBUG: 現在のユーザー: $(gh api user --jq .login)"
   log "  DEBUG: リポジトリ権限:"
-  gh api "repos/$REPO" --jq '.permissions // "権限情報が利用できません"' || log "  ⚠️  リポジトリ権限を確認できませんでした"
+  gh api "repos/$REPO" --jq '.permissions // "権限情報が利用できません"' || log "  リポジトリ権限を確認できませんでした"
 fi
 
 # シェルエスケープ問題を回避するため本文を一時ファイルに保存
 TEMP_BODY=$(mktemp 2>/dev/null) || {
-  echo "❌ 一時ファイルを作成できませんでした。" >&2
+  printf "Error: 一時ファイルを作成できませんでした。\n" >&2
   exit 1
 }
 # 一時ファイルを追跡リストに追加
@@ -452,28 +466,28 @@ PR_CREATE_EXIT_CODE=$?
 
 if [[ $PR_CREATE_EXIT_CODE -eq 0 ]]; then
   PR_URL="$PR_CREATE_OUTPUT"
-  log "✅ ドラフトPRが正常に作成されました！"
+  log "ドラフトPRが正常に作成されました！"
   log "   URL: $PR_URL"
 else
-  echo "❌ PRの作成に失敗しました (終了コード: $PR_CREATE_EXIT_CODE)" >&2
-  echo "エラー出力:" >&2
-  echo "$PR_CREATE_OUTPUT" >&2
-  echo "" >&2
-  echo "デバッグ情報:" >&2
-  echo "  リポジトリ: $REPO" >&2
-  echo "  ベースブランチ: $DEFAULT_BRANCH" >&2
-  echo "  ヘッドブランチ: $BRANCH" >&2
-  echo "  タイトル: $TITLE" >&2
-  echo "  本文プレビュー（最初の10行）:" >&2
-  echo "$BODY" | head -10 >&2
-  echo "" >&2
-  echo "GitHub認証を確認中..." >&2
-  gh auth status >&2 || echo "認証チェックが失敗しました" >&2
-  echo "" >&2
-  echo "リモートにブランチが存在するかを確認中..." >&2
-  git ls-remote --heads origin "$BRANCH" >&2 || echo "ヘッドブランチがリモートに見つかりません" >&2
-  git ls-remote --heads origin "$DEFAULT_BRANCH" >&2 || echo "ベースブランチがリモートに見つかりません" >&2
+  printf "Error: PRの作成に失敗しました (終了コード: %d)\n" "$PR_CREATE_EXIT_CODE" >&2
+  printf "エラー出力:\n" >&2
+  printf "%s\n" "$PR_CREATE_OUTPUT" >&2
+  printf "\n" >&2
+  printf "デバッグ情報:\n" >&2
+  printf "  リポジトリ: %s\n" "$REPO" >&2
+  printf "  ベースブランチ: %s\n" "$DEFAULT_BRANCH" >&2
+  printf "  ヘッドブランチ: %s\n" "$BRANCH" >&2
+  printf "  タイトル: %s\n" "$TITLE" >&2
+  printf "  本文プレビュー（最初の10行）:\n" >&2
+  printf "%s" "$BODY" | head -10 >&2
+  printf "\n" >&2
+  printf "GitHub認証を確認中...\n" >&2
+  gh auth status >&2 || printf "認証チェックが失敗しました\n" >&2
+  printf "\n" >&2
+  printf "リモートにブランチが存在するかを確認中...\n" >&2
+  git ls-remote --heads origin "$BRANCH" >&2 || printf "ヘッドブランチがリモートに見つかりません\n" >&2
+  git ls-remote --heads origin "$DEFAULT_BRANCH" >&2 || printf "ベースブランチがリモートに見つかりません\n" >&2
   exit 1
 fi
 
-log "🎉 処理が正常に完了しました！"
+log "処理が正常に完了しました！"
