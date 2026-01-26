@@ -34,10 +34,16 @@ const { fetch } = useQuery<RelatedLiquorsResponse>(RELATED_LIQUORS_GET);
 
 // データフェッチ
 const fetchData = async (id: string): Promise<void> => {
-  const { relatedLiquors: response } = await fetch({
-    id,
-  });
-  relatedLiquors.value = response;
+  try {
+    const { relatedLiquors: response } = await fetch({
+      id,
+    });
+    relatedLiquors.value = response;
+  } catch (error) {
+    // エラーが発生した場合は空配列を設定（関連銘柄が表示されないだけで、他の機能には影響しない）
+    console.error('Failed to fetch related liquors:', error);
+    relatedLiquors.value = [];
+  }
 };
 
 // liquorIdの変更を監視

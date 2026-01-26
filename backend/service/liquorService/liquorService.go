@@ -14,6 +14,7 @@ import (
 	"errors"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"math/rand"
 	"time"
 )
 
@@ -276,10 +277,10 @@ func GetRelatedLiquors(ctx context.Context, lr liquorRepository.LiquorsRepositor
 	}
 
 	// ランダムに並び替え
-	for i := len(filteredLiquors) - 1; i > 0; i-- {
-		j := int(primitive.NewObjectID().Timestamp().Unix()) % (i + 1)
+	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
+	rng.Shuffle(len(filteredLiquors), func(i, j int) {
 		filteredLiquors[i], filteredLiquors[j] = filteredLiquors[j], filteredLiquors[i]
-	}
+	})
 
 	// 最大5件に制限
 	maxResults := 5
