@@ -54,6 +54,15 @@ export function useApiMutation<
         debug('リフレッシュトークン取得');
         await refreshToken(); //アクセストークン期限切れの場合、リフレッシュトークンを再取得
 
+        // 新しいアクセストークンをヘッダーに設定
+        if (options.isAuth) {
+          const { accessToken } = useUserStore();
+          const token = accessToken.get();
+          if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+          }
+        }
+
         //再度リクエスト
         return await run();
       } else if ((err as Error).message == 'unauthorized') {
