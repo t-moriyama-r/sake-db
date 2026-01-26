@@ -2,13 +2,19 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import {
   faArrowLeft,
   faArrowRightToBracket,
+  faBookmark,
+  faCalendarPlus,
   faChevronDown,
+  faEdit,
   faGear,
   faMagnifyingGlass,
   faPersonCirclePlus,
   faPlus,
   faRightFromBracket,
+  faStar,
+  faTrash,
   faUser,
+  faUserFriends,
   faWineBottle,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -17,13 +23,19 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 library.add(
   faArrowLeft,
   faArrowRightToBracket,
+  faBookmark,
+  faCalendarPlus,
   faChevronDown,
+  faEdit,
   faGear,
   faMagnifyingGlass,
   faPersonCirclePlus,
   faPlus,
   faRightFromBracket,
+  faStar,
+  faTrash,
   faUser,
+  faUserFriends,
   faWineBottle,
 );
 
