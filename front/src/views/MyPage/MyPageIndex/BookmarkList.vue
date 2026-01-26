@@ -33,7 +33,7 @@
         <div class="bookmark-actions">
           <BookMarkLogics :target-id="user.userId" v-slot="{ remove }">
             <CommonButton
-              color="danger"
+              :color="ColorType.Danger"
               size="small"
               @click="deleteUser(user.userId, remove)"
             >
