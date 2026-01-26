@@ -29,7 +29,7 @@
         <RadiusImage
           v-if="data.user.imageBase64"
           :imageSrc="data.user.imageBase64"
-          radius="5px"
+          radius="10px"
           :alt="data.user.name"
         />
         <router-link :to="{ name: 'UserPage', params: { id: data.user.id } }">
@@ -75,6 +75,9 @@ div.container {
   }
 
   div.comment-container {
+    display: flex;
+    align-items: center;
+    gap: 0.25em;
     span.comment {
       font-size: 10px;
     }
