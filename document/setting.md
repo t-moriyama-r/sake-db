@@ -73,6 +73,78 @@ pre-pushフックでは、フロントエンドのコードに対して`npm run 
 LEFTHOOK=0 git push
 ```
 
+### 自動PR生成ツール
+プロジェクトでは、Claude Codeを使用した自動PR生成機能を提供しています。
+
+#### 必要なツール
+
+自動PR生成機能を利用するには、以下のツールが必要です：
+
+##### GitHub CLI (`gh`)
+GitHubのPR作成に使用します（`/pr`と`/pr-sh`の両方で必須）。
+
+**インストール:**
+- 公式サイト: https://cli.github.com/
+- Windows: `winget install GitHub.cli` または `choco install gh`
+- macOS: `brew install gh`
+- Linux: パッケージマネージャーを使用（詳細は公式サイト参照）
+
+**認証:**
+```bash
+gh auth login
+```
+
+##### Claude CLI (`claude`)
+AI によるPR内容生成に使用します（`/pr-sh`のみで必要）。
+
+**インストール:**
+```bash
+npm install -g @anthropic-ai/claude-cli
+```
+
+**認証:**
+APIキーの設定が必要です。詳細はClaude CLIのドキュメントを参照してください。
+
+##### jq
+JSON処理ツールです（`/pr-sh`のみで必要）。
+
+**インストール:**
+- Windows:
+  - winget: `winget install jqlang.jq`
+  - Chocolatey: `choco install jq`
+  - 手動: https://jqlang.github.io/jq/download/
+- macOS: `brew install jq`
+- Linux: `sudo apt install jq` または `sudo yum install jq`
+
+**確認:**
+```bash
+jq --version
+```
+
+#### コマンドの使い分け
+
+##### `/pr` コマンド
+Claude AIが直接gitコマンドとgh CLIを実行してPRを作成します。
+
+**特徴:**
+- 各ステップでユーザーの確認を求めるため、より安全
+- `gh`と`claude`のみで動作（`jq`不要）
+- 初めての利用や重要な変更に推奨
+
+##### `/pr-sh` コマンド
+シェルスクリプト（`ai-pr-draft-ja.sh`）を自動実行してPRを作成します。
+
+**特徴:**
+- 完全に自動化されており、ユーザー確認なしで実行
+- Claude Codeのコンテキストを節約（試験運用中）
+- すべてのツール（`gh`, `claude`, `jq`）が必要
+- 日常的な作業や信頼できる環境に推奨
+
+**デバッグモード:**
+```bash
+/pr-sh --debug
+```
+
 ## 諸々の経緯
 ### リバースプロキシサーバーを採用した理由
 ~~正直忘れたんですが~~ 勉強のために(といいつつケチっただけ)認証を自前で組むことにした際、CORS制約をクリアするための対策として採用した。
