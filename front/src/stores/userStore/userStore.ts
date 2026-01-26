@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { nextTick, ref } from 'vue';
 
 import client from '@/apolloClient';
+import { clearRecommendCache } from '@/funcs/composable/useCacheManagement';
 import { useMutation } from '@/funcs/composable/useQuery/useQuery';
 import { debug } from '@/funcs/util/core/console';
 import {
@@ -40,6 +41,8 @@ export const useUserStore = defineStore(USER_STORE, () => {
     accessToken.reset(data.accessToken);
     isLogin.value = true; //ログイン状態をtrueにする
     user.value = data.user; //ユーザー情報をセット
+    // ログイン時にレコメンドリストのキャッシュをクリア
+    clearRecommendCache();
   }
 
   const accessToken = {
@@ -84,6 +87,8 @@ export const useUserStore = defineStore(USER_STORE, () => {
     //ストア情報のクリア
     isLogin.value = false;
     user.value = null;
+    // ログアウト時にレコメンドリストのキャッシュをクリア
+    clearRecommendCache();
   }
 
   return {

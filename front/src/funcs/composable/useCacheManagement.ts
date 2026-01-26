@@ -105,6 +105,27 @@ export function clearTagSearchCache(tag?: string) {
 }
 
 /**
+ * レコメンドリスト関連のキャッシュをクリア
+ * ログイン・ログアウト時に呼び出して、認証状態に応じた最新のレコメンドリストを取得できるようにする
+ */
+export function clearRecommendCache() {
+  // ブックマークベースのレコメンドリストキャッシュをクリア
+  client.cache.evict({
+    id: 'ROOT_QUERY',
+    fieldName: 'getRecommendLiquorList',
+  });
+
+  // ランダムレコメンドリストキャッシュをクリア
+  client.cache.evict({
+    id: 'ROOT_QUERY',
+    fieldName: 'randomRecommendList',
+  });
+
+  // ガベージコレクションを実行
+  client.cache.gc();
+}
+
+/**
  * 指定されたカテゴリIDから親カテゴリまでのIDパスを取得
  * @param categories - カテゴリツリー
  * @param targetId - 検索対象のカテゴリID
