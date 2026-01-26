@@ -7,6 +7,7 @@
 import { ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
+import { useLiquorSnsCard } from '@/funcs/composable/useLiquorSnsCard';
 import useQuery from '@/funcs/composable/useQuery/useQuery';
 import {
   type Liquor,
@@ -24,6 +25,9 @@ const sidebarStore = useSelectedCategoryStore();
 const { fetch } = useQuery<LiquorResponse<Liquor>>(LIQUOR_DETAIL_GET);
 
 const isNoCache: boolean = window.history.state?.noCache ?? false; //TODO:何故か常にtrueになってる...？
+
+// SNSカード用のメタタグを設定
+useLiquorSnsCard(liquor);
 
 // データフェッチ
 const fetchData = async (id: string): Promise<void> => {

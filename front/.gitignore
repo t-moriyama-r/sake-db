@@ -1,4 +1,16 @@
+# Environment files
 .env
+.env.*
+!.env.example
+
+# Dependencies
 node_modules
+
+# Build output
+dist
+dist-ssr
+*.local
+
+# Misc
 NUL
 dist/

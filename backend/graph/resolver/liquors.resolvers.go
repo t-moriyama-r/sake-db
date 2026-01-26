@@ -116,3 +116,12 @@ func (r *queryResolver) GetMyBoard(ctx context.Context, liquorID string) (*graph
 
 	return board.ToGraphQL(), nil
 }
+
+// SearchLiquors is the resolver for the searchLiquors field.
+func (r *queryResolver) SearchLiquors(ctx context.Context, keyword string, limit *int) ([]*graphModel.Liquor, error) {
+	result, err := liquorService.SearchLiquors(ctx, r.LiquorRepo, keyword, limit)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}

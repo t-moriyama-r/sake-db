@@ -23,11 +23,12 @@
 
 <script setup lang="ts">
 /**
- * TODO: ロジックは後で実装
+ * キーワード検索コンポーネント
  */
 
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { Form, type SubmissionHandler } from 'vee-validate';
+import { useRouter } from 'vue-router';
 
 //import { ref } from 'vue';
 import {
@@ -38,6 +39,8 @@ import {
 //import CommonButton from '@/components/parts/common/CommonButton/CommonButton.vue';
 import FormField from '@/components/parts/forms/core/FormField.vue';
 import SubmitButton from '@/components/parts/forms/core/SubmitButton.vue';
+
+const router = useRouter();
 
 // const isDialogOpen = ref(false);
 // const onDialogOpen = () => {
@@ -51,8 +54,11 @@ import SubmitButton from '@/components/parts/forms/core/SubmitButton.vue';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 //@ts-expect-error
 const onSubmit: SubmissionHandler = async (values: FormValues) => {
-  //TODO
-  console.log('values:', values);
+  // 検索結果ページに遷移
+  await router.push({
+    name: 'SearchResults',
+    query: { keyword: values.keyword },
+  });
   //onDialogClose();
 };
 </script>

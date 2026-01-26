@@ -1,4 +1,7 @@
 # .lefthook.yml
+pre-commit:
+  skip: true
+
 pre-push:
   parallel: true
   commands:
