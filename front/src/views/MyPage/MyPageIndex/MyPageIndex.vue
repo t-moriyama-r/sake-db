@@ -10,7 +10,12 @@
             radius="60px"
             alt="プロフィール画像"
           />
-          <div v-else class="default-avatar">
+          <div
+            v-else
+            class="default-avatar"
+            role="img"
+            aria-label="デフォルトプロフィール画像"
+          >
             <font-awesome-icon :icon="['fas', 'user']" class="user-icon" />
           </div>
         </div>
@@ -44,6 +49,9 @@
       </div>
       <div class="section-content">
         <UserPosts v-if="evaluateList" :evaluates="evaluateList" />
+        <div v-else-if="hasError" class="error-message">
+          評価リストの取得に失敗しました。
+        </div>
         <div v-else class="loading-message">読み込み中...</div>
       </div>
     </div>
@@ -70,6 +78,7 @@ import { onMounted, ref } from 'vue';
 import CommonButton from '@/components/parts/common/CommonButton/CommonButton.vue';
 import RadiusImage from '@/components/parts/common/RadiusImage.vue';
 import useQuery from '@/funcs/composable/useQuery/useQuery';
+import { useToast } from '@/funcs/composable/useToast';
 import type { AuthUserFull } from '@/graphQL/Auth/types';
 import {
   type EvaluateList,
@@ -88,6 +97,9 @@ const props = defineProps<Props>();
 
 // 評価リストの取得
 const evaluateList = ref<EvaluateList | null>(null);
+const hasError = ref<boolean>(false);
+const toast = useToast();
+
 const { fetch } = useQuery<GetUserDetailResponse>(GET_USERDATA_FULL, {
   isAuth: true,
 });
@@ -96,8 +108,11 @@ onMounted(async () => {
   try {
     const response = await fetch({ id: props.user.id });
     evaluateList.value = response.getUserByIdDetail.evaluateList;
+    hasError.value = false;
   } catch (error) {
     console.error('評価リストの取得に失敗しました:', error);
+    hasError.value = true;
+    toast.error('評価リストの取得に失敗しました。');
   }
 });
 </script>
@@ -225,6 +240,13 @@ onMounted(async () => {
   text-align: center;
   padding: 2rem;
   color: #718096;
+  font-size: 1rem;
+}
+
+.error-message {
+  text-align: center;
+  padding: 2rem;
+  color: #e53e3e;
   font-size: 1rem;
 }
 

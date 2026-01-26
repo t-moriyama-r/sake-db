@@ -10,7 +10,12 @@
               radius="30px"
               alt="ユーザーアイコン"
             />
-            <div v-else class="default-user-avatar">
+            <div
+              v-else
+              class="default-user-avatar"
+              role="img"
+              aria-label="デフォルトユーザーアイコン"
+            >
               <font-awesome-icon :icon="['fas', 'user']" class="user-icon" />
             </div>
           </div>
@@ -66,6 +71,7 @@ import {
   type GetBookmarkListResponse,
   LIST,
 } from '@/graphQL/Bookmark/bookmark';
+import { ColorType } from '@/type/common/ColorType';
 
 const { fetch } = useQuery<GetBookmarkListResponse>(LIST, {
   isAuth: true,

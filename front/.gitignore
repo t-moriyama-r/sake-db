@@ -7,10 +7,9 @@
 node_modules
 
 # Build output
-dist
+dist/
 dist-ssr
 *.local
 
 # Misc
 NUL
-dist/
