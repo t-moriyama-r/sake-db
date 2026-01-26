@@ -125,3 +125,12 @@ func (r *queryResolver) SearchLiquors(ctx context.Context, keyword string, limit
 	}
 	return result, nil
 }
+
+// RelatedLiquors is the resolver for the relatedLiquors field.
+func (r *queryResolver) RelatedLiquors(ctx context.Context, liquorID string) ([]*graphModel.Liquor, error) {
+	result, err := liquorService.GetRelatedLiquors(ctx, r.LiquorRepo, r.CategoryRepo, liquorID)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}

@@ -67,6 +67,7 @@ extend type Query {
   board(liquorId: String!,page:Int):[BoardPost!]
   getMyBoard(liquorId: String!):BoardPost @optionalAuth #未ログイン時にも呼ばれるのでoptionalに
   searchLiquors(keyword: String!, limit: Int): [Liquor!]! #キーワード検索
+  relatedLiquors(liquorId: String!): [Liquor!]! #関連銘柄
 }
 
 extend type Mutation{

@@ -204,3 +204,94 @@ func SearchLiquors(ctx context.Context, r liquorRepository.LiquorsRepository, ke
 
 	return result, nil
 }
+
+// GetRelatedLiquors 関連銘柄を取得する
+// 自身が属するカテゴリの子・兄弟・あるいは1階層上までの親カテゴリ配下に属する酒から最大5つピックアップする
+func GetRelatedLiquors(ctx context.Context, lr liquorRepository.LiquorsRepository, cr categoriesRepository.CategoryRepository, liquorID string) ([]*graphModel.Liquor, *customError.Error) {
+	// 対象の酒を取得
+	lid, err := primitive.ObjectIDFromHex(liquorID)
+	if err != nil {
+		return nil, errGetLiquorIdHex(err, liquorID)
+	}
+	
+	liquor, cErr := lr.GetLiquorById(ctx, lid)
+	if cErr != nil {
+		return nil, cErr
+	}
+
+	// 関連カテゴリIDのリストを収集
+	relatedCategoryIds := make(map[int]bool)
+
+	// 1. 自身のカテゴリの子カテゴリ
+	childCategoryIds, cErr := categoryService.GetBelongCategoryIdList(ctx, liquor.CategoryID, &cr)
+	if cErr != nil {
+		return nil, cErr
+	}
+	for _, id := range childCategoryIds {
+		// 自身のカテゴリIDは除外
+		if id != liquor.CategoryID {
+			relatedCategoryIds[id] = true
+		}
+	}
+
+	// 2. 自身のカテゴリを取得して、親・兄弟カテゴリを探す
+	category, cErr := cr.GetCategoryByID(ctx, liquor.CategoryID)
+	if cErr != nil {
+		return nil, cErr
+	}
+
+	// 親カテゴリが存在する場合
+	if category.Parent != nil {
+		// 親カテゴリとその子カテゴリ（兄弟カテゴリ）を取得
+		parentCategoryIds, cErr := categoryService.GetBelongCategoryIdList(ctx, *category.Parent, &cr)
+		if cErr != nil {
+			return nil, cErr
+		}
+		for _, id := range parentCategoryIds {
+			// 自身のカテゴリIDは除外
+			if id != liquor.CategoryID {
+				relatedCategoryIds[id] = true
+			}
+		}
+	}
+
+	// マップをスライスに変換
+	var categoryIdList []int
+	for id := range relatedCategoryIds {
+		categoryIdList = append(categoryIdList, id)
+	}
+
+	// カテゴリIDリストから酒を取得
+	liquors, cErr := lr.GetLiquorsFromCategoryIds(ctx, categoryIdList)
+	if cErr != nil {
+		return nil, cErr
+	}
+
+	// 自身を除外してシャッフル
+	var filteredLiquors []*liquorRepository.Model
+	for _, l := range liquors {
+		if l.ID != lid {
+			filteredLiquors = append(filteredLiquors, l)
+		}
+	}
+
+	// ランダムに並び替え
+	for i := len(filteredLiquors) - 1; i > 0; i-- {
+		j := int(primitive.NewObjectID().Timestamp().Unix()) % (i + 1)
+		filteredLiquors[i], filteredLiquors[j] = filteredLiquors[j], filteredLiquors[i]
+	}
+
+	// 最大5件に制限
+	maxResults := 5
+	if len(filteredLiquors) > maxResults {
+		filteredLiquors = filteredLiquors[:maxResults]
+	}
+
+	// GraphQL形式に変換
+	var result []*graphModel.Liquor
+	for _, l := range filteredLiquors {
+		result = append(result, l.ToGraphQL())
+	}
+
+	return result, nil
+}
