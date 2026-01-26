@@ -31,17 +31,18 @@ type BoardInput struct {
 }
 
 type BoardPost struct {
-	ID           string    `json:"id"`
-	UserID       *string   `json:"userId,omitempty"`
-	UserName     *string   `json:"userName,omitempty"`
-	CategoryID   int       `json:"categoryId"`
-	CategoryName string    `json:"categoryName"`
-	LiquorID     string    `json:"liquorId"`
-	LiquorName   string    `json:"liquorName"`
-	Text         string    `json:"text"`
-	Youtube      *string   `json:"youtube,omitempty"`
-	Rate         *int      `json:"rate,omitempty"`
-	UpdatedAt    time.Time `json:"updatedAt"`
+	ID              string    `json:"id"`
+	UserID          *string   `json:"userId,omitempty"`
+	UserName        *string   `json:"userName,omitempty"`
+	UserImageBase64 *string   `json:"userImageBase64,omitempty"`
+	CategoryID      int       `json:"categoryId"`
+	CategoryName    string    `json:"categoryName"`
+	LiquorID        string    `json:"liquorId"`
+	LiquorName      string    `json:"liquorName"`
+	Text            string    `json:"text"`
+	Youtube         *string   `json:"youtube,omitempty"`
+	Rate            *int      `json:"rate,omitempty"`
+	UpdatedAt       time.Time `json:"updatedAt"`
 }
 
 type BookMarkListUser struct {

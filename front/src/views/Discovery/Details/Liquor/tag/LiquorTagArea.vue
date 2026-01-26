@@ -1,18 +1,21 @@
 <template>
-  <div>
-    タグ一覧
-    <div>
+  <div class="bg-white rounded-lg shadow-md p-6">
+    <h3 class="text-xl font-semibold text-gray-900 mb-4">タグ一覧</h3>
+    <div class="flex flex-wrap gap-2">
       <LiquorTag
         v-for="tag in tags"
         :tag="tag"
         :key="tag.id"
         @delete="deleted"
-      /><TagInput
+      />
+      <TagInput
         v-if="user"
         :liquor-id="props.liquorId"
         @submitted="submitted"
       />
-      <div v-if="tags.length === 0">登録されたタグはありません</div>
+    </div>
+    <div v-if="tags.length === 0" class="text-gray-500 text-sm mt-2">
+      登録されたタグはありません
     </div>
   </div>
 </template>
