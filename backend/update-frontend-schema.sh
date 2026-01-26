@@ -5,6 +5,9 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 FRONT_DIR="$PROJECT_ROOT/front"
 
+# バックエンドのURL（環境変数で上書き可能）
+BACKEND_URL="${BACKEND_URL:-http://localhost:8080}"
+
 echo "================================================"
 echo "フロントエンドのGraphQL型定義を更新します"
 echo "================================================"
@@ -12,13 +15,17 @@ echo ""
 
 # バックエンドが起動しているかチェック
 echo "バックエンドの起動状態を確認中..."
-if ! curl -s http://localhost:8080/query > /dev/null 2>&1; then
+echo "URL: $BACKEND_URL/query"
+if ! curl -s "$BACKEND_URL/query" > /dev/null 2>&1; then
     echo ""
     echo "⚠️  エラー: バックエンドが起動していません！"
     echo ""
     echo "以下のいずれかの方法でバックエンドを起動してください："
     echo "  - Docker Compose: docker-compose up"
     echo "  - 直接実行: cd backend && go run main.go"
+    echo ""
+    echo "カスタムURLを使用する場合："
+    echo "  BACKEND_URL=http://custom-url:8080 make update-frontend"
     echo ""
     exit 1
 fi

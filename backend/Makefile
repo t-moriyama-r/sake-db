@@ -48,8 +48,7 @@ deps:
 	go mod download
 	go mod tidy
 
-.PHONY: seeder setup install-tools fmt lint vet generate check deps update-frontend
-
+# テストコマンド
 test:
 	go test ./... -v
 
@@ -68,3 +67,7 @@ test-resolver:
 
 benchmark:
 	go test ./db/repository/liquorRepository -bench=. -benchmem
+
+.PHONY: seeder setup install-tools fmt lint vet generate check deps \
+         update-frontend test test-coverage test-coverage-html test-repo \
+         test-resolver benchmark

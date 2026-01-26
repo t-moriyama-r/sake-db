@@ -110,6 +110,7 @@ npm run codegen
 **原因:**
 - バックエンドサーバーが起動していない
 - ポート8080でリッスンしていない
+- カスタムポートを使用している
 
 **解決方法:**
 ```bash
@@ -118,6 +119,9 @@ docker-compose up
 
 # または直接実行
 cd backend && go run main.go
+
+# カスタムURLを使用する場合
+BACKEND_URL=http://custom-url:9000 make update-frontend
 ```
 
 ### エラー: スキーマの取得に失敗しました
