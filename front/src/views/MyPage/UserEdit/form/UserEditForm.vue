@@ -3,6 +3,7 @@
     @submit="onSubmit"
     :initial-values="generateInitialValues(props.user)"
     :validation-schema="validationSchema"
+    validate-on-input
   >
     <FormField :name="FormKeys.NAME" label="名前" />
     <FormField :name="FormKeys.MAIL" label="メールアドレス" type="email" />
@@ -23,6 +24,7 @@
 
 <script setup lang="ts">
 import { Form, type SubmissionHandler } from 'vee-validate';
+import { useRouter } from 'vue-router';
 
 import UploadWithImage from '@/components/parts/forms/common/UploadWithImage.vue';
 import FormField from '@/components/parts/forms/core/FormField.vue';
@@ -47,6 +49,7 @@ const props = defineProps<Props>();
 
 const toast = useToast();
 const userStore = useUserStore();
+const router = useRouter();
 
 const { execute } = useMutation<AuthUser>(Update, {
   isUseSpinner: true,
@@ -67,7 +70,7 @@ const onSubmit: SubmissionHandler = async (values: FormValues) => {
     input: {
       name: values[FormKeys.NAME],
       email: values[FormKeys.MAIL],
-      password: values[FormKeys.PASSWORD],
+      password: values[FormKeys.PASSWORD] || null, // 空文字列の場合はnullに変換
       profile: values[FormKeys.PROFILE],
       imageBase64: base64ImageData ?? null,
     },
@@ -77,6 +80,13 @@ const onSubmit: SubmissionHandler = async (values: FormValues) => {
     userStore.restoreUserData({
       isReFetch: true,
     });
+    // ユーザーページへ遷移
+    if (userStore.user?.id) {
+      router.push({
+        name: 'UserPage',
+        params: { id: userStore.user.id },
+      });
+    }
   });
 };
 </script>
