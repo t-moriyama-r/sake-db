@@ -49,7 +49,7 @@ func InitializeHandler() (*gin.Engine, error) {
 	if err != nil {
 		return nil, err
 	}
-	handler := liquorPost.NewHandler(database, s3S3, categoryRepository, liquorsRepository, usersRepository)
+	handler := liquorPost.NewHandler(database, s3S3, categoryRepository, liquorsRepository, usersRepository, flavorMapMasterRepository)
 	categoryPostHandler := categoryPost.NewHandler(database, s3S3, categoryRepository, flavorMapMasterRepository)
 	userHandler := api.NewUserHandler(database, usersRepository)
 	errorsRepository := errorRepository.New(dbDB)
