@@ -67,6 +67,7 @@ export type BoardPost = {
   text: Scalars['String']['output'];
   updatedAt: Scalars['DateTime']['output'];
   userId?: Maybe<Scalars['ID']['output']>;
+  userImageBase64?: Maybe<Scalars['String']['output']>;
   userName?: Maybe<Scalars['String']['output']>;
   youtube?: Maybe<Scalars['String']['output']>;
 };
@@ -846,6 +847,7 @@ export type BoardQuery = {
     __typename: 'BoardPost';
     userId?: string | null;
     userName?: string | null;
+    userImageBase64?: string | null;
     text: string;
     rate?: number | null;
     updatedAt: any;

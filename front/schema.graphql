@@ -53,6 +53,7 @@ type BoardPost {
   id: ID!
   userId: ID
   userName: String
+  userImageBase64: String
   categoryId: Int!
   categoryName: String!
   liquorId: ID!
