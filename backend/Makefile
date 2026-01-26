@@ -34,6 +34,11 @@ vet:
 generate:
 	go run github.com/99designs/gqlgen generate --config gqlgen.yml
 
+# フロントエンドの型定義を更新（スキーマ変更後に実行）
+update-frontend:
+	@echo "フロントエンドの型定義を更新します..."
+	@./update-frontend-schema.sh
+
 # すべてのチェックを実行（注意：fmtはファイルを変更します）
 check: vet lint generate
 	@gofmt -l . | grep . && echo "Warning: Some files need formatting. Run 'make fmt' to fix." || echo "All checks passed!"
@@ -43,8 +48,7 @@ deps:
 	go mod download
 	go mod tidy
 
-.PHONY: seeder setup install-tools fmt lint vet generate check deps
-
+# テストコマンド
 test:
 	go test ./... -v
 
@@ -63,3 +67,7 @@ test-resolver:
 
 benchmark:
 	go test ./db/repository/liquorRepository -bench=. -benchmem
+
+.PHONY: seeder setup install-tools fmt lint vet generate check deps \
+         update-frontend test test-coverage test-coverage-html test-repo \
+         test-resolver benchmark

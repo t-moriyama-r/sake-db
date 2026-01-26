@@ -53,3 +53,12 @@ feat: 日本酒検索機能を追加
   1. 元のGraphQLスキーマファイル（`backend/graph/schema/*.graphqls`）またはGraphQLドキュメント（`front/src/graphQL/`のサブディレクトリ内の`.ts`ファイル）を修正してください（注意：`auto-generated.ts`は除く）
   2. `npm run codegen`コマンドを実行して、自動生成ファイルを再生成してください
   3. 決して自動生成ファイルを直接編集しないでください
+
+## バックエンドスキーマ変更時の必須手順
+- **`backend/graph/schema/*.graphqls`ファイルを変更した場合、必ず以下のコマンドを実行してください：**
+  1. バックエンドを起動する（Docker Composeまたは`go run main.go`）
+  2. フロントエンドディレクトリに移動：`cd front`
+  3. スキーマを取得：`npm run fetch-schema`（バックエンドが起動している必要があります）
+  4. 型定義を生成：`npm run codegen`
+- **これらのコマンドを実行しないと、フロントエンドの型定義がバックエンドのスキーマと一致しなくなり、ビルドエラーや型エラーが発生します。**
+- **Copilot、Claude Code、その他のAIツールを使用してバックエンドスキーマを変更する場合も、必ずこの手順を実行してください。**
