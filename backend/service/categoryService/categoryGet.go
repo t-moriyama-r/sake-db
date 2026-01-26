@@ -134,9 +134,9 @@ func GetReadonlyAncestor(ctx context.Context, categoryId int, r *categoriesRepos
 	}
 
 	// 祖先を辿り、readonlyフラグが設定されている最初のカテゴリを探す
-	for _, category := range *categoryTrail {
-		if category.Readonly {
-			return &category, nil
+	for i := range *categoryTrail {
+		if (*categoryTrail)[i].Readonly {
+			return &(*categoryTrail)[i], nil
 		}
 	}
 
@@ -147,6 +147,7 @@ func GetReadonlyAncestor(ctx context.Context, categoryId int, r *categoriesRepos
 // flavor_map_masterに存在する祖先がない場合はnilを返す
 func GetFlavorMapAncestor(ctx context.Context, categoryId int, categoryRepo *categoriesRepository.CategoryRepository, flavorMapRepo interface {
 	ExistsCategoryID(ctx context.Context, categoryID int) (bool, *customError.Error)
+	GetCategoryIDSet(ctx context.Context, categoryIDs []int) (map[int]bool, *customError.Error)
 }) (*categoriesRepository.Model, *customError.Error) {
 	// カテゴリまでのパンくずリストを取得
 	categoryTrail, err := GetCategoryTrail(ctx, categoryId, categoryRepo)
@@ -154,14 +155,22 @@ func GetFlavorMapAncestor(ctx context.Context, categoryId int, categoryRepo *cat
 		return nil, err
 	}
 
+	// 全カテゴリIDを収集
+	categoryIDs := make([]int, len(*categoryTrail))
+	for i := range *categoryTrail {
+		categoryIDs[i] = (*categoryTrail)[i].ID
+	}
+
+	// 一括でflavor_map_masterに存在するカテゴリIDを取得
+	flavorMapCategorySet, err := flavorMapRepo.GetCategoryIDSet(ctx, categoryIDs)
+	if err != nil {
+		return nil, err
+	}
+
 	// 祖先を辿り、flavor_map_masterに存在する最初のカテゴリを探す
-	for _, category := range *categoryTrail {
-		exists, err := flavorMapRepo.ExistsCategoryID(ctx, category.ID)
-		if err != nil {
-			return nil, err
-		}
-		if exists {
-			return &category, nil
+	for i := range *categoryTrail {
+		if flavorMapCategorySet[(*categoryTrail)[i].ID] {
+			return &(*categoryTrail)[i], nil
 		}
 	}
 

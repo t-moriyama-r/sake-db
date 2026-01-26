@@ -10,13 +10,16 @@ import (
 )
 
 const (
-	MasterFind           = "REPO-FLAVOR-MAP-001-MasterFind"
-	MasterFindCursor     = "REPO-FLAVOR-MAP-002-MasterFindCursor"
-	Insert               = "REPO-FLAVOR-MAP-003-Insert"
-	Update               = "REPO-FLAVOR-MAP-004-Update"
-	GetVotedDataByLiquor = "REPO-FLAVOR-MAP-005-GetVotedDataByLiquor"
-	Upsert               = "REPO-FLAVOR-MAP-006-Upsert"
-	ExistsCategoryID     = "REPO-FLAVOR-MAP-007-ExistsCategoryID"
+	MasterFind              = "REPO-FLAVOR-MAP-001-MasterFind"
+	MasterFindCursor        = "REPO-FLAVOR-MAP-002-MasterFindCursor"
+	Insert                  = "REPO-FLAVOR-MAP-003-Insert"
+	Update                  = "REPO-FLAVOR-MAP-004-Update"
+	GetVotedDataByLiquor    = "REPO-FLAVOR-MAP-005-GetVotedDataByLiquor"
+	Upsert                  = "REPO-FLAVOR-MAP-006-Upsert"
+	ExistsCategoryID        = "REPO-FLAVOR-MAP-007-ExistsCategoryID"
+	GetCategoryIDSet        = "REPO-FLAVOR-MAP-008-GetCategoryIDSet"
+	GetCategoryIDSetDecode  = "REPO-FLAVOR-MAP-009-GetCategoryIDSetDecode"
+	GetCategoryIDSetCursor  = "REPO-FLAVOR-MAP-010-GetCategoryIDSetCursor"
 )
 
 func errMasterFind(err error) *customError.Error {
@@ -84,5 +87,33 @@ func errExistsCategoryID(err error, categoryID int) *customError.Error {
 		UserMsg:    errorMsg.SERVER,
 		Level:      logrus.ErrorLevel,
 		Input:      categoryID,
+	})
+}
+
+func errGetCategoryIDSet(err error, categoryIDs []int) *customError.Error {
+	return customError.NewError(err, customError.Params{
+		StatusCode: http.StatusInternalServerError,
+		ErrCode:    GetCategoryIDSet,
+		UserMsg:    errorMsg.SERVER,
+		Level:      logrus.ErrorLevel,
+		Input:      categoryIDs,
+	})
+}
+
+func errGetCategoryIDSetDecode(err error) *customError.Error {
+	return customError.NewError(err, customError.Params{
+		StatusCode: http.StatusInternalServerError,
+		ErrCode:    GetCategoryIDSetDecode,
+		UserMsg:    errorMsg.SERVER,
+		Level:      logrus.ErrorLevel,
+	})
+}
+
+func errGetCategoryIDSetCursor(err error) *customError.Error {
+	return customError.NewError(err, customError.Params{
+		StatusCode: http.StatusInternalServerError,
+		ErrCode:    GetCategoryIDSetCursor,
+		UserMsg:    errorMsg.SERVER,
+		Level:      logrus.ErrorLevel,
 	})
 }

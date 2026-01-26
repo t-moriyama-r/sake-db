@@ -101,6 +101,8 @@ func (h *Handler) Post(c *gin.Context, ur *userRepository.UsersRepository) (*int
 	}
 
 	// 同じ親カテゴリ内での重複チェック
+	// NOTE: この重複チェックは同時リクエストでの競合を完全に防ぐことはできません。
+	// 確実に防ぐには、MongoDB側で (parent, name) のユニークインデックスを追加してください。
 	duplicate, err := h.CategoryRepo.FindCategoryByParentAndName(ctx, &request.Parent, request.Name, request.Id)
 	if err != nil {
 		return nil, err

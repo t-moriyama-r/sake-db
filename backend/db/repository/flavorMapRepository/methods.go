@@ -96,3 +96,33 @@ func (r *FlavorMapMasterRepository) ExistsCategoryID(ctx context.Context, catego
 	
 	return true, nil
 }
+
+// GetCategoryIDSet 指定されたcategory_idのセットを取得（flavor_map_masterに存在するもの）
+func (r *FlavorMapMasterRepository) GetCategoryIDSet(ctx context.Context, categoryIDs []int) (map[int]bool, *customError.Error) {
+	if len(categoryIDs) == 0 {
+		return make(map[int]bool), nil
+	}
+	
+	cursor, err := r.Collection.Find(ctx, bson.M{
+		CategoryID: bson.M{"$in": categoryIDs},
+	})
+	if err != nil {
+		return nil, errGetCategoryIDSet(err, categoryIDs)
+	}
+	defer cursor.Close(ctx)
+	
+	result := make(map[int]bool)
+	for cursor.Next(ctx) {
+		var model MasterModel
+		if err := cursor.Decode(&model); err != nil {
+			return nil, errGetCategoryIDSetDecode(err)
+		}
+		result[model.CategoryID] = true
+	}
+	
+	if err := cursor.Err(); err != nil {
+		return nil, errGetCategoryIDSetCursor(err)
+	}
+	
+	return result, nil
+}
