@@ -54,6 +54,7 @@
 <script setup lang="ts">
 import { format } from 'date-fns';
 import { onMounted, ref } from 'vue';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 import CommonButton from '@/components/parts/common/CommonButton/CommonButton.vue';
 import RadiusImage from '@/components/parts/common/RadiusImage.vue';
