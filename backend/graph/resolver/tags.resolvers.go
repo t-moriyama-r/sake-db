@@ -79,7 +79,17 @@ func (r *queryResolver) GetTags(ctx context.Context, liquorID string) ([]*graphM
 }
 
 // SearchLiquorsByTag is the resolver for the searchLiquorsByTag field.
-func (r *queryResolver) SearchLiquorsByTag(ctx context.Context, tag string) ([]*graphModel.Liquor, error) {
+func (r *queryResolver) SearchLiquorsByTag(ctx context.Context, tag string, limit *int, offset *int) ([]*graphModel.Liquor, error) {
+	// デフォルト値を設定
+	defaultLimit := 20
+	if limit == nil {
+		limit = &defaultLimit
+	}
+	defaultOffset := 0
+	if offset == nil {
+		offset = &defaultOffset
+	}
+
 	// タグからお酒IDのリストを取得
 	liquorIds, err := r.LiquorRepo.SearchLiquorsByTag(ctx, tag)
 	if err != nil {
@@ -91,8 +101,8 @@ func (r *queryResolver) SearchLiquorsByTag(ctx context.Context, tag string) ([]*
 		return []*graphModel.Liquor{}, nil
 	}
 
-	// IDからお酒データを取得
-	liquors, err := r.LiquorRepo.GetLiquorsByIds(ctx, liquorIds)
+	// IDからお酒データを取得（ページネーション付き）
+	liquors, err := r.LiquorRepo.GetLiquorsByIdsWithPagination(ctx, liquorIds, limit, offset)
 	if err != nil {
 		return nil, err
 	}

@@ -19,7 +19,7 @@ const (
 	UpdateUnMarshal = "REPO-CATEGORY-009-UpdateUnMarshal"
 	UpdateOne       = "REPO-CATEGORY-010-UpdateOne"
 	UpdateOneGetId  = "REPO-CATEGORY-011-UpdateOneGetId"
-	GetMaxID  = "REPO-CATEGORY-012-GetMaxID"
+	GetMaxID        = "REPO-CATEGORY-012-GetMaxID"
 )
 
 func errFind(err error) *customError.Error {

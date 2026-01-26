@@ -286,7 +286,7 @@ func TestGetLiquorsFromCategoryIds_正常系_指定したカテゴリIDの日本
 
 	// 異なるカテゴリIDのテストデータを挿入
 	ctx := context.Background()
-	
+
 	// カテゴリID 1の日本酒
 	for i := 0; i < 3; i++ {
 		name := fmt.Sprintf("吟醸酒%d", i+1)
