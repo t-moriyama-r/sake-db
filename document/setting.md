@@ -51,23 +51,23 @@
 1. ルートディレクトリに移動
 
 2. 自己署名証明書を生成
-   ```bash
-   MSYS_NO_PATHCONV=1 openssl req -x509 -nodes -days 36500 -newkey rsa:2048 \
-  -keyout .ssl/key.pem \
-  -out .ssl/cert.pem \
-  -subj "/C=JP/ST=Tokyo/L=Tokyo/O=Development/CN=localhost"
-   ```
+ ```bash
+MSYS_NO_PATHCONV=1 openssl req -x509 -nodes -days 36500 -newkey rsa:2048 \
+-keyout .ssl/key.pem \
+-out .ssl/cert.pem \
+-subj "/C=JP/ST=Tokyo/L=Tokyo/O=Development/CN=localhost"
+```
    
-   このコマンドは以下を生成します：
-   - `cert.pem`: SSL証明書
-   - `key.pem`: 秘密鍵
-   - 有効期限: 100年
-   - CN（Common Name）: localhost
+ このコマンドは以下を生成します：
+ - `cert.pem`: SSL証明書
+ - `key.pem`: 秘密鍵
+ - 有効期限: 100年
+ - CN（Common Name）: localhost
 
  このあたりは環境によって違うと思うので、各々調べてください。結果的に.ssl内に自己署名証明書があればOK。
  `cert.pem`と`key.pem`の2つのファイルが存在することを確認してください。
 
-これでバックエンドで`go run main.go`を実行する
+これでバックエンドで`go run main.go`を実行すると、`http://localhost:5173/`でアクセスできる。
 
 ### バックエンド
 ローカル側で何かしらの手段で実行する。デバッグでも通常の実行でも可。基本的には`go run main.go`です。<br/>
