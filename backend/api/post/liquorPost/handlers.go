@@ -2,6 +2,7 @@ package liquorPost
 
 import (
 	"backend/db/repository/categoriesRepository"
+	"backend/db/repository/flavorMapRepository"
 	"backend/db/repository/liquorRepository"
 	"backend/db/repository/userRepository"
 	"github.com/aws/aws-sdk-go/service/s3"
@@ -9,20 +10,22 @@ import (
 )
 
 type Handler struct {
-	DB           *mongo.Database
-	S3Client     *s3.S3
-	CategoryRepo categoriesRepository.CategoryRepository
-	LiquorsRepo  liquorRepository.LiquorsRepository
-	UserRepo     userRepository.UsersRepository
+	DB                  *mongo.Database
+	S3Client            *s3.S3
+	CategoryRepo        categoriesRepository.CategoryRepository
+	LiquorsRepo         liquorRepository.LiquorsRepository
+	UserRepo            userRepository.UsersRepository
+	FlavorMapMasterRepo flavorMapRepository.FlavorMapMasterRepository
 }
 
 // NewHandler 新しいLiquorHandlerを作成するコンストラクタ
-func NewHandler(db *mongo.Database, s3Client *s3.S3, categoryRepo categoriesRepository.CategoryRepository, liquorsRepo liquorRepository.LiquorsRepository, userRepo userRepository.UsersRepository) *Handler {
+func NewHandler(db *mongo.Database, s3Client *s3.S3, categoryRepo categoriesRepository.CategoryRepository, liquorsRepo liquorRepository.LiquorsRepository, userRepo userRepository.UsersRepository, flavorMapMasterRepo flavorMapRepository.FlavorMapMasterRepository) *Handler {
 	return &Handler{
-		DB:           db,
-		S3Client:     s3Client,
-		CategoryRepo: categoryRepo,
-		LiquorsRepo:  liquorsRepo,
-		UserRepo:     userRepo,
+		DB:                  db,
+		S3Client:            s3Client,
+		CategoryRepo:        categoryRepo,
+		LiquorsRepo:         liquorsRepo,
+		UserRepo:            userRepo,
+		FlavorMapMasterRepo: flavorMapMasterRepo,
 	}
 }

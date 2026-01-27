@@ -50,6 +50,41 @@ func (h *Handler) Post(c *gin.Context, ur *userRepository.UsersRepository) (*int
 		if err != nil {
 			return nil, err
 		}
+
+		// 親カテゴリ（Parentがnil）の移動を禁止
+		if old.Parent == nil {
+			return nil, errParentCategoryMove(request)
+		}
+
+		// 親が変更される場合のみ、フレーバーマップチェックを行う
+		if *old.Parent != request.Parent {
+			// 現在のカテゴリの祖先でflavor_map_masterに存在するカテゴリを取得
+			oldFlavorMapAncestor, err := categoryService.GetFlavorMapAncestor(ctx, *request.Id, &h.CategoryRepo, &h.FlavorMapMasterRepo)
+			if err != nil {
+				return nil, err
+			}
+
+			// 新しい親の祖先でflavor_map_masterに存在するカテゴリを取得
+			newFlavorMapAncestor, err := categoryService.GetFlavorMapAncestor(ctx, request.Parent, &h.CategoryRepo, &h.FlavorMapMasterRepo)
+			if err != nil {
+				return nil, err
+			}
+
+			// 両方のflavor_map祖先が異なる場合は移動を禁止
+			// （flavor_map祖先がある場合、別のflavor_map祖先配下には移動できない）
+			if oldFlavorMapAncestor != nil {
+				// 新しい親にflavor_map祖先がない、または異なるflavor_map祖先の場合は禁止
+				if newFlavorMapAncestor == nil || oldFlavorMapAncestor.ID != newFlavorMapAncestor.ID {
+					oldName := oldFlavorMapAncestor.Name
+					newName := "不明"
+					if newFlavorMapAncestor != nil {
+						newName = newFlavorMapAncestor.Name
+					}
+					return nil, errFlavorMapCategoryMove(request, oldName, newName)
+				}
+			}
+		}
+
 		//nil参照エラー回避が面倒なので、nilは0扱いとする(versionNoがスキーマ上後付なので、nilの可能性がある)
 		if old.VersionNo == nil {
 			zero := 0
@@ -63,6 +98,17 @@ func (h *Handler) Post(c *gin.Context, ur *userRepository.UsersRepository) (*int
 		if *old.VersionNo != *request.VersionNo {
 			return nil, errInvalidVersion(request)
 		}
+	}
+
+	// 同じ親カテゴリ内での重複チェック
+	// NOTE: この重複チェックは同時リクエストでの競合を完全に防ぐことはできません。
+	// 確実に防ぐには、MongoDB側で (parent, name) のユニークインデックスを追加してください。
+	duplicate, err := h.CategoryRepo.FindCategoryByParentAndName(ctx, &request.Parent, request.Name, request.Id)
+	if err != nil {
+		return nil, err
+	}
+	if duplicate != nil {
+		return nil, errDuplicateName(request)
 	}
 
 	// フォームからファイルを取得
