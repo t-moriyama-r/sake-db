@@ -32,8 +32,20 @@
 
 ![image](https://github.com/user-attachments/assets/8b2ad7ce-5e21-4871-bd1e-fc0544b85d60)
 
-この4つのイメージが作成されるはず。
+この4つのイメージが作成されるはず。<br/>
+<br/>
+フロントのnpm install
+`cd front`<br/>
+`cd npm i`<br/>
 
+バックエンド
+`cd ../backend`<br/>
+`go mod tidy`<br/>
+
+プロキシサーバー
+オレオレ証明書が必要。
+
+これでバックエンドで`go run main.go`を実行すると``
 
 ### バックエンド
 ローカル側で何かしらの手段で実行する。デバッグでも通常の実行でも可。基本的には`go run main.go`です。<br/>
@@ -54,8 +66,6 @@ HMRが効いているので開発中は特に何も意識しなくてOKのはず
 プロジェクトではlefthookを使用してGit hooksを管理しています。
 
 #### 初回セットアップ
-`cd front`<br/>
-`cd npm i`<br/>
 
 `front`ディレクトリで`npm install`を実行すると、`prepare`スクリプトによって自動的にlefthookのGit hooksがリポジトリルート(`.git/hooks/`)にインストールされます。
 
