@@ -26,6 +26,13 @@
 
 ## 環境構築
 (正直あんま構造覚えてないので、誰かが環境構築する際に一緒にやりたい...)<br>
+
+### 環境変数の設定
+バックエンドを起動する前に、`.env`ファイルを設定する必要があります：
+1. `backend/.env.example`を`backend/.env`または`backend/.env.dev`としてコピー
+2. 必要な環境変数を設定（MongoDB、JWT、AWS等）
+3. **パスワードリセット機能を使用する場合**: [AWS SES設定ガイド](./aws-ses-setup.md)を参照してAWS SES関連の環境変数を設定してください
+
 ### コンテナ
 `cd sake-db`<br/>
 `docker compose up -d`を実行する
