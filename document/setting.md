@@ -94,7 +94,7 @@ HMRが効いているので開発中は特に何も意識しなくてOKのはず
 
 #### 初回セットアップ
 `cd front`<br/>
-`cd npm i`<br/>
+`npm i`<br/>
 
 `front`ディレクトリで`npm install`を実行すると、`prepare`スクリプトによって自動的にlefthookのGit hooksがリポジトリルート(`.git/hooks/`)にインストールされます。
 
