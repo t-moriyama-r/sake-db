@@ -41,38 +41,31 @@
 `cd ../backend`<br/>
 `go mod tidy`<br/>
 
-プロキシサーバー
+プロキシサーバー<br/>
 オレオレ証明書が必要。
 
 #### SSL証明書の準備（初回のみ）
 プロキシサーバーはHTTPSでの通信を行うため、自己署名SSL証明書が必要です。
 以下の手順で証明書を生成してください：
 
-1. `.ssl`ディレクトリを作成
-   ```bash
-   mkdir .ssl
-   ```
+1. ルートディレクトリに移動
 
 2. 自己署名証明書を生成
    ```bash
-   openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-     -keyout .ssl/key.pem \
-     -out .ssl/cert.pem \
-     -subj "/C=JP/ST=Tokyo/L=Tokyo/O=Development/CN=localhost"
+   MSYS_NO_PATHCONV=1 openssl req -x509 -nodes -days 36500 -newkey rsa:2048 \
+  -keyout .ssl/key.pem \
+  -out .ssl/cert.pem \
+  -subj "/C=JP/ST=Tokyo/L=Tokyo/O=Development/CN=localhost"
    ```
    
    このコマンドは以下を生成します：
    - `cert.pem`: SSL証明書
    - `key.pem`: 秘密鍵
-   - 有効期限: 365日
+   - 有効期限: 100年
    - CN（Common Name）: localhost
 
-3. 証明書が正しく生成されたことを確認
-   ```bash
-   ls -l .ssl/
-   ```
-   
-   `cert.pem`と`key.pem`の2つのファイルが存在することを確認してください。
+ このあたりは環境によって違うと思うので、各々調べてください。結果的に.ssl内に自己署名証明書があればOK。
+ `cert.pem`と`key.pem`の2つのファイルが存在することを確認してください。
 
 これでバックエンドで`go run main.go`を実行する
 
