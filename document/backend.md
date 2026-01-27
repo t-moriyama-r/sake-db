@@ -242,12 +242,21 @@ MongoDB Compassを使用すると以下が可能です：
 
 #### パフォーマンスの確認
 
-クエリの実行計画を確認したい場合、MongoDB Compassの「Explain Plan」機能を使用するか、コード内で以下のように実装：
+クエリの実行計画を確認したい場合、MongoDB Compassの「Explain Plan」機能を使用するのが最も簡単です。
+
+コード内でインデックスを明示的に指定したい場合：
 
 ```go
 // リポジトリ層でのクエリ実行時
-cursor, err := collection.Find(ctx, filter, options.Find().SetHint(bson.D{{Key: "index_name", Value: 1}}))
+// インデックス名は MongoDB Compass で確認するか、
+// define.go で定義したフィールド名を使用します
+cursor, err := collection.Find(ctx, filter, options.Find().SetHint(bson.D{{Key: "email", Value: 1}}))
 ```
+
+インデックス名を確認する方法：
+1. MongoDB Compassでコレクションを開く
+2. 「Indexes」タブを選択
+3. 作成されたインデックスの一覧と名前を確認
 
 #### トランザクション
 

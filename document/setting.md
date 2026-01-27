@@ -41,6 +41,8 @@ MONGODB_USER=root
 MONGODB_PASSWORD=root
 ```
 
+**注意:** このファイルはDocker Composeの環境変数として使用されますが、実際にバックエンドが使用するデータベース名は`backend/.env.dev`の`MAIN_DB_NAME`で設定します。
+
 #### 2. バックエンドの.env.dev
 `backend/.env.dev`ファイルを作成します。
 バックエンドのAPIサーバーで使用される環境変数です。
