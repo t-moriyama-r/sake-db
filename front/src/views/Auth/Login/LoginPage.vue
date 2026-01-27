@@ -19,10 +19,10 @@ import { useUserStore } from '@/stores/userStore/userStore';
 const { isLogin } = useUserStore();
 const router = useRouter();
 
-//すでにログイン済の場合、ユーザーページへリダイレクト
+//すでにログイン済の場合、マイページへリダイレクト
 onMounted(() => {
   if (isLogin) {
-    router.push({ name: 'UserIndex' });
+    router.push({ name: 'MyPageIndex' });
   }
 });
 </script>
