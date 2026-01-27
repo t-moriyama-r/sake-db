@@ -25,6 +25,83 @@
 
 
 ## 環境構築
+### 環境変数ファイル(.env)の設定
+
+プロジェクトを動かすには、以下の3つの`.env`ファイルを設定する必要があります。
+
+#### 1. ルートディレクトリの.env.development（Docker Compose用）
+`.env.development`ファイルをルートディレクトリに作成します。
+このファイルはDocker Composeで使用されるMongoDB接続情報を定義します。
+
+```bash
+MONGODB_HOST=localhost
+MONGODB_PORT=27017
+MONGODB_DBNAME=sakedb
+MONGODB_USER=root
+MONGODB_PASSWORD=root
+```
+
+#### 2. バックエンドの.env.dev
+`backend/.env.dev`ファイルを作成します。
+バックエンドのAPIサーバーで使用される環境変数です。
+
+```bash
+MONGO_URI=mongodb://root:root@mongo:27017
+MAIN_DB_NAME=helloworld
+FRONT_URI=https://localhost
+BACK_URI=https://localhost/api
+JWT_SECRET_KEY=your-secret-key-here
+
+# AWS S3設定（画像アップロード用）
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+AWS_IMAGE_BUCKET_NAME=sake-image
+AWS_REGION=ap-northeast-1
+
+# AWS SES設定（メール送信用）
+AWS_SES_FROM=liquor@trc.mixh.jp
+AWS_SES_ACCESS_KEY=
+AWS_SES_ACCESS_SECRET=
+
+# Amazon Product Advertising API設定
+AMAZON_REGION=us-west-2
+AMAZON_ACCESS_KEY=
+AMAZON_ACCESS_SECRET=
+AMAZON_PARTNER_TAG=trc05-22
+AMAZON_PARTNER_TRACKING_ID=sake-db-22
+
+# Twitter API設定
+TWITTER_CONSUMER_KEY=
+TWITTER_CONSUMER_SECRET=
+TWITTER_BEARER_TOKEN=
+TWITTER_ACCESS_TOKEN=
+TWITTER_ACCESS_SECRET=
+TWITTER_OAUTH_CLIENT=
+TWITTER_OAUTH_SECRET=
+TWITTER_CALLBACK=
+```
+
+**重要:** 
+- `JWT_SECRET_KEY`は必ず設定してください（適当な文字列で可）
+- AWS、Amazon、Twitter関連の環境変数は、該当する機能を使用しない場合は空のままでも構いません
+
+#### 3. フロントエンドの.env.dev
+`front/.env.dev`ファイルを作成します。
+フロントエンドのVue3アプリケーションで使用される環境変数です。
+
+```bash
+CHOKIDAR_USEPOLLING=true
+VITE_API_URL=http://localhost:8080
+
+VITE_JWT_TOKEN_NAME=token
+
+VITE_HMR_HOST=localhost
+VITE_HMR_PORT=5173
+
+NODE_ENV=development
+# NODE_ENV=production
+```
+
 ### コンテナ
 `cd sake-db`<br/>
 `docker compose up -d`を実行する
@@ -78,7 +155,38 @@ MSYS_NO_PATHCONV=1 openssl req -x509 -nodes -days 36500 -newkey rsa:2048 \
 HMRが効いているので開発中は特に何も意識しなくてOKのはず。ちなみにバックエンドが実行されてないとデータは描画されません。
 
 ### DB
-シーダーとかはバックエンド側がよしなにやってくれます。ただ単にコンテナが起動してれば動きます。
+コンテナが起動すればMongoDBが利用可能になります。
+
+#### 初回セットアップ時のシーダー実行
+初回実行時、データベースにマスターデータを投入する必要があります。
+以下のコマンドでシーダーを実行してください：
+
+```bash
+cd backend
+make seeder
+```
+
+または
+
+```bash
+cd backend
+go run ./db/seeders/seeder.go
+```
+
+このコマンドは、カテゴリーやフレーバーマップなどのマスターデータをデータベースに登録します。
+シーダーはupsert方式で実行されるため、既存データがある場合は更新され、ない場合は新規作成されます。
+
+#### MongoDB Compassの使用（推奨）
+データベースの内容を視覚的に確認・編集したい場合、MongoDB Compassのインストールを推奨します。
+
+**ダウンロード:** https://www.mongodb.com/try/download/compass
+
+**接続情報:**
+```
+mongodb://root:root@localhost:27017
+```
+
+MongoDB Compassを使用すると、コレクションの確認、ドキュメントの編集、インデックスの確認などが簡単に行えます。
 
 ### プロキシサーバー
 プロキシサーバーを起動するには、事前にSSL証明書の準備が必要です。

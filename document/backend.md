@@ -130,3 +130,147 @@ func errNotFound(err error, lId primitive.ObjectID, cId int) *customError.Error 
 ```
 
 基本的にエラーごとに関数を1つ作る構成にしてる。相当ダルいが仕方ない......
+
+## データベース管理
+
+### シーダーデータの更新と反映
+
+シーダーファイル（`db/seeders/categories.json`、`db/seeders/flavorMaps.json`など）を変更した場合、以下の手順でデータベースに反映します。
+
+#### シーダーの実行
+```bash
+cd backend
+make seeder
+```
+
+または
+
+```bash
+cd backend
+go run ./db/seeders/seeder.go
+```
+
+シーダーはupsert方式で実装されているため：
+- 既存のドキュメント（`id`または`category_id`で判定）がある場合：既存データを更新
+- 存在しない場合：新規ドキュメントを作成
+
+#### データベースの完全リフレッシュ
+
+シーダーデータを完全にリセットしたい場合（開発中にデータが壊れた場合など）：
+
+1. MongoDBコンテナを再起動してデータをクリア：
+```bash
+# ルートディレクトリで実行
+docker compose down
+docker volume rm sake-db_mongo_data  # ボリュームを削除
+docker compose up -d
+```
+
+2. シーダーを実行してマスターデータを再投入：
+```bash
+cd backend
+make seeder
+```
+
+**注意:** この操作は全てのデータが削除されるため、本番環境では絶対に実行しないでください。
+
+### インデックスの定義と管理
+
+MongoDBのインデックスは`backend/db/indexes/`ディレクトリで管理されています。
+
+#### インデックスの追加手順
+
+1. `backend/db/indexes/define.go`を編集してインデックス定義を追加：
+
+```go
+var IndexDefinitions = []IndexDefinition{
+    // 既存のインデックス定義...
+    
+    // 新しいインデックスを追加
+    {
+        CollectionName: "your_collection_name",
+        IndexKeys:      bson.D{{Key: "field_name", Value: 1}}, // 1: 昇順, -1: 降順
+        IsNonUnique:    false, // false: ユニーク制約あり, true: 制約なし
+        PartialFilter:  bson.D{}, // オプション: 部分インデックスのフィルター条件
+    },
+}
+```
+
+2. バックエンドを再起動：
+```bash
+go run main.go
+```
+
+インデックスは`main.go`の起動時に自動的に作成されます（`indexes.AddIndexes()`関数）。
+
+#### 複合インデックスの例
+
+複数のフィールドを組み合わせたインデックス：
+
+```go
+{
+    CollectionName: "liquors",
+    IndexKeys:      bson.D{{Key: "category_id", Value: 1}, {Key: "created_at", Value: -1}},
+    IsNonUnique:    true,
+}
+```
+
+#### 部分インデックスの例
+
+特定の条件を満たすドキュメントのみにインデックスを適用（null値を除外など）：
+
+```go
+{
+    CollectionName: "users",
+    IndexKeys:      bson.D{{Key: "email", Value: 1}},
+    IsNonUnique:    false,
+    PartialFilter:  bson.D{{Key: "email", Value: bson.D{{Key: "$exists", Value: true}}}},
+}
+```
+
+### その他のデータベースTips
+
+#### MongoDB Compassでの確認
+- **ダウンロード:** https://www.mongodb.com/try/download/compass
+- **接続文字列:** `mongodb://root:root@localhost:27017`
+
+MongoDB Compassを使用すると以下が可能です：
+- コレクション内のドキュメントの閲覧・検索
+- ドキュメントの追加・編集・削除
+- インデックスの確認とパフォーマンス分析
+- クエリのパフォーマンステスト
+
+#### パフォーマンスの確認
+
+クエリの実行計画を確認したい場合、MongoDB Compassの「Explain Plan」機能を使用するか、コード内で以下のように実装：
+
+```go
+// リポジトリ層でのクエリ実行時
+cursor, err := collection.Find(ctx, filter, options.Find().SetHint(bson.D{{Key: "index_name", Value: 1}}))
+```
+
+#### トランザクション
+
+複数のコレクションにまたがる操作で整合性を保ちたい場合、MongoDBのトランザクションを使用できます：
+
+```go
+session, err := client.StartSession()
+if err != nil {
+    return err
+}
+defer session.EndSession(ctx)
+
+err = mongo.WithSession(ctx, session, func(sc mongo.SessionContext) error {
+    if err := session.StartTransaction(); err != nil {
+        return err
+    }
+    
+    // トランザクション内の処理
+    // ...
+    
+    if err := session.CommitTransaction(sc); err != nil {
+        return err
+    }
+    return nil
+})
+```
