@@ -2,7 +2,7 @@
 
 # シーダー実行
 seeder:
-	go run ./db/seeders/seeder.go
+	go run ./seeder.go
 
 # Lefthookと開発ツールのセットアップ
 setup:
