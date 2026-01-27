@@ -54,6 +54,9 @@ HMRが効いているので開発中は特に何も意識しなくてOKのはず
 プロジェクトではlefthookを使用してGit hooksを管理しています。
 
 #### 初回セットアップ
+`cd front`<br/>
+`cd npm i`<br/>
+
 `front`ディレクトリで`npm install`を実行すると、`prepare`スクリプトによって自動的にlefthookのGit hooksがリポジトリルート(`.git/hooks/`)にインストールされます。
 
 もし`npm install`後に`.git/hooks/`にフックが見当たらない場合は、リポジトリルートで以下のコマンドを手動で実行してください：
