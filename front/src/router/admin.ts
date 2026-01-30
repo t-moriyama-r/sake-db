@@ -5,7 +5,7 @@ import AdminIndex from '@/views/Admin/AdminIndex.vue';
  */
 const AdminRouter = {
   path: 'admin',
-  meta: { requiresAuth: true }, //TODO: 管理人用アクセスへの対応
+  meta: { requiresAuth: true, requiresAdmin: true },
   children: [
     {
       path: 'index',
