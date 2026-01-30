@@ -128,3 +128,28 @@ func (r *CategoryRepository) GetMaxID(ctx context.Context) (int, *customError.Er
 
 	return result.ID, nil
 }
+
+// FindCategoryByParentAndName 親カテゴリIDと名前でカテゴリを検索する（重複チェック用）
+func (r *CategoryRepository) FindCategoryByParentAndName(ctx context.Context, parent *int, name string, excludeId *int) (*Model, *customError.Error) {
+	filter := bson.M{
+		"parent": parent,
+		"name":   name,
+	}
+	
+	// 更新時に自分自身を除外する
+	if excludeId != nil {
+		filter["id"] = bson.M{"$ne": *excludeId}
+	}
+
+	var result Model
+	err := r.collection.FindOne(ctx, filter).Decode(&result)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			// 見つからない場合はnilを返す（重複なし）
+			return nil, nil
+		}
+		return nil, errFindByParentAndName(err, parent, name)
+	}
+
+	return &result, nil
+}

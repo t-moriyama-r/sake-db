@@ -11,14 +11,14 @@ import (
 )
 
 const (
-	ParseFailInput = "LIQUOR-POST-001-ParseFailInput"
-	ParseTempID    = "LIQUOR-POST-002-ParseTempID"
-	DuplicateName  = "LIQUOR-POST-003-DuplicateName"
-	ParseID        = "LIQUOR-POST-004-ParseID"
-	InvalidInput   = "LIQUOR-POST-005-InvalidInput"
-
-	InvalidVersion = "LIQUOR-POST-006-InvalidVersion"
-	InvalidFile    = "LIQUOR-POST-007-InvalidFile"
+	ParseFailInput         = "LIQUOR-POST-001-ParseFailInput"
+	ParseTempID            = "LIQUOR-POST-002-ParseTempID"
+	DuplicateName          = "LIQUOR-POST-003-DuplicateName"
+	ParseID                = "LIQUOR-POST-004-ParseID"
+	InvalidInput           = "LIQUOR-POST-005-InvalidInput"
+	InvalidVersion         = "LIQUOR-POST-006-InvalidVersion"
+	InvalidFile            = "LIQUOR-POST-007-InvalidFile"
+	FlavorMapCategoryMove  = "LIQUOR-POST-008-FlavorMapCategoryMove"
 )
 
 func errInvalidInput(c *gin.Context, err error) *customError.Error {
@@ -81,5 +81,14 @@ func errInvalidFile(err error, img multipart.File) *customError.Error {
 		UserMsg:    "画像の読み込みに失敗しました",
 		Level:      logrus.ErrorLevel,
 		Input:      img,
+	})
+}
+
+func errFlavorMapCategoryMove(oldCategoryName string, newCategoryName string) *customError.Error {
+	return customError.NewError(errors.New("異なるフレーバーマップカテゴリへの移動はできません"), customError.Params{
+		StatusCode: http.StatusBadRequest,
+		ErrCode:    FlavorMapCategoryMove,
+		UserMsg:    "このお酒は「" + oldCategoryName + "」カテゴリに属しているため、「" + newCategoryName + "」カテゴリには移動できません。フレーバーマップの意味が異なるカテゴリへの移動は禁止されています。",
+		Level:      logrus.InfoLevel,
 	})
 }

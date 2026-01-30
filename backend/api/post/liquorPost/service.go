@@ -6,6 +6,7 @@ import (
 	"backend/db/repository/userRepository"
 	"backend/middlewares/auth"
 	"backend/middlewares/customError"
+	"backend/service/categoryService"
 	"backend/util/amazon/s3"
 	"backend/util/helper"
 	"errors"
@@ -77,6 +78,34 @@ func (h *Handler) Post(c *gin.Context, ur *userRepository.UsersRepository) (*str
 		//旧バージョンno(今あるDBのバージョンno)が空でない場合のみチェックする
 		if *old.VersionNo != *request.VersionNo {
 			return nil, errInvalidVersion()
+		}
+
+		// カテゴリが変更される場合のみ、フレーバーマップチェックを行う
+		if old.CategoryID != request.CategoryID {
+			// 現在のお酒のカテゴリの祖先でflavor_map_masterに存在するカテゴリを取得
+			oldFlavorMapAncestor, err := categoryService.GetFlavorMapAncestor(ctx, old.CategoryID, &h.CategoryRepo, &h.FlavorMapMasterRepo)
+			if err != nil {
+				return nil, err
+			}
+
+			// 新しいカテゴリの祖先でflavor_map_masterに存在するカテゴリを取得
+			newFlavorMapAncestor, err := categoryService.GetFlavorMapAncestor(ctx, request.CategoryID, &h.CategoryRepo, &h.FlavorMapMasterRepo)
+			if err != nil {
+				return nil, err
+			}
+
+			// 両方のflavor_map祖先が異なる場合は移動を禁止
+			if oldFlavorMapAncestor != nil {
+				// 新しいカテゴリにflavor_map祖先がない、または異なるflavor_map祖先の場合は禁止
+				if newFlavorMapAncestor == nil || oldFlavorMapAncestor.ID != newFlavorMapAncestor.ID {
+					oldName := oldFlavorMapAncestor.Name
+					newName := "不明"
+					if newFlavorMapAncestor != nil {
+						newName = newFlavorMapAncestor.Name
+					}
+					return nil, errFlavorMapCategoryMove(oldName, newName)
+				}
+			}
 		}
 	}
 
