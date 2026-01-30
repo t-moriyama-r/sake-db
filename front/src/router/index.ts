@@ -39,7 +39,7 @@ router.beforeEach((to, from, next) => {
 
   // 認証チェックを実行（認証が必要なページで未ログインの場合はログインページにリダイレクト）
   authenticate(to, (authNext) => {
-    if (authNext === undefined || typeof authNext === 'boolean') {
+    if (authNext === undefined) {
       // 認証チェックが通過した場合、管理者権限チェックを実行
       requireAdmin(to, next);
     } else {
