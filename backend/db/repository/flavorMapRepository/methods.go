@@ -79,3 +79,50 @@ func (r *FlavorToLiquorRepository) UpsertData(ctx context.Context, tying TyingMo
 
 	return nil
 }
+
+// ExistsCategoryID 指定されたcategory_idがflavor_map_masterに存在するかチェック
+func (r *FlavorMapMasterRepository) ExistsCategoryID(ctx context.Context, categoryID int) (bool, *customError.Error) {
+	var model MasterModel
+	err := r.Collection.FindOne(ctx, bson.M{
+		CategoryID: categoryID,
+	}).Decode(&model)
+	
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return false, nil
+		}
+		return false, errExistsCategoryID(err, categoryID)
+	}
+	
+	return true, nil
+}
+
+// GetCategoryIDSet 指定されたcategory_idのセットを取得（flavor_map_masterに存在するもの）
+func (r *FlavorMapMasterRepository) GetCategoryIDSet(ctx context.Context, categoryIDs []int) (map[int]bool, *customError.Error) {
+	if len(categoryIDs) == 0 {
+		return make(map[int]bool), nil
+	}
+	
+	cursor, err := r.Collection.Find(ctx, bson.M{
+		CategoryID: bson.M{"$in": categoryIDs},
+	})
+	if err != nil {
+		return nil, errGetCategoryIDSet(err, categoryIDs)
+	}
+	defer cursor.Close(ctx)
+	
+	result := make(map[int]bool)
+	for cursor.Next(ctx) {
+		var model MasterModel
+		if err := cursor.Decode(&model); err != nil {
+			return nil, errGetCategoryIDSetDecode(err)
+		}
+		result[model.CategoryID] = true
+	}
+	
+	if err := cursor.Err(); err != nil {
+		return nil, errGetCategoryIDSetCursor(err)
+	}
+	
+	return result, nil
+}
