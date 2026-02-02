@@ -21,15 +21,19 @@ export function useApiMutation<
     debug('リクエストdata:', data);
     const headers = apiType.headers ?? { 'Content-Type': 'application/json' };
 
-    // isAuthフラグがtrueの場合、JWTトークンを追加
-    if (options.isAuth) {
-      // ストアにアクセスしてアクセストークンを取得
-      const { accessToken } = useUserStore();
-      const token = accessToken.get();
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
+    // JWTトークンをヘッダーに設定するヘルパー関数
+    const setAuthToken = () => {
+      if (options.isAuth) {
+        const { accessToken } = useUserStore();
+        const token = accessToken.get();
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
       }
-    }
+    };
+
+    // isAuthフラグがtrueの場合、JWTトークンを追加
+    setAuthToken();
 
     async function run(): Promise<AxiosResponse<Response>> {
       return axios({
@@ -53,6 +57,9 @@ export function useApiMutation<
       if (errResponse && errResponse.message == TOKEN_EXPIRE_MSG) {
         debug('リフレッシュトークン取得');
         await refreshToken(); //アクセストークン期限切れの場合、リフレッシュトークンを再取得
+
+        // 新しいアクセストークンをヘッダーに設定
+        setAuthToken();
 
         //再度リクエスト
         return await run();
